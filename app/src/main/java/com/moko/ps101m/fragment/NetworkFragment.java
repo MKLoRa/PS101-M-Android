@@ -7,29 +7,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.moko.ps101m.activity.DeviceInfoActivity;
-import com.moko.ps101m.databinding.Lw006FragmentLoraBinding;
+import com.moko.ps101m.databinding.Lw006FragmentNetworkBinding;
 
-public class LoRaFragment extends Fragment {
-    private static final String TAG = LoRaFragment.class.getSimpleName();
-    private Lw006FragmentLoraBinding mBind;
-    private DeviceInfoActivity activity;
+public class NetworkFragment extends Fragment {
+    private static final String TAG = NetworkFragment.class.getSimpleName();
+    private Lw006FragmentNetworkBinding mBind;
 
-    public LoRaFragment() {
+    public NetworkFragment() {
     }
 
-
-    public static LoRaFragment newInstance() {
-        LoRaFragment fragment = new LoRaFragment();
-        return fragment;
+    public static NetworkFragment newInstance() {
+        return new NetworkFragment();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
-        mBind = Lw006FragmentLoraBinding.inflate(inflater, container, false);
-        activity = (DeviceInfoActivity) getActivity();
+        mBind = Lw006FragmentNetworkBinding.inflate(inflater, container, false);
         return mBind.getRoot();
     }
 

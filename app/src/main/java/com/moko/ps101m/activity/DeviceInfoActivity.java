@@ -1,6 +1,5 @@
 package com.moko.ps101m.activity;
 
-
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.bluetooth.BluetoothAdapter;
@@ -38,7 +37,7 @@ import com.moko.ps101m.dialog.AlertMessageDialog;
 import com.moko.ps101m.dialog.ChangePasswordDialog;
 import com.moko.ps101m.fragment.DeviceFragment;
 import com.moko.ps101m.fragment.GeneralFragment;
-import com.moko.ps101m.fragment.LoRaFragment;
+import com.moko.ps101m.fragment.NetworkFragment;
 import com.moko.ps101m.fragment.PositionFragment;
 import com.moko.ps101m.utils.ToastUtils;
 import com.moko.support.ps101m.LoRaLW006MokoSupport;
@@ -59,7 +58,7 @@ import java.util.TimerTask;
 public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.OnCheckedChangeListener {
     private Lw006ActivityDeviceInfoBinding mBind;
     private FragmentManager fragmentManager;
-    private LoRaFragment loraFragment;
+    private NetworkFragment loraFragment;
     private PositionFragment posFragment;
     private GeneralFragment generalFragment;
     private DeviceFragment deviceFragment;
@@ -108,7 +107,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
     }
 
     private void initFragment() {
-        loraFragment = LoRaFragment.newInstance();
+        loraFragment = NetworkFragment.newInstance();
         posFragment = PositionFragment.newInstance();
         generalFragment = GeneralFragment.newInstance();
         deviceFragment = DeviceFragment.newInstance();

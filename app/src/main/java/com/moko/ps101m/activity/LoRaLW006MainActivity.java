@@ -85,13 +85,13 @@ public class LoRaLW006MainActivity extends Lw006BaseActivity implements MokoScan
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             // 优先保存到SD卡中
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                PATH_LOGCAT = getExternalFilesDir(null).getAbsolutePath() + File.separator + (BuildConfig.IS_LIBRARY ? "MKLoRa" : "LW006");
+                PATH_LOGCAT = getExternalFilesDir(null).getAbsolutePath() + File.separator + (BuildConfig.IS_LIBRARY ? "MKLoRa" : "PS101M");
             } else {
-                PATH_LOGCAT = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + (BuildConfig.IS_LIBRARY ? "MKLoRa" : "LW006");
+                PATH_LOGCAT = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + (BuildConfig.IS_LIBRARY ? "MKLoRa" : "PS101M");
             }
         } else {
             // 如果SD卡不存在，就保存到本应用的目录下
-            PATH_LOGCAT = getFilesDir().getAbsolutePath() + File.separator + (BuildConfig.IS_LIBRARY ? "MKLoRa" : "LW006");
+            PATH_LOGCAT = getFilesDir().getAbsolutePath() + File.separator + (BuildConfig.IS_LIBRARY ? "MKLoRa" : "PS101M");
         }
         LoRaLW006MokoSupport.getInstance().init(getApplicationContext());
         mSavedPassword = SPUtiles.getStringValue(this, AppConstants.SP_KEY_SAVED_PASSWORD_LW006, "");
@@ -116,9 +116,7 @@ public class LoRaLW006MainActivity extends Lw006BaseActivity implements MokoScan
         if (!LoRaLW006MokoSupport.getInstance().isBluetoothOpen()) {
             LoRaLW006MokoSupport.getInstance().enableBluetooth();
         } else {
-            if (animation == null) {
-                startScan();
-            }
+            if (animation == null) startScan();
         }
     }
 
@@ -133,7 +131,6 @@ public class LoRaLW006MainActivity extends Lw006BaseActivity implements MokoScan
         mokoBleScanner.startScanDevice(this);
         mHandler.postDelayed(() -> mokoBleScanner.stopScanDevice(), 1000 * 60);
     }
-
 
     private AdvInfoAnalysisImpl beaconInfoParseable;
     public String filterName;
@@ -214,8 +211,7 @@ public class LoRaLW006MainActivity extends Lw006BaseActivity implements MokoScan
     }
 
     public void onRefresh(View view) {
-        if (isWindowLocked())
-            return;
+        if (isWindowLocked()) return;
         if (!LoRaLW006MokoSupport.getInstance().isBluetoothOpen()) {
             LoRaLW006MokoSupport.getInstance().enableBluetooth();
             return;

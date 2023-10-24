@@ -19,7 +19,7 @@ import androidx.annotation.NonNull;
 
 final class MokoBleConfig extends MokoBleManager {
 
-    private MokoResponseCallback mMokoResponseCallback;
+    private final MokoResponseCallback mMokoResponseCallback;
     private BluetoothGattCharacteristic passwordCharacteristic;
     private BluetoothGattCharacteristic disconnectedCharacteristic;
     private BluetoothGattCharacteristic paramsCharacteristic;

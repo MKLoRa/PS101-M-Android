@@ -47,7 +47,7 @@
         android:layout_below="@id/iv_logo"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="15dp"
-        android:text="LW006"
+        android:text="PS101-M"
         android:textColor="@color/lw006_grey_888888"
         android:textSize="20sp" />
 

@@ -28,13 +28,12 @@ public class AdvInfoAnalysisImpl implements DeviceInfoParseable<AdvInfo> {
         ScanRecord record = result.getScanRecord();
         if (null == record) return null;
         byte[] bytes = record.getServiceData(new ParcelUuid(OrderServices.SERVICE_ADV.getUuid()));
-        if (null == bytes || bytes.length != 14) return null;
-        // 0x00:LR1110,0x01:L76
+        if (null == bytes || bytes.length != 16) return null;
         int deviceType = bytes[0] & 0xFF;
-        int txPower = bytes[8];
-        int powerPercent = bytes[9] & 0xff;
-        int batteryVoltage = MokoUtils.toInt(Arrays.copyOfRange(bytes, 10, 12));
-        boolean verifyEnable = ((bytes[12] & 0xff) >> 7 & 0x01) == 1;
+        int txPower = bytes[7];
+        int powerPercent = bytes[8] & 0xff;
+        int batteryVoltage = MokoUtils.toInt(Arrays.copyOfRange(bytes, 9, 11));
+        boolean verifyEnable = (bytes[11] & 0xff) == 1;
         AdvInfo advInfo;
         if (advInfoHashMap.containsKey(deviceInfo.mac)) {
             advInfo = advInfoHashMap.get(deviceInfo.mac);
