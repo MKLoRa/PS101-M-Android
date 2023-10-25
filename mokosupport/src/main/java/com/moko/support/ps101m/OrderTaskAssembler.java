@@ -1,6 +1,8 @@
 package com.moko.support.ps101m;
 
 import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -14,6 +16,7 @@ import com.moko.support.ps101m.task.ParamsReadTask;
 import com.moko.support.ps101m.task.ParamsWriteTask;
 import com.moko.support.ps101m.task.SetPasswordTask;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class OrderTaskAssembler {
@@ -1053,6 +1056,132 @@ public class OrderTaskAssembler {
     ///////////////////////////////////////////////////////////////////////////
     // WRITE
     ///////////////////////////////////////////////////////////////////////////
+    public static OrderTask setMQTTHost(String mqttHost) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setMQTTHost(mqttHost);
+        return task;
+    }
+
+    public static OrderTask setMQTTPort(@IntRange(from = 1, to = 65535) int port) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setMQTTPort(port);
+        return task;
+    }
+
+    public static OrderTask setMQTTClientId(String clientId) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setMQTTClientId(clientId);
+        return task;
+    }
+
+    public static OrderTask setMQTTSubscribeTopic(String subtopic) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setMQTTSubscribeTopic(subtopic);
+        return task;
+    }
+
+    public static OrderTask setMQTTPublishTopic(String publishTopic) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setMQTTPublishTopic(publishTopic);
+        return task;
+    }
+
+    public static OrderTask setMQTTCleanSession(@IntRange(from = 0, to = 1) int enable) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setMQTTCleanSession(enable);
+        return task;
+    }
+
+    public static OrderTask setMQTTQos(@IntRange(from = 0, to = 2) int qos) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setMQTTQos(qos);
+        return task;
+    }
+
+    public static OrderTask setMQTTKeepAlive(@IntRange(from = 10, to = 120) int keepAlive) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setMQTTKeepAlive(keepAlive);
+        return task;
+    }
+
+    public static OrderTask setApn(@Nullable String apn) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setApn(apn);
+        return task;
+    }
+
+    public static OrderTask setNetworkFormat(@IntRange(from = 0, to = 3) int networkFormat) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setNetworkFormat(networkFormat);
+        return task;
+    }
+
+    public static OrderTask setMQTTUsername(@Nullable String userName) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setMQTTUsername(userName);
+        return task;
+    }
+
+    public static OrderTask setMQTTPassword(@Nullable String password) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setMQTTPassword(password);
+        return task;
+    }
+
+    public static OrderTask setMQTTConnectMode(@IntRange(from = 0, to = 3) int mode) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setMQTTConnectMode(mode);
+        return task;
+    }
+
+    public static OrderTask setMQTTLwtEnable(@IntRange(from = 0, to = 1) int enable) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setMQTTLwtEnable(enable);
+        return task;
+    }
+
+    public static OrderTask setMQTTLwtRetain(@IntRange(from = 0, to = 1) int enable) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setMQTTLwtRetain(enable);
+        return task;
+    }
+
+    public static OrderTask setMQTTLwtQos(@IntRange(from = 0, to = 2) int qos) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setMQTTLwtQos(qos);
+        return task;
+    }
+
+    public static OrderTask setMQTTLwtTopic(String lwtTopic) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setMQTTLwtTopic(lwtTopic);
+        return task;
+    }
+
+    public static OrderTask setMQTTLwtPayload(String lwtPayload) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setMQTTLwtPayload(lwtPayload);
+        return task;
+    }
+
+    public static OrderTask setCA(File file) throws Exception {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setFile(ParamsKeyEnum.KEY_MQTT_CA, file);
+        return task;
+    }
+
+    public static OrderTask setClientCert(File file) throws Exception {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setFile(ParamsKeyEnum.KEY_MQTT_CLIENT_CERT, file);
+        return task;
+    }
+
+    public static OrderTask setClientKey(File file) throws Exception {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setFile(ParamsKeyEnum.KEY_MQTT_CLIENT_KEY, file);
+        return task;
+    }
+
     public static OrderTask setNetworkReconnectInterval(@IntRange(from = 0, to = 100) int interval) {
         ParamsWriteTask task = new ParamsWriteTask();
         task.setNetworkReconnectInterval(interval);

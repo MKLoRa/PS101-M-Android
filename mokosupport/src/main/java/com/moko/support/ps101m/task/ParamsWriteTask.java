@@ -3,6 +3,7 @@ package com.moko.support.ps101m.task;
 import android.text.TextUtils;
 
 import androidx.annotation.IntRange;
+import androidx.annotation.Nullable;
 
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.utils.MokoUtils;
@@ -10,6 +11,8 @@ import com.moko.support.ps101m.LoRaLW006MokoSupport;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -24,6 +27,283 @@ public class ParamsWriteTask extends OrderTask {
     @Override
     public byte[] assemble() {
         return data;
+    }
+
+    //mqtt参数
+    public void setMQTTHost(String mqttHost) {
+        byte[] bytes = mqttHost.getBytes();
+        int length = bytes.length;
+        data = new byte[length + 4];
+        data[0] = (byte) 0xED;
+        data[1] = (byte) 0x01;
+        data[2] = (byte) ParamsKeyEnum.KEY_MQTT_HOST.getParamsKey();
+        data[3] = (byte) length;
+        System.arraycopy(bytes, 0, data, 4, bytes.length);
+        response.responseValue = data;
+    }
+
+    public void setMQTTPort(@IntRange(from = 1, to = 65535) int port) {
+        byte[] bytes = MokoUtils.toByteArray(port, 2);
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_MQTT_PORT.getParamsKey(),
+                (byte) 0x02,
+                bytes[0],
+                bytes[1]
+        };
+    }
+
+
+    public void setMQTTClientId(String clientId) {
+        byte[] bytes = clientId.getBytes();
+        int length = bytes.length;
+        data = new byte[length + 4];
+        data[0] = (byte) 0xED;
+        data[1] = (byte) 0x01;
+        data[2] = (byte) ParamsKeyEnum.KEY_MQTT_CLIENT_ID.getParamsKey();
+        data[3] = (byte) length;
+        System.arraycopy(bytes, 0, data, 4, bytes.length);
+        response.responseValue = data;
+    }
+
+    public void setMQTTSubscribeTopic(String subtopic) {
+        byte[] bytes = subtopic.getBytes();
+        int length = bytes.length;
+        data = new byte[length + 4];
+        data[0] = (byte) 0xED;
+        data[1] = (byte) 0x01;
+        data[2] = (byte) ParamsKeyEnum.KEY_SUBSCRIBE_TOPIC.getParamsKey();
+        data[3] = (byte) length;
+        System.arraycopy(bytes, 0, data, 4, bytes.length);
+        response.responseValue = data;
+    }
+
+    public void setMQTTPublishTopic(String publishTopic) {
+        byte[] bytes = publishTopic.getBytes();
+        int length = bytes.length;
+        data = new byte[length + 4];
+        data[0] = (byte) 0xED;
+        data[1] = (byte) 0x01;
+        data[2] = (byte) ParamsKeyEnum.KEY_PUBLISH_TOPIC.getParamsKey();
+        data[3] = (byte) length;
+        System.arraycopy(bytes, 0, data, 4, bytes.length);
+        response.responseValue = data;
+    }
+
+    public void setMQTTCleanSession(@IntRange(from = 0, to = 1) int enable) {
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_MQTT_CLEAN_SESSION.getParamsKey(),
+                (byte) 0x01,
+                (byte) enable
+        };
+    }
+
+    public void setMQTTQos(@IntRange(from = 0, to = 2) int qos) {
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_MQTT_QOS.getParamsKey(),
+                (byte) 0x01,
+                (byte) qos
+        };
+    }
+
+    public void setMQTTKeepAlive(@IntRange(from = 10, to = 120) int keepAlive) {
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_MQTT_KEEP_ALIVE.getParamsKey(),
+                (byte) 0x01,
+                (byte) keepAlive
+        };
+    }
+
+    public void setApn(@Nullable String apn) {
+        if (!TextUtils.isEmpty(apn)) {
+            byte[] bytes = apn.getBytes();
+            int length = bytes.length;
+            data = new byte[length + 4];
+            data[0] = (byte) 0xED;
+            data[1] = (byte) 0x01;
+            data[2] = (byte) ParamsKeyEnum.KEY_APN.getParamsKey();
+            data[3] = (byte) length;
+            System.arraycopy(bytes, 0, data, 4, bytes.length);
+            response.responseValue = data;
+        } else {
+            response.responseValue = data = new byte[]{
+                    (byte) 0xED,
+                    (byte) 0x01,
+                    (byte) ParamsKeyEnum.KEY_APN.getParamsKey(),
+                    (byte) 0x00
+            };
+        }
+    }
+
+    public void setNetworkFormat(@IntRange(from = 0, to = 3) int networkFormat) {
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_NETWORK_FORMAT.getParamsKey(),
+                (byte) 0x01,
+                (byte) networkFormat
+        };
+    }
+
+    public void setMQTTUsername(@Nullable String userName) {
+        if (!TextUtils.isEmpty(userName)) {
+            byte[] bytes = userName.getBytes();
+            int length = bytes.length;
+            data = new byte[length + 4];
+            data[0] = (byte) 0xED;
+            data[1] = (byte) 0x01;
+            data[2] = (byte) ParamsKeyEnum.KEY_MQTT_USERNAME.getParamsKey();
+            data[3] = (byte) length;
+            System.arraycopy(bytes, 0, data, 4, bytes.length);
+            response.responseValue = data;
+        } else {
+            response.responseValue = data = new byte[]{
+                    (byte) 0xED,
+                    (byte) 0x01,
+                    (byte) ParamsKeyEnum.KEY_MQTT_USERNAME.getParamsKey(),
+                    (byte) 0x00
+            };
+        }
+    }
+
+    public void setMQTTPassword(@Nullable String password) {
+        if (!TextUtils.isEmpty(password)) {
+            byte[] bytes = password.getBytes();
+            int length = bytes.length;
+            data = new byte[length + 4];
+            data[0] = (byte) 0xED;
+            data[1] = (byte) 0x01;
+            data[2] = (byte) ParamsKeyEnum.KEY_MQTT_PASSWORD.getParamsKey();
+            data[3] = (byte) length;
+            System.arraycopy(bytes, 0, data, 4, bytes.length);
+            response.responseValue = data;
+        } else {
+            response.responseValue = data = new byte[]{
+                    (byte) 0xED,
+                    (byte) 0x01,
+                    (byte) ParamsKeyEnum.KEY_MQTT_PASSWORD.getParamsKey(),
+                    (byte) 0x00
+            };
+        }
+    }
+
+    public void setMQTTConnectMode(@IntRange(from = 0, to = 3) int mode) {
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_CONNECT_MODE.getParamsKey(),
+                (byte) 0x01,
+                (byte) mode
+        };
+    }
+
+    public void setMQTTLwtEnable(@IntRange(from = 0, to = 1) int enable) {
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_MQTT_LWT_ENABLE.getParamsKey(),
+                (byte) 0x01,
+                (byte) enable
+        };
+    }
+
+    public void setMQTTLwtRetain(@IntRange(from = 0, to = 1) int enable) {
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_MQTT_LWT_RETAIN.getParamsKey(),
+                (byte) 0x01,
+                (byte) enable
+        };
+    }
+
+    public void setMQTTLwtQos(@IntRange(from = 0, to = 2) int qos) {
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_MQTT_LWT_QOS.getParamsKey(),
+                (byte) 0x01,
+                (byte) qos
+        };
+    }
+
+    public void setMQTTLwtTopic(String lwtTopic) {
+        byte[] bytes = lwtTopic.getBytes();
+        int length = bytes.length;
+        data = new byte[length + 4];
+        data[0] = (byte) 0xED;
+        data[1] = (byte) 0x01;
+        data[2] = (byte) ParamsKeyEnum.KEY_MQTT_LWT_TOPIC.getParamsKey();
+        data[3] = (byte) length;
+        System.arraycopy(bytes, 0, data, 4, bytes.length);
+        response.responseValue = data;
+    }
+
+    public void setMQTTLwtPayload(String lwtPayload) {
+        byte[] bytes = lwtPayload.getBytes();
+        int length = bytes.length;
+        data = new byte[length + 4];
+        data[0] = (byte) 0xED;
+        data[1] = (byte) 0x01;
+        data[2] = (byte) ParamsKeyEnum.KEY_MQTT_LWT_PAYLOAD.getParamsKey();
+        data[3] = (byte) length;
+        System.arraycopy(bytes, 0, data, 4, bytes.length);
+        response.responseValue = data;
+    }
+
+    public void setFile(ParamsKeyEnum key, File file) throws Exception {
+        if (null == file) {
+            data = new byte[dataLength + 6];
+            data[0] = (byte) 0xEE;
+            data[1] = (byte) 0x01;
+            data[2] = (byte) key.getParamsKey();
+            data[3] = 0;
+            data[4] = 0;
+            data[5] = 0;
+        } else {
+            FileInputStream inputSteam = new FileInputStream(file);
+            dataBytes = new byte[(int) file.length()];
+            inputSteam.read(dataBytes);
+            dataLength = dataBytes.length;
+            if (dataLength % DATA_LENGTH_MAX > 0) {
+                packetCount = dataLength / DATA_LENGTH_MAX + 1;
+            } else {
+                packetCount = dataLength / DATA_LENGTH_MAX;
+            }
+            remainPack = packetCount - 1;
+            packetIndex = 0;
+            delayTime = DEFAULT_DELAY_TIME + 500 * packetCount;
+            if (packetCount > 1) {
+                data = new byte[DATA_LENGTH_MAX + 6];
+                data[0] = (byte) 0xEE;
+                data[1] = (byte) 0x01;
+                data[2] = (byte) key.getParamsKey();
+                data[3] = (byte) packetCount;
+                data[4] = (byte) packetIndex;
+                data[5] = (byte) DATA_LENGTH_MAX;
+                for (int i = 0; i < DATA_LENGTH_MAX; i++, dataOrigin++) {
+                    data[i + 6] = dataBytes[dataOrigin];
+                }
+            } else {
+                data = new byte[dataLength + 6];
+                data[0] = (byte) 0xEE;
+                data[1] = (byte) 0x01;
+                data[2] = (byte) key.getParamsKey();
+                data[3] = (byte) packetCount;
+                data[4] = (byte) packetIndex;
+                data[5] = (byte) dataLength;
+                for (int i = 0; i < dataLength; i++) {
+                    data[i + 6] = dataBytes[i];
+                }
+            }
+        }
     }
 
     public void setNetworkReconnectInterval(@IntRange(from = 0, to = 100) int interval) {

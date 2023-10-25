@@ -186,6 +186,9 @@
         <activity android:name="com.moko.ps101m.activity.device.OnOffSettingsActivity"
             android:screenOrientation="portrait"/>
 
+        <activity android:name=".activity.setting.NetworkSettingsActivity"
+            android:screenOrientation="portrait"/>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.moko.ps101m.fileprovider"

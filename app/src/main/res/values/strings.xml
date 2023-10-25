@@ -4,7 +4,15 @@
     <string name="cancel">Cancel</string>
     <string name="ensure">OK</string>
     <string name="confirm">Confirm</string>
+
+    <string name="mqtt_verify_client_id_empty">ClientId error</string>
+    <string name="mqtt_verify_host">Host error</string>
+    <string name="mqtt_verify_port">Port range is 1~65535</string>
+    <string name="mqtt_verify_port_empty">Port error</string>
+    <string name="mqtt_verify_firmware_file_url">Firmware file Url error</string>
     <string name="mqtt_verify_ca">CA error</string>
+    <string name="mqtt_verify_topic_subscribe">Subscribed Topic error</string>
+    <string name="mqtt_verify_topic_publish">Published Topic error</string>
     <string name="mqtt_verify_client_key">Client Key error</string>
     <string name="mqtt_verify_client_cert">Client Cert error</string>
 

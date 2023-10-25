@@ -199,6 +199,9 @@
         <activity android:name=".activity.device.OnOffSettingsActivity"
             android:screenOrientation="portrait"/>
 
+        <activity android:name=".activity.setting.NetworkSettingsActivity"
+            android:screenOrientation="portrait"/>
+
         <service android:name="com.moko.ps101m.service.DfuService" />
     </application>
 </manifest>

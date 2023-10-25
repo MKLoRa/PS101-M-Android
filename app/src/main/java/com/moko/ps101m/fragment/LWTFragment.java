@@ -63,39 +63,18 @@ public class LWTFragment extends Fragment {
         return mBind.getRoot();
     }
 
-    @Override
-    public void onResume() {
-        Log.i(TAG, "onResume: ");
-        super.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        Log.i(TAG, "onPause: ");
-        super.onPause();
-    }
-
-    @Override
-    public void onDestroy() {
-        Log.i(TAG, "onDestroy: ");
-        super.onDestroy();
-    }
-
     public boolean isValid() {
-        if (!mBind.cbLwt.isChecked())
-            return true;
-        final String topicStr = mBind.etLwtTopic.getText().toString();
-        if (TextUtils.isEmpty(topicStr)) {
+        if (!mBind.cbLwt.isChecked()) return true;
+        if (TextUtils.isEmpty(mBind.etLwtTopic.getText())) {
             ToastUtils.showToast(getActivity(), "LWT Topic Error");
             return false;
         }
-        topic = topicStr;
-        final String payloadStr = mBind.etLwtPayload.getText().toString();
-        if (TextUtils.isEmpty(payloadStr)) {
+        topic = mBind.etLwtTopic.getText().toString();
+        if (TextUtils.isEmpty(mBind.etLwtPayload.getText())) {
             ToastUtils.showToast(getActivity(), "LWT Payload Error");
             return false;
         }
-        payload = payloadStr;
+        payload = mBind.etLwtPayload.getText().toString();
         return true;
     }
 

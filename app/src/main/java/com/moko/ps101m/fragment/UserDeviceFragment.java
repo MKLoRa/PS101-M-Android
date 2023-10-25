@@ -2,6 +2,7 @@ package com.moko.ps101m.fragment;
 
 import android.os.Bundle;
 import android.text.InputFilter;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,12 +28,6 @@ public class UserDeviceFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        Log.i(TAG, "onCreate: ");
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
         mBind = FragmentUserDeviceBinding.inflate(inflater, container, false);
@@ -47,24 +42,6 @@ public class UserDeviceFragment extends Fragment {
         mBind.etMqttUsername.setText(username);
         mBind.etMqttPassword.setText(password);
         return mBind.getRoot();
-    }
-
-    @Override
-    public void onResume() {
-        Log.i(TAG, "onResume: ");
-        super.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        Log.i(TAG, "onPause: ");
-        super.onPause();
-    }
-
-    @Override
-    public void onDestroy() {
-        Log.i(TAG, "onDestroy: ");
-        super.onDestroy();
     }
 
     public void setUserName(String username) {
@@ -82,10 +59,10 @@ public class UserDeviceFragment extends Fragment {
     }
 
     public String getUsername() {
-        return mBind.etMqttUsername.getText().toString();
+        return TextUtils.isEmpty(mBind.etMqttUsername.getText()) ? null : mBind.etMqttUsername.getText().toString();
     }
 
     public String getPassword() {
-        return mBind.etMqttPassword.getText().toString();
+        return TextUtils.isEmpty(mBind.etMqttPassword.getText()) ? null : mBind.etMqttPassword.getText().toString();
     }
 }

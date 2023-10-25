@@ -14,7 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.moko.ps101m.R;
 import com.moko.ps101m.activity.Lw006BaseActivity;
 import com.moko.ps101m.databinding.FragmentSslDeviceBinding;
 import com.moko.ps101m.dialog.BottomDialog;
@@ -33,9 +32,6 @@ public class SSLDeviceFragment extends Fragment {
     private FragmentSslDeviceBinding mBind;
     private Lw006BaseActivity activity;
     private int mConnectMode;
-    private String caPath;
-    private String clientKeyPath;
-    private String clientCertPath;
     private ArrayList<String> values;
     private int selected;
 
@@ -74,9 +70,6 @@ public class SSLDeviceFragment extends Fragment {
         values.add("Self signed certificates");
         if (mConnectMode > 0) {
             selected = mConnectMode - 1;
-            mBind.tvCaFile.setText(caPath);
-            mBind.tvClientKeyFile.setText(clientKeyPath);
-            mBind.tvClientCertFile.setText(clientCertPath);
             mBind.tvCertification.setText(values.get(selected));
         }
         if (selected == 0) {
@@ -101,9 +94,6 @@ public class SSLDeviceFragment extends Fragment {
         mBind.clCertificate.setVisibility(mConnectMode > 0 ? View.VISIBLE : View.GONE);
         if (mConnectMode > 0) {
             selected = mConnectMode - 1;
-            mBind.tvCaFile.setText(caPath);
-            mBind.tvClientKeyFile.setText(clientKeyPath);
-            mBind.tvClientCertFile.setText(clientCertPath);
             mBind.tvCertification.setText(values.get(selected));
         }
         mBind.cbSsl.setChecked(mConnectMode > 0);
@@ -120,24 +110,6 @@ public class SSLDeviceFragment extends Fragment {
             mBind.llClientKey.setVisibility(View.VISIBLE);
             mBind.llClientCert.setVisibility(View.VISIBLE);
         }
-    }
-
-    public void setCAPath(String caPath) {
-        this.caPath = caPath;
-        if (mBind == null) return;
-        mBind.tvCaFile.setText(caPath);
-    }
-
-    public void setClientKeyPath(String clientKeyPath) {
-        this.clientKeyPath = clientKeyPath;
-        if (mBind == null) return;
-        mBind.tvClientKeyFile.setText(clientKeyPath);
-    }
-
-    public void setClientCertPath(String clientCertPath) {
-        this.clientCertPath = clientCertPath;
-        if (mBind == null) return;
-        mBind.tvClientCertFile.setText(clientCertPath);
     }
 
     public void selectCertificate() {
@@ -202,8 +174,7 @@ public class SSLDeviceFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != activity.RESULT_OK)
-            return;
+        if (resultCode != activity.RESULT_OK) return;
         //得到uri，后面就是将uri转化成file的过程。
         Uri uri = data.getData();
         String filePath = FileUtils.getPath(activity, uri);
@@ -214,15 +185,12 @@ public class SSLDeviceFragment extends Fragment {
         final File file = new File(filePath);
         if (file.exists()) {
             if (requestCode == REQUEST_CODE_SELECT_CA) {
-                caPath = filePath;
                 mBind.tvCaFile.setText(filePath);
             }
             if (requestCode == REQUEST_CODE_SELECT_CLIENT_KEY) {
-                clientKeyPath = filePath;
                 mBind.tvClientKeyFile.setText(filePath);
             }
             if (requestCode == REQUEST_CODE_SELECT_CLIENT_CERT) {
-                clientCertPath = filePath;
                 mBind.tvClientCertFile.setText(filePath);
             }
         } else {
@@ -230,45 +198,19 @@ public class SSLDeviceFragment extends Fragment {
         }
     }
 
-    public boolean isValid() {
-        final String caFile = mBind.tvCaFile.getText().toString();
-        final String clientKeyFile = mBind.tvClientKeyFile.getText().toString();
-        final String clientCertFile = mBind.tvClientCertFile.getText().toString();
-        if (mConnectMode == 2) {
-            if (TextUtils.isEmpty(caFile)) {
-                ToastUtils.showToast(activity, getString(R.string.mqtt_verify_ca));
-                return false;
-            }
-        } else if (mConnectMode == 3) {
-            if (TextUtils.isEmpty(caFile)) {
-                ToastUtils.showToast(activity, getString(R.string.mqtt_verify_ca));
-                return false;
-            }
-            if (TextUtils.isEmpty(clientKeyFile)) {
-                ToastUtils.showToast(activity, getString(R.string.mqtt_verify_client_key));
-                return false;
-            }
-            if (TextUtils.isEmpty(clientCertFile)) {
-                ToastUtils.showToast(activity, getString(R.string.mqtt_verify_client_cert));
-                return false;
-            }
-        }
-        return true;
-    }
-
     public int getConnectMode() {
         return mConnectMode;
     }
 
     public String getCaPath() {
-        return caPath;
+        return TextUtils.isEmpty(mBind.tvCaFile.getText()) ? null : mBind.tvCaFile.getText().toString().trim();
     }
 
     public String getClientKeyPath() {
-        return clientKeyPath;
+        return TextUtils.isEmpty(mBind.tvClientKeyFile.getText()) ? null : mBind.tvClientKeyFile.getText().toString().trim();
     }
 
     public String getClientCertPath() {
-        return clientCertPath;
+        return TextUtils.isEmpty(mBind.tvClientCertFile.getText()) ? null : mBind.tvClientCertFile.getText().toString().trim();
     }
 }
