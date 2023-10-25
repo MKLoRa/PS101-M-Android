@@ -1,7 +1,6 @@
 package com.moko.ps101m.activity;
 
 import android.app.AlertDialog;
-import android.app.FragmentManager;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -13,6 +12,7 @@ import android.view.View;
 import android.widget.RadioGroup;
 
 import androidx.annotation.IdRes;
+import androidx.fragment.app.FragmentManager;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -58,7 +58,7 @@ import java.util.TimerTask;
 public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.OnCheckedChangeListener {
     private Lw006ActivityDeviceInfoBinding mBind;
     private FragmentManager fragmentManager;
-    private NetworkFragment loraFragment;
+    private NetworkFragment networkFragment;
     private PositionFragment posFragment;
     private GeneralFragment generalFragment;
     private DeviceFragment deviceFragment;
@@ -78,7 +78,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
         mBind = Lw006ActivityDeviceInfoBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         mDeviceType = getIntent().getIntExtra(AppConstants.EXTRA_KEY_DEVICE_TYPE, 0);
-        fragmentManager = getFragmentManager();
+        fragmentManager = getSupportFragmentManager();
         initFragment();
         mBind.radioBtnLora.setChecked(true);
         mBind.tvTitle.setText(R.string.title_lora);
@@ -93,30 +93,30 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
             LoRaLW006MokoSupport.getInstance().enableBluetooth();
         } else {
             showSyncingProgressDialog();
-            mBind.frameContainer.postDelayed(()->{
+            mBind.frameContainer.postDelayed(() -> {
                 List<OrderTask> orderTasks = new ArrayList<>();
                 // sync time after connect success;
                 orderTasks.add(OrderTaskAssembler.setTime());
                 // get lora params
-                orderTasks.add(OrderTaskAssembler.getLoraRegion());
-                orderTasks.add(OrderTaskAssembler.getLoraUploadMode());
-                orderTasks.add(OrderTaskAssembler.getLoraNetworkStatus());
+                orderTasks.add(OrderTaskAssembler.getNetworkStatus());
+                orderTasks.add(OrderTaskAssembler.getMqttConnectionStatus());
+                orderTasks.add(OrderTaskAssembler.getNetworkReconnectInterval());
                 LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-            },300);
+            }, 300);
         }
     }
 
     private void initFragment() {
-        loraFragment = NetworkFragment.newInstance();
+        networkFragment = NetworkFragment.newInstance();
         posFragment = PositionFragment.newInstance();
         generalFragment = GeneralFragment.newInstance();
         deviceFragment = DeviceFragment.newInstance();
         fragmentManager.beginTransaction()
-                .add(R.id.frame_container, loraFragment)
+                .add(R.id.frame_container, networkFragment)
                 .add(R.id.frame_container, posFragment)
                 .add(R.id.frame_container, generalFragment)
                 .add(R.id.frame_container, deviceFragment)
-                .show(loraFragment)
+                .show(networkFragment)
                 .hide(posFragment)
                 .hide(generalFragment)
                 .hide(deviceFragment)
@@ -201,7 +201,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
                                     if (result == 1)
                                         ToastUtils.showToast(this, "Time sync completed!");
                                     break;
-                                case KEY_OFFLINE_LOCATION_ENABLE:
+                                case KEY_NETWORK_RECONNECT_INTERVAL:
                                 case KEY_LOW_POWER_PERCENT:
                                 case KEY_HEARTBEAT_INTERVAL:
                                 case KEY_TIME_ZONE:
@@ -222,36 +222,22 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
                         if (flag == 0x00) {
                             // read
                             switch (configKeyEnum) {
-                                case KEY_LORA_REGION:
-                                    if (length > 0) {
-                                        mSelectedRegion = value[4] & 0xFF;
-                                    }
-                                    break;
-                                case KEY_LORA_MODE:
-                                    if (length > 0) {
-                                        mSelectUploadMode = value[4];
-                                        String loraInfo = String.format("%s/%s/ClassA",
-                                                mUploadMode[mSelectUploadMode - 1],
-                                                mRegions[mSelectedRegion]);
-                                        loraFragment.setLoRaInfo(loraInfo);
-                                    }
-                                    break;
-                                case KEY_LORA_NETWORK_STATUS:
-                                    if (length > 0) {
+                                case KEY_NETWORK_STATUS:
+                                    if (length == 1) {
                                         int networkStatus = value[4] & 0xFF;
-                                        loraFragment.setLoraStatus(networkStatus);
+                                        networkFragment.setNetworkStatus(networkStatus);
                                     }
                                     break;
-                                case KEY_OFFLINE_LOCATION_ENABLE:
-                                    if (length > 0) {
-                                        int enable = value[4] & 0xFF;
-                                        posFragment.setOfflineLocationEnable(enable);
+                                case KEY_MQTT_CONNECT_STATUS:
+                                    if (length == 1) {
+                                        int status = value[4] & 0xFF;
+                                        networkFragment.setMqttConnectionStatus(status);
                                     }
                                     break;
-                                case KEY_HEARTBEAT_INTERVAL:
-                                    if (length > 0) {
-                                        byte[] intervalBytes = Arrays.copyOfRange(value, 4, 4 + length);
-                                        generalFragment.setHeartbeatInterval(MokoUtils.toInt(intervalBytes));
+                                case KEY_NETWORK_RECONNECT_INTERVAL:
+                                    if (length == 1) {
+                                        int interval = value[4] & 0xff;
+                                        networkFragment.setNetworkReconnectInterval(interval);
                                     }
                                     break;
                                 case KEY_TIME_ZONE:
@@ -399,12 +385,12 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
             if (resultCode == RESULT_OK) {
                 showSyncingProgressDialog();
 //                mBind.ivSave.postDelayed(() -> {
-                    List<OrderTask> orderTasks = new ArrayList<>();
-                    // setting
-                    orderTasks.add(OrderTaskAssembler.getLoraRegion());
-                    orderTasks.add(OrderTaskAssembler.getLoraUploadMode());
-                    orderTasks.add(OrderTaskAssembler.getLoraNetworkStatus());
-                    LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+                List<OrderTask> orderTasks = new ArrayList<>();
+                // setting
+                orderTasks.add(OrderTaskAssembler.getLoraRegion());
+                orderTasks.add(OrderTaskAssembler.getLoraUploadMode());
+                orderTasks.add(OrderTaskAssembler.getLoraNetworkStatus());
+                LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
 //                }, 500);
             }
         } else if (requestCode == AppConstants.REQUEST_CODE_SYSTEM_INFO) {
@@ -450,9 +436,15 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
     }
 
     public void onSave(View view) {
-        if (isWindowLocked())
-            return;
-        if (mBind.radioBtnGeneral.isChecked()) {
+        if (isWindowLocked()) return;
+        if (mBind.radioBtnNetwork.isChecked()) {
+            if (networkFragment.isValid()) {
+                showSyncingProgressDialog();
+                LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setNetworkReconnectInterval(networkFragment.getReconnectInterval()));
+            } else {
+                ToastUtils.showToast(this, "Para error!");
+            }
+        } else if (mBind.radioBtnGeneral.isChecked()) {
             if (generalFragment.isValid()) {
                 showSyncingProgressDialog();
                 generalFragment.saveParams();
@@ -492,7 +484,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
         mBind.tvTitle.setText("Device Settings");
         mBind.ivSave.setVisibility(View.GONE);
         fragmentManager.beginTransaction()
-                .hide(loraFragment)
+                .hide(networkFragment)
                 .hide(posFragment)
                 .hide(generalFragment)
                 .show(deviceFragment)
@@ -512,7 +504,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
         mBind.tvTitle.setText("General Settings");
         mBind.ivSave.setVisibility(View.VISIBLE);
         fragmentManager.beginTransaction()
-                .hide(loraFragment)
+                .hide(networkFragment)
                 .hide(posFragment)
                 .show(generalFragment)
                 .hide(deviceFragment)
@@ -525,7 +517,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
         mBind.tvTitle.setText("Positioning Strategy");
         mBind.ivSave.setVisibility(View.GONE);
         fragmentManager.beginTransaction()
-                .hide(loraFragment)
+                .hide(networkFragment)
                 .show(posFragment)
                 .hide(generalFragment)
                 .hide(deviceFragment)
@@ -535,10 +527,10 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
     }
 
     private void showLoRaAndGetData() {
-        mBind.tvTitle.setText(R.string.title_lora);
-        mBind.ivSave.setVisibility(View.GONE);
+        mBind.tvTitle.setText("Network");
+        mBind.ivSave.setVisibility(View.VISIBLE);
         fragmentManager.beginTransaction()
-                .show(loraFragment)
+                .show(networkFragment)
                 .hide(posFragment)
                 .hide(generalFragment)
                 .hide(deviceFragment)

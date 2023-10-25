@@ -20,7 +20,7 @@
     <style name="lw006_divider_line">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1px</item>
-        <item name="android:background">@color/lw006_grey_b3b3b3</item>
+        <item name="android:background">@color/grey_b3b3b3</item>
     </style>
 
     <style name="LW006BottomDialog" parent="@android:style/Theme.Dialog">
@@ -51,8 +51,8 @@
 
     <!--自定义seekbarstyle-->
     <style name="LW006CustomSeekbarStyle">
-        <item name="android:progressDrawable">@drawable/lw006_seekbar_progress_drawable</item>
-        <item name="android:thumb">@drawable/lw006_seekbar_thumb</item>
+        <item name="android:progressDrawable">@drawable/seekbar_progress_drawable</item>
+        <item name="android:thumb">@drawable/seekbar_thumb</item>
         <item name="android:thumbOffset">0dp</item>
     </style>
 </resources>

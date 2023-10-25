@@ -26,6 +26,16 @@ public class ParamsWriteTask extends OrderTask {
         return data;
     }
 
+    public void setNetworkReconnectInterval(@IntRange(from = 0, to = 100) int interval) {
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_NETWORK_RECONNECT_INTERVAL.getParamsKey(),
+                (byte) 0x01,
+                (byte) interval
+        };
+    }
+
     /**
      * 上行配置参数
      *
@@ -82,7 +92,7 @@ public class ParamsWriteTask extends OrderTask {
         for (int i = 0; i < 4; ++i) {
             bytes[i] = (byte) (time >> 8 * (3 - i) & 255);
         }
-        data = new byte[]{
+        response.responseValue = data = new byte[]{
                 (byte) 0xED,
                 (byte) 0x01,
                 (byte) ParamsKeyEnum.KEY_TIME_UTC.getParamsKey(),
@@ -92,7 +102,6 @@ public class ParamsWriteTask extends OrderTask {
                 bytes[2],
                 bytes[3],
         };
-        response.responseValue = data;
     }
 
     public void setTimeZone(@IntRange(from = -24, to = 28) int timeZone) {
@@ -1274,7 +1283,7 @@ public class ParamsWriteTask extends OrderTask {
         response.responseValue = data;
     }
 
-    public void setGpsModule(@IntRange(from = 0,to = 1) int module){
+    public void setGpsModule(@IntRange(from = 0, to = 1) int module) {
         response.responseValue = data = new byte[]{
                 (byte) 0xED,
                 (byte) 0x01,

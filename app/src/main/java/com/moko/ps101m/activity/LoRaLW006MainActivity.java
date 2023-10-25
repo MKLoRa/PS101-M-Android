@@ -103,7 +103,7 @@ public class LoRaLW006MainActivity extends Lw006BaseActivity implements MokoScan
         adapter.openLoadAnimation();
         mBind.rvDevices.setLayoutManager(new LinearLayoutManager(this));
         DividerItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
-        itemDecoration.setDrawable(ContextCompat.getDrawable(this, R.drawable.lw006_shape_recycleview_divider));
+        itemDecoration.setDrawable(ContextCompat.getDrawable(this, R.drawable.shape_recycleview_divider));
         mBind.rvDevices.addItemDecoration(itemDecoration);
         mBind.rvDevices.setAdapter(adapter);
         mHandler = new Handler(Looper.getMainLooper());

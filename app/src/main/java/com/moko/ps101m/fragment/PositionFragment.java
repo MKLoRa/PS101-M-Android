@@ -1,11 +1,13 @@
 package com.moko.ps101m.fragment;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ps101m.R;
@@ -32,7 +34,7 @@ public class PositionFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
         mBind = Lw006FragmentPosBinding.inflate(inflater, container, false);

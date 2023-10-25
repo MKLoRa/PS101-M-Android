@@ -1,11 +1,14 @@
 package com.moko.ps101m.fragment;
 
-import android.app.Fragment;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import com.moko.ps101m.databinding.Lw006FragmentNetworkBinding;
 
@@ -21,17 +24,22 @@ public class NetworkFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
         mBind = Lw006FragmentNetworkBinding.inflate(inflater, container, false);
         return mBind.getRoot();
     }
 
-    public void setLoRaInfo(String loraInfo) {
-        mBind.tvLoraInfo.setText(loraInfo);
+    public void setNetworkReconnectInterval(int interval) {
+        mBind.etInterval.setText(String.valueOf(interval));
+        mBind.etInterval.setSelection(mBind.etInterval.getText().length());
     }
 
-    public void setLoraStatus(int networkCheck) {
+    public void setMqttConnectionStatus(int status) {
+        mBind.tvMqttConnectionStatus.setText(status == 1 ? "Connected" : "Connecting");
+    }
+
+    public void setNetworkStatus(int networkCheck) {
         String networkCheckDisPlay = "";
         switch (networkCheck) {
             case 0:
@@ -40,7 +48,21 @@ public class NetworkFragment extends Fragment {
             case 1:
                 networkCheckDisPlay = "Connected";
                 break;
+            case 2:
+                networkCheckDisPlay = "No SIM";
+                break;
         }
-        mBind.tvLoraStatus.setText(networkCheckDisPlay);
+        mBind.tvCellularConnectionStatus.setText(networkCheckDisPlay);
+    }
+
+    public boolean isValid() {
+        if (TextUtils.isEmpty(mBind.etInterval.getText())) return false;
+        String intervalStr = mBind.etInterval.getText().toString();
+        int interval = Integer.parseInt(intervalStr);
+        return interval <= 100;
+    }
+
+    public int getReconnectInterval(){
+        return Integer.parseInt(mBind.etInterval.getText().toString());
     }
 }

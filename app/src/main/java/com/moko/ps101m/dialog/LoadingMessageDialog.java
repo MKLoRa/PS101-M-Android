@@ -27,7 +27,7 @@ public class LoadingMessageDialog extends MokoBaseDialog<Lw006DialogLoadingMessa
     @Override
     protected void onCreateView() {
         ProgressDrawable progressDrawable = new ProgressDrawable();
-        progressDrawable.setColor(ContextCompat.getColor(getContext(), R.color.lw006_text_black_4d4d4d));
+        progressDrawable.setColor(ContextCompat.getColor(getContext(), R.color.black_4d4d4d));
         mBind.ivLoading.setImageDrawable(progressDrawable);
         progressDrawable.start();
         if (messageId > 0) {

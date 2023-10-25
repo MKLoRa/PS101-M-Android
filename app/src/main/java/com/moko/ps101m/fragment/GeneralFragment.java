@@ -1,12 +1,13 @@
 package com.moko.ps101m.fragment;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.fragment.app.Fragment;
 
 import com.moko.ps101m.activity.DeviceInfoActivity;
 import com.moko.ps101m.databinding.Lw006FragmentGeneralBinding;

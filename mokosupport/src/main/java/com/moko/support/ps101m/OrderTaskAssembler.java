@@ -923,10 +923,142 @@ public class OrderTaskAssembler {
         return task;
     }
 
+    public static OrderTask getNetworkStatus() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_NETWORK_STATUS);
+        return task;
+    }
+
+    public static OrderTask getMqttConnectionStatus() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_MQTT_CONNECT_STATUS);
+        return task;
+    }
+
+    public static OrderTask getNetworkReconnectInterval() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_NETWORK_RECONNECT_INTERVAL);
+        return task;
+    }
+
+    public static OrderTask getMQTTHost() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_MQTT_HOST);
+        return task;
+    }
+
+    public static OrderTask getMQTTPort() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_MQTT_PORT);
+        return task;
+    }
+
+    public static OrderTask getMQTTClientId() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_MQTT_CLIENT_ID);
+        return task;
+    }
+
+    public static OrderTask getMQTTSubscribeTopic() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_SUBSCRIBE_TOPIC);
+        return task;
+    }
+
+    public static OrderTask getMQTTPublishTopic() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_PUBLISH_TOPIC);
+        return task;
+    }
+
+    public static OrderTask getMQTTCleanSession() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_MQTT_CLEAN_SESSION);
+        return task;
+    }
+
+    public static OrderTask getMQTTQos() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_MQTT_QOS);
+        return task;
+    }
+
+    public static OrderTask getMQTTKeepAlive() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_MQTT_KEEP_ALIVE);
+        return task;
+    }
+
+    public static OrderTask getApn() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_APN);
+        return task;
+    }
+
+    public static OrderTask getNetworkFormat() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_NETWORK_FORMAT);
+        return task;
+    }
+
+    public static OrderTask getMQTTUsername() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_MQTT_USERNAME);
+        return task;
+    }
+
+    public static OrderTask getMQTTPassword() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_MQTT_PASSWORD);
+        return task;
+    }
+
+    public static OrderTask getMQTTConnectMode() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_CONNECT_MODE);
+        return task;
+    }
+
+    public static OrderTask getMQTTLwtEnable() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_MQTT_LWT_ENABLE);
+        return task;
+    }
+
+    public static OrderTask getMQTTLwtRetain() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_MQTT_LWT_RETAIN);
+        return task;
+    }
+
+    public static OrderTask getMQTTLwtQos() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_MQTT_LWT_QOS);
+        return task;
+    }
+
+    public static OrderTask getMQTTLwtTopic() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_MQTT_LWT_TOPIC);
+        return task;
+    }
+
+    public static OrderTask getMQTTLwtPayload() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_MQTT_LWT_PAYLOAD);
+        return task;
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////
     // WRITE
     ///////////////////////////////////////////////////////////////////////////
+    public static OrderTask setNetworkReconnectInterval(@IntRange(from = 0, to = 100) int interval) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setNetworkReconnectInterval(interval);
+        return task;
+    }
+
     public static OrderTask setPassword(String password) {
         SetPasswordTask task = new SetPasswordTask();
         task.setData(password);
