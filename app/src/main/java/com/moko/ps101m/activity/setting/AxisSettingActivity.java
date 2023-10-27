@@ -69,8 +69,6 @@ public class AxisSettingActivity extends Lw006BaseActivity {
         if (!MokoConstants.ACTION_CURRENT_DATA.equals(action))
             EventBus.getDefault().cancelEventDelivery(event);
         runOnUiThread(() -> {
-            if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
-            }
             if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
                 dismissSyncProgressDialog();
             }
@@ -83,11 +81,8 @@ public class AxisSettingActivity extends Lw006BaseActivity {
                         int header = value[0] & 0xFF;// 0xED
                         int flag = value[1] & 0xFF;// read or write
                         int cmd = value[2] & 0xFF;
-                        if (header != 0xED) return;
                         ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
-                        if (configKeyEnum == null) {
-                            return;
-                        }
+                        if (header != 0xED || configKeyEnum == null) return;
                         int length = value[3] & 0xFF;
                         if (flag == 0x01) {
                             // write
@@ -170,16 +165,6 @@ public class AxisSettingActivity extends Lw006BaseActivity {
     }
 
     public void onBack(View view) {
-        backHome();
-    }
-
-    @Override
-    public void onBackPressed() {
-        backHome();
-    }
-
-    private void backHome() {
-        setResult(RESULT_OK);
         finish();
     }
 

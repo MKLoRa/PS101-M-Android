@@ -227,16 +227,6 @@ public class FilterMacAddressActivity extends Lw006BaseActivity {
     }
 
     public void onBack(View view) {
-        backHome();
-    }
-
-    @Override
-    public void onBackPressed() {
-        backHome();
-    }
-
-    private void backHome() {
-        setResult(RESULT_OK);
         finish();
     }
 }

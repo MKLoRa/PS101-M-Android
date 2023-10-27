@@ -29,6 +29,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class FilterBXPTagIdActivity extends Lw006BaseActivity {
     private Lw006ActivityFilterBxpTagIdBinding mBind;
@@ -75,19 +76,15 @@ public class FilterBXPTagIdActivity extends Lw006BaseActivity {
             if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
                 OrderTaskResponse response = event.getResponse();
                 OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
-                int responseType = response.responseType;
                 byte[] value = response.responseValue;
                 if (orderCHAR == OrderCHAR.CHAR_PARAMS) {
                     if (value.length >= 4) {
                         int header = value[0] & 0xFF;// 0xED
                         int flag = value[1] & 0xFF;// read or write
                         int cmd = value[2] & 0xFF;
-                        if (header != 0xED)
-                            return;
+                        if (header != 0xED) return;
                         ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
-                        if (configKeyEnum == null) {
-                            return;
-                        }
+                        if (configKeyEnum == null) return;
                         int length = value[3] & 0xFF;
                         if (flag == 0x01) {
                             // write
@@ -148,7 +145,7 @@ public class FilterBXPTagIdActivity extends Lw006BaseActivity {
                                             View v = LayoutInflater.from(FilterBXPTagIdActivity.this).inflate(R.layout.lw006_item_tag_id_filter, mBind.llTagId, false);
                                             TextView title = v.findViewById(R.id.tv_tag_id_title);
                                             EditText etMacAddress = v.findViewById(R.id.et_tag_id);
-                                            title.setText(String.format("Tag ID %d", i + 1));
+                                            title.setText(String.format(Locale.getDefault(), "Tag ID %d", i + 1));
                                             etMacAddress.setText(macAddress);
                                             etMacAddress.setSelection(etMacAddress.getText().length());
                                             mBind.llTagId.addView(v);
@@ -182,7 +179,7 @@ public class FilterBXPTagIdActivity extends Lw006BaseActivity {
         }
         View v = LayoutInflater.from(this).inflate(R.layout.lw006_item_tag_id_filter, mBind.llTagId, false);
         TextView title = v.findViewById(R.id.tv_tag_id_title);
-        title.setText(String.format("Tag ID %d", count + 1));
+        title.setText(String.format(Locale.getDefault(), "Tag ID %d", count + 1));
         mBind.llTagId.addView(v);
     }
 
@@ -230,7 +227,6 @@ public class FilterBXPTagIdActivity extends Lw006BaseActivity {
         return true;
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -239,17 +235,6 @@ public class FilterBXPTagIdActivity extends Lw006BaseActivity {
     }
 
     public void onBack(View view) {
-        backHome();
-    }
-
-    @Override
-    public void onBackPressed() {
-        backHome();
-    }
-
-    private void backHome() {
-        EventBus.getDefault().unregister(this);
-        setResult(RESULT_OK);
         finish();
     }
 }

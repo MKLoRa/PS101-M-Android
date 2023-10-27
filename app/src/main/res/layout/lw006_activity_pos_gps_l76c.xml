@@ -15,13 +15,11 @@
             android:id="@+id/tv_back"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:clickable="true"
             android:drawableLeft="@drawable/lw006_ic_back"
             android:drawablePadding="6dp"
             android:gravity="center_vertical"
             android:onClick="onBack"
             android:paddingLeft="16dp"
-            android:text=""
             android:textColor="@color/white_ffffff"
             android:textSize="15sp" />
 
@@ -39,7 +37,6 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
-            android:clickable="true"
             android:onClick="onSave"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
@@ -53,8 +50,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:background="@color/white_ffffff"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
         android:paddingStart="10dp"
         android:paddingEnd="10dp">
 
@@ -76,7 +71,7 @@
             android:layout_height="45dp"
             android:layout_marginRight="10dp"
             android:gravity="center"
-            android:hint="60~600"
+            android:hint="30~600"
             android:inputType="number"
             android:maxLength="3"
             android:textColor="@color/black_333333"
@@ -102,8 +97,9 @@
         <View
             android:id="@+id/line1"
             style="@style/lw006_divider_line"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
             app:layout_constraintTop_toBottomOf="@id/tv1" />
-
 
         <TextView
             android:id="@+id/tv2"
@@ -144,33 +140,6 @@
             app:layout_constraintBottom_toBottomOf="@+id/tv2"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tv2" />
-
-        <View
-            android:id="@+id/line2"
-            style="@style/lw006_divider_line"
-            app:layout_constraintTop_toBottomOf="@id/tv2" />
-
-        <CheckBox
-            android:id="@+id/cb_extreme_mode"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:button="@null"
-            android:drawableRight="@drawable/selector_cb_btn"
-            android:text="Extreme Mode"
-            android:textColor="@color/black_333333"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@id/line2" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:lineSpacingMultiplier="1.2"
-            android:text="*In this mode, the byte length of the GPS location packet is forced to be in 11 bytes"
-            android:textColor="@color/grey_666666"
-            android:textSize="12sp"
-            android:paddingBottom="10dp"
-            app:layout_constraintTop_toBottomOf="@+id/cb_extreme_mode" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

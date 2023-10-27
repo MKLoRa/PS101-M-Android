@@ -28,6 +28,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -38,7 +39,7 @@ import java.util.List;
 public class AlarmFunctionActivity extends Lw006BaseActivity {
     private Lw006ActivityAlarmFunctionBinding mBind;
     private boolean mReceiverTag;
-    private final ArrayList<String> mValues = new ArrayList<>(4);
+    private final String[] mValues = {"NO", "Alert", "SOS"};
     private int mSelected;
     private int alarmTypeFlag;
 
@@ -48,9 +49,6 @@ public class AlarmFunctionActivity extends Lw006BaseActivity {
         mBind = Lw006ActivityAlarmFunctionBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
-        mValues.add("NO");
-        mValues.add("Alert");
-        mValues.add("SOS");
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
@@ -65,10 +63,10 @@ public class AlarmFunctionActivity extends Lw006BaseActivity {
         mBind.tvAlarmType.setOnClickListener(v -> {
             if (isWindowLocked()) return;
             BottomDialog dialog = new BottomDialog();
-            dialog.setDatas(mValues, mSelected);
+            dialog.setDatas(new ArrayList<>(Arrays.asList(mValues)), mSelected);
             dialog.setListener(value -> {
                 mSelected = value;
-                mBind.tvAlarmType.setText(mValues.get(value));
+                mBind.tvAlarmType.setText(mValues[value]);
             });
             dialog.show(getSupportFragmentManager());
         });
@@ -93,8 +91,6 @@ public class AlarmFunctionActivity extends Lw006BaseActivity {
         if (!MokoConstants.ACTION_CURRENT_DATA.equals(action))
             EventBus.getDefault().cancelEventDelivery(event);
         runOnUiThread(() -> {
-            if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
-            }
             if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
                 dismissSyncProgressDialog();
             }
@@ -132,7 +128,7 @@ public class AlarmFunctionActivity extends Lw006BaseActivity {
                                 case KEY_ALARM_TYPE:
                                     if (length == 1) {
                                         mSelected = value[4] & 0xff;
-                                        mBind.tvAlarmType.setText(mValues.get(mSelected));
+                                        mBind.tvAlarmType.setText(mValues[mSelected]);
                                     }
                                     break;
 

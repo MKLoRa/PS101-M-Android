@@ -92,8 +92,6 @@ public enum ParamsKeyEnum implements Serializable {
     KEY_TIME_MODE_REPORT_TIME_POINT(0x43),
     // 运动模式事件
     KEY_MOTION_MODE_EVENT(0x44),
-    // 运动开始定位上报次数
-    KEY_MOTION_MODE_START_NUMBER(0x45),
     // 运动开始定位策略
     KEY_MOTION_MODE_START_POS_STRATEGY(0x46),
     // 运动中定位间隔
@@ -137,13 +135,13 @@ public enum ParamsKeyEnum implements Serializable {
     // 过滤设备类型开关
     KEY_FILTER_RAW_DATA(0x59),
     // iBeacon类型过滤开关
-    KEY_FILTER_IBEACON_ENABLE(0x5A),
+    KEY_FILTER_IBEACON_ENABLE(0x65),
     // iBeacon类型Major范围
-    KEY_FILTER_IBEACON_MAJOR_RANGE(0x5B),
+    KEY_FILTER_IBEACON_MAJOR_RANGE(0x66),
     // iBeacon类型Minor范围
-    KEY_FILTER_IBEACON_MINOR_RANGE(0x5C),
+    KEY_FILTER_IBEACON_MINOR_RANGE(0x67),
     // iBeacon类型UUID
-    KEY_FILTER_IBEACON_UUID(0x5D),
+    KEY_FILTER_IBEACON_UUID(0x68),
     // eddystone-UID类型过滤开关
     KEY_FILTER_EDDYSTONE_UID_ENABLE(0x5E),
     // eddystone-UID类型Namespace
@@ -159,13 +157,13 @@ public enum ParamsKeyEnum implements Serializable {
     // eddystone- TLM类型TLMVersion
     KEY_FILTER_EDDYSTONE_TLM_VERSION(0x64),
     // BXP-iBeacon类型过滤开关
-    KEY_FILTER_BXP_IBEACON_ENABLE(0x65),
+    KEY_FILTER_BXP_IBEACON_ENABLE(0x5A),
     // BXP-iBeacon类型Major范围
-    KEY_FILTER_BXP_IBEACON_MAJOR_RANGE(0x66),
+    KEY_FILTER_BXP_IBEACON_MAJOR_RANGE(0x5B),
     // BXP-iBeacon类型Minor范围
-    KEY_FILTER_BXP_IBEACON_MINOR_RANGE(0x67),
+    KEY_FILTER_BXP_IBEACON_MINOR_RANGE(0x5C),
     // BXP-iBeacon类型UUID
-    KEY_FILTER_BXP_IBEACON_UUID(0x68),
+    KEY_FILTER_BXP_IBEACON_UUID(0x5D),
     // BXP-Device类型过滤开关
     KEY_FILTER_BXP_DEVICE(0x69),
     // BeaconX Pro-ACC设备过滤开关
@@ -214,23 +212,21 @@ public enum ParamsKeyEnum implements Serializable {
 
     //// 定位参数
     // WIFI定位数据格式
-    KEY_WIFI_POS_DATA_TYPE(0x7D),
+    KEY_WIFI_RSSI_FILTER(0x7F),
     //wifi定位机制
-    KEY_WIFI_POS_MECHANISM(0x7E),
+    KEY_WIFI_POS_MECHANISM(0x80),
     // WIFI定位超时时间
-    KEY_WIFI_POS_TIMEOUT(0x7F),
+    KEY_WIFI_POS_TIMEOUT(0x81),
     // WIFI定位成功BSSID数量
-    KEY_WIFI_POS_BSSID_NUMBER(0x80),
+    KEY_WIFI_POS_BSSID_NUMBER(0x82),
     // 蓝牙定位机制选择
-    KEY_BLE_POS_MECHANISM(0x81),
+    KEY_BLE_POS_MECHANISM(0x83),
     // 蓝牙定位超时时间
-    KEY_BLE_POS_TIMEOUT(0x82),
+    KEY_BLE_POS_TIMEOUT(0x84),
     // 蓝牙定位成功MAC数量
-    KEY_BLE_POS_MAC_NUMBER(0x83),
+    KEY_BLE_POS_MAC_NUMBER(0x85),
     //gps型号选择
-    KEY_GPS_MODULE(0x84),
-    // GPS极限上传模式（L76版本）
-    KEY_GPS_EXTREME_MODE_L76C(0x85),
+    KEY_GPS_MODULE(0x84a),
     // GPS定位超时时间（L76版本）
     KEY_GPS_POS_TIMEOUT_L76C(0x86),
     // GPS位置精度因子PDOP（L76版本）
@@ -359,6 +355,8 @@ public enum ParamsKeyEnum implements Serializable {
     KEY_ALARM_SOS_REPORT_INTERVAL(0xBC),
     //SOS 报警事件通知
     KEY_ALARM_SOS_NOTIFY_ENABLE(0xBD),
+    //三轴数据上报间隔
+    KEY_AXIS_REPORT_INTERVAL(0xBE),
 
 
 

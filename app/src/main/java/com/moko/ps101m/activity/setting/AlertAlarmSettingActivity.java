@@ -27,6 +27,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -37,8 +38,8 @@ import java.util.List;
 public class AlertAlarmSettingActivity extends Lw006BaseActivity {
     private ActivityAlartAlermSettingBinding mBind;
     private boolean mReceiverTag;
-    private final ArrayList<String> mValues = new ArrayList<>(8);
-    private final ArrayList<String> triggerMode = new ArrayList<>(6);
+    private final String[] mValues = {"WIFI", "BLE", "GPS", "WIFI+GPS", "BLE+GPS", "WIFI+BLE", "WIFI+BLE+GPS"};
+    private final String[] triggerMode = {"Single Click", "Double Click", "Long Press 1s", "Long Press 2s", "Long Press 3s"};
     private int mSelectedPos;
     private int mSelectedMode;
     private int modeFlag, posFlag;
@@ -49,18 +50,6 @@ public class AlertAlarmSettingActivity extends Lw006BaseActivity {
         mBind = ActivityAlartAlermSettingBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
-        mValues.add("WIFI");
-        mValues.add("BLE");
-        mValues.add("GPS");
-        mValues.add("WIFI+GPS");
-        mValues.add("BLE+GPS");
-        mValues.add("WIFI+BLE");
-        mValues.add("WIFI+BLE+GPS");
-        triggerMode.add("Single Click");
-        triggerMode.add("Double Click");
-        triggerMode.add("Long Press 1s");
-        triggerMode.add("Long Press 2s");
-        triggerMode.add("Long Press 3s");
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
@@ -76,10 +65,10 @@ public class AlertAlarmSettingActivity extends Lw006BaseActivity {
         mBind.tvTriggerMode.setOnClickListener(v -> {
             if (isWindowLocked()) return;
             BottomDialog dialog = new BottomDialog();
-            dialog.setDatas(triggerMode, mSelectedMode);
+            dialog.setDatas(new ArrayList<>(Arrays.asList(triggerMode)), mSelectedMode);
             dialog.setListener(value -> {
                 mSelectedMode = value;
-                mBind.tvTriggerMode.setText(triggerMode.get(value));
+                mBind.tvTriggerMode.setText(triggerMode[value]);
             });
             dialog.show(getSupportFragmentManager());
         });
@@ -87,10 +76,10 @@ public class AlertAlarmSettingActivity extends Lw006BaseActivity {
         mBind.tvPosStrategy.setOnClickListener(v -> {
             if (isWindowLocked()) return;
             BottomDialog dialog = new BottomDialog();
-            dialog.setDatas(mValues, mSelectedPos);
+            dialog.setDatas(new ArrayList<>(Arrays.asList(mValues)), mSelectedPos);
             dialog.setListener(value -> {
                 mSelectedPos = value;
-                mBind.tvPosStrategy.setText(mValues.get(value));
+                mBind.tvPosStrategy.setText(mValues[value]);
             });
             dialog.show(getSupportFragmentManager());
         });
@@ -112,8 +101,6 @@ public class AlertAlarmSettingActivity extends Lw006BaseActivity {
         if (!MokoConstants.ACTION_CURRENT_DATA.equals(action))
             EventBus.getDefault().cancelEventDelivery(event);
         runOnUiThread(() -> {
-            if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
-            }
             if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
                 dismissSyncProgressDialog();
             }
@@ -155,14 +142,14 @@ public class AlertAlarmSettingActivity extends Lw006BaseActivity {
                                 case KEY_ALARM_ALERT_TRIGGER_TYPE:
                                     if (length == 1) {
                                         mSelectedMode = value[4] & 0xff;
-                                        mBind.tvTriggerMode.setText(triggerMode.get(mSelectedMode));
+                                        mBind.tvTriggerMode.setText(triggerMode[mSelectedMode]);
                                     }
                                     break;
 
                                 case KEY_ALARM_ALERT_POS_STRATEGY:
                                     if (length == 1) {
                                         mSelectedPos = value[4] & 0xff;
-                                        mBind.tvPosStrategy.setText(mValues.get(mSelectedPos));
+                                        mBind.tvPosStrategy.setText(mValues[mSelectedPos]);
                                     }
                                     break;
 

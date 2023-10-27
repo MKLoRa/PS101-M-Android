@@ -11,7 +11,6 @@ import android.view.View;
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
-import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ps101m.activity.Lw006BaseActivity;
 import com.moko.ps101m.databinding.Lw006ActivityDownlinkForPosBinding;
@@ -27,13 +26,13 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 public class DownlinkForPosActivity extends Lw006BaseActivity {
     private Lw006ActivityDownlinkForPosBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
-    private ArrayList<String> mValues;
+    private final String[] mValues = {"WIFI", "BLE", "GPS", "WIFI+GPS", "BLE+GPS", "WIFI+BLE", "WIFI+BLE+GPS"};
     private int mSelected;
 
     @Override
@@ -41,14 +40,6 @@ public class DownlinkForPosActivity extends Lw006BaseActivity {
         super.onCreate(savedInstanceState);
         mBind = Lw006ActivityDownlinkForPosBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
-        mValues = new ArrayList<>();
-        mValues.add("WIFI");
-        mValues.add("BLE");
-        mValues.add("GPS");
-        mValues.add("WIFI+GPS");
-        mValues.add("BLE+GPS");
-        mValues.add("WIFI+BLE");
-        mValues.add("WIFI+BLE+GPS");
         EventBus.getDefault().register(this);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
@@ -56,9 +47,7 @@ public class DownlinkForPosActivity extends Lw006BaseActivity {
         registerReceiver(mReceiver, filter);
         mReceiverTag = true;
         showSyncingProgressDialog();
-        List<OrderTask> orderTasks = new ArrayList<>();
-        orderTasks.add(OrderTaskAssembler.getDownLinkPosStrategy());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getDownLinkPosStrategy());
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 300)
@@ -91,12 +80,9 @@ public class DownlinkForPosActivity extends Lw006BaseActivity {
                         int header = value[0] & 0xFF;// 0xED
                         int flag = value[1] & 0xFF;// read or write
                         int cmd = value[2] & 0xFF;
-                        if (header != 0xED)
-                            return;
+                        if (header != 0xED) return;
                         ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
-                        if (configKeyEnum == null) {
-                            return;
-                        }
+                        if (configKeyEnum == null) return;
                         int length = value[3] & 0xFF;
                         if (flag == 0x01) {
                             // write
@@ -117,7 +103,7 @@ public class DownlinkForPosActivity extends Lw006BaseActivity {
                             if (configKeyEnum == ParamsKeyEnum.KEY_DOWN_LINK_POS_STRATEGY) {
                                 if (length > 0) {
                                     mSelected = value[4] & 0xFF;
-                                    mBind.tvDownlinkPosStrategy.setText(mValues.get(mSelected));
+                                    mBind.tvDownlinkPosStrategy.setText(mValues[mSelected]);
                                 }
                             }
                         }
@@ -156,26 +142,16 @@ public class DownlinkForPosActivity extends Lw006BaseActivity {
     }
 
     public void onBack(View view) {
-        backHome();
-    }
-
-    @Override
-    public void onBackPressed() {
-        backHome();
-    }
-
-    private void backHome() {
-        setResult(RESULT_OK);
         finish();
     }
 
     public void selectPosStrategy(View view) {
         if (isWindowLocked()) return;
         BottomDialog dialog = new BottomDialog();
-        dialog.setDatas(mValues, mSelected);
+        dialog.setDatas(new ArrayList<>(Arrays.asList(mValues)), mSelected);
         dialog.setListener(value -> {
             mSelected = value;
-            mBind.tvDownlinkPosStrategy.setText(mValues.get(value));
+            mBind.tvDownlinkPosStrategy.setText(mValues[value]);
             savedParamsError = false;
             showSyncingProgressDialog();
             LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setDownLinkPosStrategy(mSelected));

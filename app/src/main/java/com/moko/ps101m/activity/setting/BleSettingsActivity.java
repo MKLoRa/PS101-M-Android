@@ -5,6 +5,7 @@ import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -34,7 +35,6 @@ import java.util.TimerTask;
 
 public class BleSettingsActivity extends Lw006BaseActivity implements SeekBar.OnSeekBarChangeListener {
     private final String FILTER_ASCII = "[ -~]*";
-
     private Lw006ActivityBleSettingsBinding mBind;
     private boolean savedParamsError;
     private boolean mPasswordVerifyEnable;
@@ -88,18 +88,14 @@ public class BleSettingsActivity extends Lw006BaseActivity implements SeekBar.On
             if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
                 OrderTaskResponse response = event.getResponse();
                 OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
-                int responseType = response.responseType;
                 byte[] value = response.responseValue;
                 if (orderCHAR == OrderCHAR.CHAR_PARAMS) {
                     if (value.length >= 4) {
                         int header = value[0] & 0xFF;// 0xED
                         int flag = value[1] & 0xFF;// read or write
                         int cmd = value[2] & 0xFF;
-                        if (header != 0xED) return;
                         ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
-                        if (configKeyEnum == null) {
-                            return;
-                        }
+                        if (header != 0xED || configKeyEnum == null) return;
                         int length = value[3] & 0xFF;
                         if (flag == 0x01) {
                             // write
@@ -181,16 +177,6 @@ public class BleSettingsActivity extends Lw006BaseActivity implements SeekBar.On
     }
 
     public void onBack(View view) {
-        backHome();
-    }
-
-    @Override
-    public void onBackPressed() {
-        backHome();
-    }
-
-    private void backHome() {
-        setResult(RESULT_OK);
         finish();
     }
 
@@ -209,7 +195,6 @@ public class BleSettingsActivity extends Lw006BaseActivity implements SeekBar.On
         final String advTimeoutStr = mBind.etAdvTimeout.getText().toString();
         final int timeout = Integer.parseInt(advTimeoutStr);
         if (timeout < 1 || timeout > 60) return false;
-
         if (TextUtils.isEmpty(mBind.etAdInterval.getText())) return false;
         int interval = Integer.parseInt(mBind.etAdInterval.getText().toString().trim());
         return interval >= 1 && interval <= 100;
@@ -217,7 +202,7 @@ public class BleSettingsActivity extends Lw006BaseActivity implements SeekBar.On
 
 
     private void saveParams() {
-        final String advName = mBind.etAdvName.getText().toString();
+        final String advName = TextUtils.isEmpty(mBind.etAdvName.getText())?null :mBind.etAdvName.getText().toString();
         final String timeoutStr = mBind.etAdvTimeout.getText().toString();
         final int timeout = Integer.parseInt(timeoutStr);
         final int progress = mBind.sbTxPower.getProgress();

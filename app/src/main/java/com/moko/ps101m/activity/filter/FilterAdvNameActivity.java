@@ -82,7 +82,6 @@ public class FilterAdvNameActivity extends Lw006BaseActivity {
             if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
                 OrderTaskResponse response = event.getResponse();
                 OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
-                int responseType = response.responseType;
                 byte[] value = response.responseValue;
                 if (orderCHAR == OrderCHAR.CHAR_PARAMS) {
                     if (value.length >= 4) {
@@ -90,9 +89,7 @@ public class FilterAdvNameActivity extends Lw006BaseActivity {
                         int flag = value[1] & 0xFF;// read or write
                         int cmd = value[2] & 0xFF;
                         ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
-                        if (configKeyEnum == null) {
-                            return;
-                        }
+                        if (configKeyEnum == null) return;
                         int length = value[3] & 0xFF;
                         if (flag == 0x01) {
                             // write
@@ -163,8 +160,7 @@ public class FilterAdvNameActivity extends Lw006BaseActivity {
     }
 
     public void onSave(View view) {
-        if (isWindowLocked())
-            return;
+        if (isWindowLocked()) return;
         if (isValid()) {
             showSyncingProgressDialog();
             saveParams();
@@ -174,8 +170,7 @@ public class FilterAdvNameActivity extends Lw006BaseActivity {
     }
 
     public void onAdd(View view) {
-        if (isWindowLocked())
-            return;
+        if (isWindowLocked()) return;
         int count = mBind.llDavName.getChildCount();
         if (count > 9) {
             ToastUtils.showToast(this, "You can set up to 10 filters!");
@@ -190,8 +185,7 @@ public class FilterAdvNameActivity extends Lw006BaseActivity {
     }
 
     public void onDel(View view) {
-        if (isWindowLocked())
-            return;
+        if (isWindowLocked()) return;
         final int c = mBind.llDavName.getChildCount();
         if (c == 0) {
             ToastUtils.showToast(this, "There are currently no filters to delete");
@@ -240,16 +234,6 @@ public class FilterAdvNameActivity extends Lw006BaseActivity {
     }
 
     public void onBack(View view) {
-        backHome();
-    }
-
-    @Override
-    public void onBackPressed() {
-        backHome();
-    }
-
-    private void backHome() {
-        setResult(RESULT_OK);
         finish();
     }
 }

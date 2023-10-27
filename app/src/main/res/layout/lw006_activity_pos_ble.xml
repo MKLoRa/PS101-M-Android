@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/grey_f2f2f2"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:ignore="HardcodedText">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -15,13 +17,11 @@
             android:id="@+id/tv_back"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:clickable="true"
-            android:drawableLeft="@drawable/lw006_ic_back"
+            android:drawableStart="@drawable/lw006_ic_back"
             android:drawablePadding="6dp"
             android:gravity="center_vertical"
             android:onClick="onBack"
             android:paddingLeft="16dp"
-            android:text=""
             android:textColor="@color/white_ffffff"
             android:textSize="15sp" />
 
@@ -38,8 +38,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:clickable="true"
+            android:layout_alignParentEnd="true"
             android:onClick="onSave"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
@@ -47,7 +46,7 @@
 
     </RelativeLayout>
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -77,7 +76,8 @@
                     android:textColor="@color/black_333333"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    app:layout_constraintLeft_toLeftOf="parent" />
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <EditText
                     android:id="@+id/et_pos_timeout"
@@ -125,6 +125,7 @@
                     android:textColor="@color/black_333333"
                     android:textSize="15sp"
                     android:textStyle="bold"
+                    app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/line1" />
 
                 <EditText
@@ -159,6 +160,7 @@
                     android:textColor="@color/black_333333"
                     android:textSize="15sp"
                     android:textStyle="bold"
+                    app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/line2" />
 
                 <TextView
@@ -166,7 +168,6 @@
                     android:layout_width="110dp"
                     android:layout_height="35dp"
                     android:background="@drawable/shape_radius_blue_btn_bg"
-                    android:clickable="true"
                     android:gravity="center"
                     android:onClick="onBleFixMechanism"
                     android:text="Time Priority"
@@ -193,6 +194,7 @@
                     android:textColor="@color/black_333333"
                     android:textSize="15sp"
                     android:textStyle="bold"
+                    app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/line3" />
 
                 <TextView
@@ -200,12 +202,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="35dp"
                     android:background="@drawable/shape_radius_blue_btn_bg"
-                    android:clickable="true"
                     android:gravity="center"
                     android:minWidth="150dp"
+                    android:onClick="onScanningType"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
-                    android:onClick="onScanningType"
                     android:text="1M PHY(BLE 4.x)"
                     android:textColor="@color/white_ffffff"
                     android:textSize="15sp"
@@ -273,7 +274,7 @@
                         android:id="@+id/tv_rssi_filter_value"
                         android:layout_width="70dp"
                         android:layout_height="wrap_content"
-                        android:gravity="right"
+                        android:gravity="end"
                         android:text="-127dBm"
                         android:textColor="@color/black_333333"
                         android:textSize="15sp"
@@ -287,7 +288,7 @@
                         android:id="@+id/tv_rssi_filter_tips"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/rssi_filter"
+                        android:text="@string/ble_fix_filter"
                         android:textColor="@color/black_333333"
                         android:textSize="12sp"
                         app:layout_constraintLeft_toLeftOf="parent"
@@ -320,7 +321,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/shape_radius_blue_btn_bg"
-                        android:clickable="true"
                         android:gravity="center"
                         android:minWidth="150dp"
                         android:onClick="onFilterRelationship"
@@ -337,8 +337,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:clickable="true"
-                    android:drawableRight="@drawable/lw006_ic_arrow_right"
+                    android:drawableEnd="@drawable/lw006_ic_arrow_right"
                     android:gravity="center_vertical"
                     android:onClick="onFilterByMac"
                     android:text="Filter by MAC"
@@ -352,8 +351,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:layout_marginTop="1dp"
-                    android:clickable="true"
-                    android:drawableRight="@drawable/lw006_ic_arrow_right"
+                    android:drawableEnd="@drawable/lw006_ic_arrow_right"
                     android:gravity="center_vertical"
                     android:onClick="onFilterByName"
                     android:text="Filter by ADV Name"
@@ -367,8 +365,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:layout_marginTop="1dp"
-                    android:clickable="true"
-                    android:drawableRight="@drawable/lw006_ic_arrow_right"
+                    android:drawableEnd="@drawable/lw006_ic_arrow_right"
                     android:gravity="center_vertical"
                     android:onClick="onFilterByRawData"
                     android:text="Filter by Raw Data"
@@ -377,5 +374,5 @@
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>

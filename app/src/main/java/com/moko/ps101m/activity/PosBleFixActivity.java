@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -32,17 +33,19 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class PosBleFixActivity extends Lw006BaseActivity implements SeekBar.OnSeekBarChangeListener {
     private Lw006ActivityPosBleBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
-    private ArrayList<String> mRelationshipValues;
+    private final String[] mRelationshipValues = {"Null", "Only MAC", "Only ADV Name", "Only Raw Data", "ADV Name&Raw Data", "MAC&ADV Name&Raw Data", "ADV Name | Raw Data"};
     private int mRelationshipSelected;
-    private ArrayList<String> mScanningTypeValues;
+    private final String[] mScanningTypeValues = {"1M PHY(BLE 4.x)", "1M PHY(BLE 5)", "1M PHY(BLE 4.x + BLE 5)", "Coded PHY(BLE 5)"};
     private int mScanningTypeSelected;
-    private ArrayList<String> mBleFixMechanismValues;
+    private final String[] mBleFixMechanismValues = {"RSSI Priority", "Time Priority"};
     private int mBleFixMechanismSelected;
 
     @Override
@@ -51,28 +54,15 @@ public class PosBleFixActivity extends Lw006BaseActivity implements SeekBar.OnSe
         mBind = Lw006ActivityPosBleBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
-
-        mRelationshipValues = new ArrayList<>();
-        mRelationshipValues.add("Null");
-        mRelationshipValues.add("Only MAC");
-        mRelationshipValues.add("Only ADV Name");
-        mRelationshipValues.add("Only Raw Data");
-        mRelationshipValues.add("ADV Name&Raw Data");
-        mRelationshipValues.add("MAC&ADV Name&Raw Data");
-        mRelationshipValues.add("ADV Name | Raw Data");
-        mScanningTypeValues = new ArrayList<>();
-        mScanningTypeValues.add("1M PHY(BLE 4.x)");
-        mScanningTypeValues.add("1M PHY(BLE 5)");
-        mScanningTypeValues.add("1M PHY(BLE 4.x + BLE 5)");
-        mScanningTypeValues.add("Coded PHY(BLE 5)");
-        mBleFixMechanismValues = new ArrayList<>();
-        mBleFixMechanismValues.add("RSSI Priority");
-        mBleFixMechanismValues.add("Time Priority");
         mBind.sbRssiFilter.setOnSeekBarChangeListener(this);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
-        registerReceiver(mReceiver, filter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(mReceiver, filter, RECEIVER_EXPORTED);
+        } else {
+            registerReceiver(mReceiver, filter);
+        }
         mReceiverTag = true;
         showSyncingProgressDialog();
         List<OrderTask> orderTasks = new ArrayList<>();
@@ -109,7 +99,6 @@ public class PosBleFixActivity extends Lw006BaseActivity implements SeekBar.OnSe
             if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
                 OrderTaskResponse response = event.getResponse();
                 OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
-                int responseType = response.responseType;
                 byte[] value = response.responseValue;
                 if (orderCHAR == OrderCHAR.CHAR_PARAMS) {
                     if (value.length >= 4) {
@@ -165,7 +154,7 @@ public class PosBleFixActivity extends Lw006BaseActivity implements SeekBar.OnSe
                                     if (length > 0) {
                                         int mechanism = value[4] & 0xFF;
                                         mBleFixMechanismSelected = mechanism;
-                                        mBind.tvBleFixMechanism.setText(mBleFixMechanismValues.get(mechanism));
+                                        mBind.tvBleFixMechanism.setText(mBleFixMechanismValues[mechanism]);
                                     }
                                     break;
                                 case KEY_FILTER_RSSI:
@@ -173,21 +162,21 @@ public class PosBleFixActivity extends Lw006BaseActivity implements SeekBar.OnSe
                                         final int rssi = value[4];
                                         int progress = rssi + 127;
                                         mBind.sbRssiFilter.setProgress(progress);
-                                        mBind.tvRssiFilterTips.setText(getString(R.string.rssi_filter, rssi));
+                                        mBind.tvRssiFilterTips.setText(getString(R.string.ble_fix_filter, rssi));
                                     }
                                     break;
                                 case KEY_FILTER_BLE_SCAN_PHY:
                                     if (length > 0) {
                                         int type = value[4] & 0xFF;
                                         mScanningTypeSelected = type;
-                                        mBind.tvScanningType.setText(mScanningTypeValues.get(type));
+                                        mBind.tvScanningType.setText(mScanningTypeValues[type]);
                                     }
                                     break;
                                 case KEY_FILTER_RELATIONSHIP:
                                     if (length > 0) {
                                         int relationship = value[4] & 0xFF;
                                         mRelationshipSelected = relationship;
-                                        mBind.tvFilterRelationship.setText(mRelationshipValues.get(relationship));
+                                        mBind.tvFilterRelationship.setText(mRelationshipValues[relationship]);
                                     }
                                     break;
                             }
@@ -236,7 +225,6 @@ public class PosBleFixActivity extends Lw006BaseActivity implements SeekBar.OnSe
         LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
-
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -281,10 +269,10 @@ public class PosBleFixActivity extends Lw006BaseActivity implements SeekBar.OnSe
     public void onBleFixMechanism(View view) {
         if (isWindowLocked()) return;
         BottomDialog dialog = new BottomDialog();
-        dialog.setDatas(mBleFixMechanismValues, mBleFixMechanismSelected);
+        dialog.setDatas(new ArrayList<>(Arrays.asList(mBleFixMechanismValues)), mBleFixMechanismSelected);
         dialog.setListener(value -> {
             mBleFixMechanismSelected = value;
-            mBind.tvBleFixMechanism.setText(mBleFixMechanismValues.get(value));
+            mBind.tvBleFixMechanism.setText(mBleFixMechanismValues[value]);
         });
         dialog.show(getSupportFragmentManager());
     }
@@ -292,10 +280,10 @@ public class PosBleFixActivity extends Lw006BaseActivity implements SeekBar.OnSe
     public void onScanningType(View view) {
         if (isWindowLocked()) return;
         BottomDialog dialog = new BottomDialog();
-        dialog.setDatas(mScanningTypeValues, mScanningTypeSelected);
+        dialog.setDatas(new ArrayList<>(Arrays.asList(mScanningTypeValues)), mScanningTypeSelected);
         dialog.setListener(value -> {
             mScanningTypeSelected = value;
-            mBind.tvScanningType.setText(mScanningTypeValues.get(value));
+            mBind.tvScanningType.setText(mScanningTypeValues[value]);
         });
         dialog.show(getSupportFragmentManager());
     }
@@ -303,10 +291,10 @@ public class PosBleFixActivity extends Lw006BaseActivity implements SeekBar.OnSe
     public void onFilterRelationship(View view) {
         if (isWindowLocked()) return;
         BottomDialog dialog = new BottomDialog();
-        dialog.setDatas(mRelationshipValues, mRelationshipSelected);
+        dialog.setDatas(new ArrayList<>(Arrays.asList(mRelationshipValues)), mRelationshipSelected);
         dialog.setListener(value -> {
             mRelationshipSelected = value;
-            mBind.tvFilterRelationship.setText(mRelationshipValues.get(value));
+            mBind.tvFilterRelationship.setText(mRelationshipValues[value]);
         });
         dialog.show(getSupportFragmentManager());
     }
@@ -332,8 +320,8 @@ public class PosBleFixActivity extends Lw006BaseActivity implements SeekBar.OnSe
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
         int rssi = progress - 127;
-        mBind.tvRssiFilterValue.setText(String.format("%ddBm", rssi));
-        mBind.tvRssiFilterTips.setText(getString(R.string.rssi_filter, rssi));
+        mBind.tvRssiFilterValue.setText(String.format(Locale.getDefault(), "%ddBm", rssi));
+        mBind.tvRssiFilterTips.setText(getString(R.string.ble_fix_filter, rssi));
     }
 
     @Override

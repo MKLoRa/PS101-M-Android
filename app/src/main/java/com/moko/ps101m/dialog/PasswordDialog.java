@@ -89,6 +89,5 @@ public class PasswordDialog extends BaseDialog<Lw006DialogPasswordBinding> {
         InputMethodManager inputManager = (InputMethodManager) mBind.etPassword
                 .getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.showSoftInput(mBind.etPassword, 0);
-
     }
 }

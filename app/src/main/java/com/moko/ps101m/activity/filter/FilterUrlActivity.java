@@ -1,6 +1,5 @@
 package com.moko.ps101m.activity.filter;
 
-
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.TextUtils;
@@ -28,9 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class FilterUrlActivity extends Lw006BaseActivity {
-
     private final String FILTER_ASCII = "[ -~]*";
-
     private Lw006ActivityFilterUrlBinding mBind;
     private boolean savedParamsError;
 
@@ -53,7 +50,6 @@ public class FilterUrlActivity extends Lw006BaseActivity {
         orderTasks.add(OrderTaskAssembler.getFilterEddystoneUrl());
         LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
-
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 400)
     public void onConnectStatusEvent(ConnectStatusEvent event) {
@@ -86,12 +82,9 @@ public class FilterUrlActivity extends Lw006BaseActivity {
                         int header = value[0] & 0xFF;// 0xED
                         int flag = value[1] & 0xFF;// read or write
                         int cmd = value[2] & 0xFF;
-                        if (header != 0xED)
-                            return;
+                        if (header != 0xED) return;
                         ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
-                        if (configKeyEnum == null) {
-                            return;
-                        }
+                        if (configKeyEnum == null) return;
                         int length = value[3] & 0xFF;
                         if (flag == 0x01) {
                             // write
@@ -139,20 +132,8 @@ public class FilterUrlActivity extends Lw006BaseActivity {
     }
 
     public void onSave(View view) {
-        if (isWindowLocked())
-            return;
-        if (isValid()) {
-            showSyncingProgressDialog();
-            saveParams();
-        }
-    }
-
-    private boolean isValid() {
-        return true;
-    }
-
-
-    private void saveParams() {
+        if (isWindowLocked()) return;
+        showSyncingProgressDialog();
         final String url = !TextUtils.isEmpty(mBind.etUrl.getText()) ? mBind.etUrl.getText().toString() : null;
         savedParamsError = false;
         List<OrderTask> orderTasks = new ArrayList<>();
@@ -160,7 +141,6 @@ public class FilterUrlActivity extends Lw006BaseActivity {
         orderTasks.add(OrderTaskAssembler.setFilterEddystoneUrlEnable(mBind.cbUrl.isChecked() ? 1 : 0));
         LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
-
 
     @Override
     protected void onDestroy() {

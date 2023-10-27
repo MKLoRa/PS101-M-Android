@@ -21,22 +21,20 @@ public class ParamsReadTask extends OrderTask {
     }
 
     private void createGetConfigData(int configKey) {
-        data = new byte[]{
+        response.responseValue = data = new byte[]{
                 (byte) 0xED,
                 (byte) 0x00,
                 (byte) configKey,
                 (byte) 0x00
         };
-        response.responseValue = data;
     }
 
     public void getFilterName() {
-        data = new byte[]{
+        response.responseValue = data = new byte[]{
                 (byte) 0xEE,
                 (byte) 0x00,
                 (byte) ParamsKeyEnum.KEY_FILTER_NAME_RULES.getParamsKey(),
                 (byte) 0x00
         };
-        response.responseValue = data;
     }
 }

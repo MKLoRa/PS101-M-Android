@@ -36,10 +36,9 @@ public class PosGpsL76CFixActivity extends Lw006BaseActivity {
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         showSyncingProgressDialog();
-        List<OrderTask> orderTasks = new ArrayList<>();
+        List<OrderTask> orderTasks = new ArrayList<>(2);
         orderTasks.add(OrderTaskAssembler.getGPSPosTimeoutL76());
         orderTasks.add(OrderTaskAssembler.getGPSPDOPLimitL76());
-        orderTasks.add(OrderTaskAssembler.getGPSExtremeModeL76());
         LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
@@ -59,39 +58,32 @@ public class PosGpsL76CFixActivity extends Lw006BaseActivity {
         if (!MokoConstants.ACTION_CURRENT_DATA.equals(action))
             EventBus.getDefault().cancelEventDelivery(event);
         runOnUiThread(() -> {
-            if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
-            }
             if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
                 dismissSyncProgressDialog();
             }
             if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
                 OrderTaskResponse response = event.getResponse();
                 OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
-                int responseType = response.responseType;
                 byte[] value = response.responseValue;
                 if (orderCHAR == OrderCHAR.CHAR_PARAMS) {
                     if (value.length >= 4) {
                         int header = value[0] & 0xFF;// 0xED
                         int flag = value[1] & 0xFF;// read or write
                         int cmd = value[2] & 0xFF;
-                        if (header != 0xED)
-                            return;
+                        if (header != 0xED) return;
                         ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
-                        if (configKeyEnum == null) {
-                            return;
-                        }
+                        if (configKeyEnum == null) return;
                         int length = value[3] & 0xFF;
                         if (flag == 0x01) {
                             // write
                             int result = value[4] & 0xFF;
                             switch (configKeyEnum) {
                                 case KEY_GPS_POS_TIMEOUT_L76C:
-                                case KEY_GPS_PDOP_LIMIT_L76C:
                                     if (result != 1) {
                                         savedParamsError = true;
                                     }
                                     break;
-                                case KEY_GPS_EXTREME_MODE_L76C:
+                                case KEY_GPS_PDOP_LIMIT_L76C:
                                     if (result != 1) {
                                         savedParamsError = true;
                                     }
@@ -121,12 +113,6 @@ public class PosGpsL76CFixActivity extends Lw006BaseActivity {
                                         mBind.etPdopLimit.setSelection(mBind.etPdopLimit.getText().length());
                                     }
                                     break;
-                                case KEY_GPS_EXTREME_MODE_L76C:
-                                    if (length > 0) {
-                                        int enable = value[4] & 0xFF;
-                                        mBind.cbExtremeMode.setChecked(enable == 1);
-                                    }
-                                    break;
                             }
                         }
                     }
@@ -149,25 +135,22 @@ public class PosGpsL76CFixActivity extends Lw006BaseActivity {
         final String posTimeoutStr = mBind.etPositionTimeout.getText().toString();
         if (TextUtils.isEmpty(posTimeoutStr)) return false;
         final int posTimeout = Integer.parseInt(posTimeoutStr);
-        if (posTimeout < 60 || posTimeout > 600) {
-            return false;
-        }
-        final String pdopLimitStr = mBind.etPdopLimit.getText().toString();
-        if (TextUtils.isEmpty(pdopLimitStr)) return false;
-        final int pdopLimit = Integer.parseInt(pdopLimitStr);
-        return pdopLimit >= 25 && pdopLimit <= 100;
+        if (posTimeout < 30 || posTimeout > 600) return false;
+        final String limitStr = mBind.etPdopLimit.getText().toString();
+        if (TextUtils.isEmpty(limitStr)) return false;
+        final int limit = Integer.parseInt(limitStr);
+        return limit >= 25 && limit <= 100;
     }
 
     private void saveParams() {
         final String posTimeoutStr = mBind.etPositionTimeout.getText().toString();
         final int posTimeout = Integer.parseInt(posTimeoutStr);
-        final String pdopLimitStr = mBind.etPdopLimit.getText().toString();
-        final int pdopLimit = Integer.parseInt(pdopLimitStr);
+        final String limitStr = mBind.etPdopLimit.getText().toString();
+        final int limit = Integer.parseInt(limitStr);
         savedParamsError = false;
         List<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.setGPSPosTimeoutL76C(posTimeout));
-        orderTasks.add(OrderTaskAssembler.setGPSPDOPLimitL76C(pdopLimit));
-        orderTasks.add(OrderTaskAssembler.setGPSExtremeModeL76C(mBind.cbExtremeMode.isChecked() ? 1 : 0));
+        orderTasks.add(OrderTaskAssembler.setGPSPDOPLimitL76C(limit));
         LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
@@ -178,16 +161,6 @@ public class PosGpsL76CFixActivity extends Lw006BaseActivity {
     }
 
     public void onBack(View view) {
-        backHome();
-    }
-
-    @Override
-    public void onBackPressed() {
-        backHome();
-    }
-
-    private void backHome() {
-        setResult(RESULT_OK);
         finish();
     }
 }

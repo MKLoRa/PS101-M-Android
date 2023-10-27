@@ -23,12 +23,13 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class FilterTLMActivity extends Lw006BaseActivity {
     private Lw006ActivityFilterTlmBinding mBind;
     private boolean savedParamsError;
-    private ArrayList<String> mValues;
+    private final String[] mValues = {"Null", "version 0", "version 1"};
     private int mSelected;
     private boolean mTLMEnable;
 
@@ -38,10 +39,6 @@ public class FilterTLMActivity extends Lw006BaseActivity {
         mBind = Lw006ActivityFilterTlmBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
-        mValues = new ArrayList<>();
-        mValues.add("Null");
-        mValues.add("version 0");
-        mValues.add("version 1");
         showSyncingProgressDialog();
         List<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.getFilterEddystoneTlmEnable());
@@ -79,12 +76,9 @@ public class FilterTLMActivity extends Lw006BaseActivity {
                         int header = value[0] & 0xFF;// 0xED
                         int flag = value[1] & 0xFF;// read or write
                         int cmd = value[2] & 0xFF;
-                        if (header != 0xED)
-                            return;
+                        if (header != 0xED) return;
                         ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
-                        if (configKeyEnum == null) {
-                            return;
-                        }
+                        if (configKeyEnum == null) return;
                         int length = value[3] & 0xFF;
                         if (flag == 0x01) {
                             // write
@@ -109,7 +103,7 @@ public class FilterTLMActivity extends Lw006BaseActivity {
                                 case KEY_FILTER_EDDYSTONE_TLM_VERSION:
                                     if (length > 0) {
                                         mSelected = value[4] & 0xFF;
-                                        mBind.tvTlmVersion.setText(mValues.get(mSelected));
+                                        mBind.tvTlmVersion.setText(mValues[mSelected]);
                                     }
                                     break;
                                 case KEY_FILTER_EDDYSTONE_TLM_ENABLE:
@@ -151,10 +145,10 @@ public class FilterTLMActivity extends Lw006BaseActivity {
     public void onTLMVersion(View view) {
         if (isWindowLocked()) return;
         BottomDialog dialog = new BottomDialog();
-        dialog.setDatas(mValues, mSelected);
+        dialog.setDatas(new ArrayList<>(Arrays.asList(mValues)), mSelected);
         dialog.setListener(value -> {
             mSelected = value;
-            mBind.tvTlmVersion.setText(mValues.get(mSelected));
+            mBind.tvTlmVersion.setText(mValues[mSelected]);
             showSyncingProgressDialog();
             List<OrderTask> orderTasks = new ArrayList<>();
             orderTasks.add(OrderTaskAssembler.setFilterEddystoneTlmVersion(mSelected));

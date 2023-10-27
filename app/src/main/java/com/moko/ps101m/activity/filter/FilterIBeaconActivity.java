@@ -76,12 +76,9 @@ public class FilterIBeaconActivity extends Lw006BaseActivity {
                         int header = value[0] & 0xFF;// 0xED
                         int flag = value[1] & 0xFF;// read or write
                         int cmd = value[2] & 0xFF;
-                        if (header != 0xED)
-                            return;
+                        if (header != 0xED) return;
                         ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
-                        if (configKeyEnum == null) {
-                            return;
-                        }
+                        if (configKeyEnum == null) return;
                         int length = value[3] & 0xFF;
                         if (flag == 0x01) {
                             // write
@@ -202,7 +199,7 @@ public class FilterIBeaconActivity extends Lw006BaseActivity {
     }
 
     private void saveParams() {
-        final String uuid = mBind.etIbeaconUuid.getText().toString();
+        final String uuid = TextUtils.isEmpty(mBind.etIbeaconUuid.getText()) ? null : mBind.etIbeaconUuid.getText().toString();
         int majorMin;
         int majorMax;
         int minorMin;

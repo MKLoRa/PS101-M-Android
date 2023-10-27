@@ -14,13 +14,11 @@
             android:id="@+id/tv_back"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:clickable="true"
             android:drawableLeft="@drawable/lw006_ic_back"
             android:drawablePadding="6dp"
             android:gravity="center_vertical"
             android:onClick="onBack"
             android:paddingLeft="16dp"
-            android:text=""
             android:textColor="@color/white_ffffff"
             android:textSize="15sp" />
 
@@ -37,7 +35,6 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
-            android:clickable="true"
             android:onClick="onSave"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
@@ -113,8 +110,6 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
                     android:padding="10dp">
 
                     <TextView
@@ -132,7 +127,6 @@
                         android:id="@+id/iv_tag_id_del"
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
-                        android:clickable="true"
                         android:onClick="onDel"
                         android:padding="12dp"
                         android:src="@drawable/lw006_ic_del"
@@ -144,7 +138,6 @@
                         android:id="@+id/iv_tag_id_add"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:clickable="true"
                         android:onClick="onAdd"
                         android:padding="12dp"
                         android:src="@drawable/lw006_ic_add"

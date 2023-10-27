@@ -34,7 +34,7 @@ import java.util.List;
 public class FilterOtherActivity extends Lw006BaseActivity {
     private Lw006ActivityFilterOtherBinding mBind;
     private boolean savedParamsError;
-    private ArrayList<String> filterOther;
+    private ArrayList<String> filterOther = new ArrayList<>();
     private ArrayList<String> mValues;
     private int mSelected;
 
@@ -44,8 +44,6 @@ public class FilterOtherActivity extends Lw006BaseActivity {
         mBind = Lw006ActivityFilterOtherBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
-
-        filterOther = new ArrayList<>();
         showSyncingProgressDialog();
         List<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.getFilterOtherEnable());
@@ -70,27 +68,21 @@ public class FilterOtherActivity extends Lw006BaseActivity {
         if (!MokoConstants.ACTION_CURRENT_DATA.equals(action))
             EventBus.getDefault().cancelEventDelivery(event);
         runOnUiThread(() -> {
-            if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
-            }
             if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
                 dismissSyncProgressDialog();
             }
             if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
                 OrderTaskResponse response = event.getResponse();
                 OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
-                int responseType = response.responseType;
                 byte[] value = response.responseValue;
                 if (orderCHAR == OrderCHAR.CHAR_PARAMS) {
                     if (value.length >= 4) {
                         int header = value[0] & 0xFF;// 0xED
                         int flag = value[1] & 0xFF;// read or write
                         int cmd = value[2] & 0xFF;
-                        if (header != 0xED)
-                            return;
+                        if (header != 0xED) return;
                         ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
-                        if (configKeyEnum == null) {
-                            return;
-                        }
+                        if (configKeyEnum == null) return;
                         int length = value[3] & 0xFF;
                         if (flag == 0x01) {
                             // write
@@ -224,16 +216,10 @@ public class FilterOtherActivity extends Lw006BaseActivity {
                 final String rawDataStr = etRawData.getText().toString();
 
                 final int dataType = TextUtils.isEmpty(dataTypeStr) ? 0 : Integer.parseInt(dataTypeStr, 16);
-//                final DataTypeEnum dataTypeEnum = DataTypeEnum.fromDataType(dataType);
-                if (dataType < 0 || dataType > 0xFF)
-                    return false;
-                if (TextUtils.isEmpty(rawDataStr)) {
-                    return false;
-                }
+                if (dataType < 0 || dataType > 0xFF) return false;
+                if (TextUtils.isEmpty(rawDataStr)) return false;
                 int length = rawDataStr.length();
-                if (length % 2 != 0) {
-                    return false;
-                }
+                if (length % 2 != 0) return false;
                 int min = 0;
                 int max = 0;
                 if (dataType != 0) {
@@ -241,29 +227,19 @@ public class FilterOtherActivity extends Lw006BaseActivity {
                         min = Integer.parseInt(minStr);
                     if (!TextUtils.isEmpty(maxStr))
                         max = Integer.parseInt(maxStr);
-                    if (min == 0 && max != 0) {
-                        return false;
-                    }
-                    if (min > 29) {
-                        return false;
-                    }
-                    if (max > 29) {
-                        return false;
-                    }
-                    if (max < min) {
-                        return false;
-                    }
+                    if (min == 0 && max != 0) return false;
+                    if (min > 29) return false;
+                    if (max > 29) return false;
+                    if (max < min) return false;
                     if (min > 0) {
                         int interval = max - min;
-                        if (length != ((interval + 1) * 2)) {
-                            return false;
-                        }
+                        if (length != ((interval + 1) * 2)) return false;
                     }
                 } else {
                     etMin.setText("0");
                     etMax.setText("0");
                 }
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 sb.append(MokoUtils.int2HexString(dataType));
                 sb.append(MokoUtils.int2HexString(min));
                 sb.append(MokoUtils.int2HexString(max));
@@ -281,9 +257,6 @@ public class FilterOtherActivity extends Lw006BaseActivity {
         List<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.setFilterOtherRules(filterOther));
         int relationship = 0;
-        if (filterOther.size() == 1) {
-            relationship = 0;
-        }
         if (filterOther.size() == 2) {
             relationship = mSelected + 1;
         }

@@ -36,7 +36,7 @@ public class MotionModeActivity extends Lw006BaseActivity {
     private Lw006ActivityMotionModeBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
-    private ArrayList<String> mValues;
+    private final String[] mValues = {"WIFI", "BLE", "GPS", "WIFI+GPS", "BLE+GPS", "WIFI+BLE", "WIFI+BLE+GPS"};
     private int mStartSelected;
     private int mTripSelected;
     private int mEndSelected;
@@ -47,14 +47,6 @@ public class MotionModeActivity extends Lw006BaseActivity {
         super.onCreate(savedInstanceState);
         mBind = Lw006ActivityMotionModeBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
-        mValues = new ArrayList<>();
-        mValues.add("WIFI");
-        mValues.add("BLE");
-        mValues.add("GPS");
-        mValues.add("WIFI+GPS");
-        mValues.add("BLE+GPS");
-        mValues.add("WIFI+BLE");
-        mValues.add("WIFI+BLE+GPS");
         EventBus.getDefault().register(this);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
@@ -64,7 +56,6 @@ public class MotionModeActivity extends Lw006BaseActivity {
         showSyncingProgressDialog();
         List<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.getMotionModeEvent());
-        orderTasks.add(OrderTaskAssembler.getMotionModeStartNumber());
         orderTasks.add(OrderTaskAssembler.getMotionStartPosStrategy());
         orderTasks.add(OrderTaskAssembler.getMotionTripInterval());
         orderTasks.add(OrderTaskAssembler.getMotionTripPosStrategy());
@@ -93,8 +84,6 @@ public class MotionModeActivity extends Lw006BaseActivity {
         if (!MokoConstants.ACTION_CURRENT_DATA.equals(action))
             EventBus.getDefault().cancelEventDelivery(event);
         runOnUiThread(() -> {
-            if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
-            }
             if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
                 dismissSyncProgressDialog();
             }
@@ -107,18 +96,14 @@ public class MotionModeActivity extends Lw006BaseActivity {
                         int header = value[0] & 0xFF;// 0xED
                         int flag = value[1] & 0xFF;// read or write
                         int cmd = value[2] & 0xFF;
-                        if (header != 0xED)
-                            return;
+                        if (header != 0xED) return;
                         ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
-                        if (configKeyEnum == null) {
-                            return;
-                        }
+                        if (configKeyEnum == null) return;
                         int length = value[3] & 0xFF;
                         if (flag == 0x01) {
                             // write
                             int result = value[4] & 0xFF;
                             switch (configKeyEnum) {
-                                case KEY_MOTION_MODE_START_NUMBER:
                                 case KEY_MOTION_MODE_START_POS_STRATEGY:
                                 case KEY_MOTION_MODE_TRIP_REPORT_INTERVAL:
                                 case KEY_MOTION_MODE_TRIP_POS_STRATEGY:
@@ -159,17 +144,10 @@ public class MotionModeActivity extends Lw006BaseActivity {
                                         mBind.cbFixOnStationaryState.setChecked((modeEvent & 64) == 64);
                                     }
                                     break;
-                                case KEY_MOTION_MODE_START_NUMBER:
-                                    if (length > 0) {
-                                        int number = value[4] & 0xFF;
-                                        mBind.etFixOnStartNumber.setText(String.valueOf(number));
-                                        mBind.etFixOnStartNumber.setSelection(mBind.etFixOnStartNumber.getText().length());
-                                    }
-                                    break;
                                 case KEY_MOTION_MODE_START_POS_STRATEGY:
                                     if (length > 0) {
                                         mStartSelected = value[4] & 0xFF;
-                                        mBind.tvPosStrategyOnStart.setText(mValues.get(mStartSelected));
+                                        mBind.tvPosStrategyOnStart.setText(mValues[mStartSelected]);
                                     }
                                     break;
                                 case KEY_MOTION_MODE_TRIP_REPORT_INTERVAL:
@@ -183,7 +161,7 @@ public class MotionModeActivity extends Lw006BaseActivity {
                                 case KEY_MOTION_MODE_TRIP_POS_STRATEGY:
                                     if (length > 0) {
                                         mTripSelected = value[4] & 0xFF;
-                                        mBind.tvPosStrategyInTrip.setText(mValues.get(mTripSelected));
+                                        mBind.tvPosStrategyInTrip.setText(mValues[mTripSelected]);
                                     }
                                     break;
                                 case KEY_MOTION_MODE_END_TIMEOUT:
@@ -211,14 +189,14 @@ public class MotionModeActivity extends Lw006BaseActivity {
                                 case KEY_MOTION_MODE_END_POS_STRATEGY:
                                     if (length > 0) {
                                         mEndSelected = value[4] & 0xFF;
-                                        mBind.tvPosStrategyOnEnd.setText(mValues.get(mEndSelected));
+                                        mBind.tvPosStrategyOnEnd.setText(mValues[mEndSelected]);
                                     }
                                     break;
 
                                 case KEY_MOTION_MODE_STATIONARY_POS_STRATEGY:
                                     if (length > 0) {
                                         stationarySelected = value[4] & 0xff;
-                                        mBind.tvPosStrategyOnStationary.setText(mValues.get(stationarySelected));
+                                        mBind.tvPosStrategyOnStationary.setText(mValues[stationarySelected]);
                                     }
                                     break;
 
@@ -265,16 +243,6 @@ public class MotionModeActivity extends Lw006BaseActivity {
     }
 
     public void onBack(View view) {
-        backHome();
-    }
-
-    @Override
-    public void onBackPressed() {
-        backHome();
-    }
-
-    private void backHome() {
-        setResult(RESULT_OK);
         finish();
     }
 
@@ -289,10 +257,6 @@ public class MotionModeActivity extends Lw006BaseActivity {
     }
 
     private boolean isValid() {
-        if (TextUtils.isEmpty(mBind.etFixOnStartNumber.getText())) return false;
-        final String startNumberStr = mBind.etFixOnStartNumber.getText().toString();
-        final int startNumber = Integer.parseInt(startNumberStr);
-        if (startNumber < 1 || startNumber > 255) return false;
         if (TextUtils.isEmpty(mBind.etReportIntervalInTrip.getText())) return false;
         final String intervalTripStr = mBind.etReportIntervalInTrip.getText().toString();
         final int intervalTrip = Integer.parseInt(intervalTripStr);
@@ -315,8 +279,6 @@ public class MotionModeActivity extends Lw006BaseActivity {
     }
 
     private void saveParams() {
-        final String startNumberStr = mBind.etFixOnStartNumber.getText().toString();
-        final int startNumber = Integer.parseInt(startNumberStr);
         final String intervalTripStr = mBind.etReportIntervalInTrip.getText().toString();
         final int intervalTrip = Integer.parseInt(intervalTripStr);
         final String endTimeoutStr = mBind.etTripEndTimeout.getText().toString();
@@ -329,7 +291,6 @@ public class MotionModeActivity extends Lw006BaseActivity {
 
         savedParamsError = false;
         List<OrderTask> orderTasks = new ArrayList<>();
-        orderTasks.add(OrderTaskAssembler.setMotionModeStartNumber(startNumber));
         orderTasks.add(OrderTaskAssembler.setMotionStartPosStrategy(mStartSelected));
         orderTasks.add(OrderTaskAssembler.setMotionTripInterval(intervalTrip));
         orderTasks.add(OrderTaskAssembler.setMotionTripPosStrategy(mTripSelected));
@@ -353,10 +314,10 @@ public class MotionModeActivity extends Lw006BaseActivity {
     public void selectPosStrategyStart(View view) {
         if (isWindowLocked()) return;
         BottomDialog dialog = new BottomDialog();
-        dialog.setDatas(mValues, mStartSelected);
+        dialog.setDatas(new ArrayList<>(Arrays.asList(mValues)), mStartSelected);
         dialog.setListener(value -> {
             mStartSelected = value;
-            mBind.tvPosStrategyOnStart.setText(mValues.get(value));
+            mBind.tvPosStrategyOnStart.setText(mValues[value]);
         });
         dialog.show(getSupportFragmentManager());
     }
@@ -364,10 +325,10 @@ public class MotionModeActivity extends Lw006BaseActivity {
     public void selectPosStrategyTrip(View view) {
         if (isWindowLocked()) return;
         BottomDialog dialog = new BottomDialog();
-        dialog.setDatas(mValues, mTripSelected);
+        dialog.setDatas(new ArrayList<>(Arrays.asList(mValues)), mTripSelected);
         dialog.setListener(value -> {
             mTripSelected = value;
-            mBind.tvPosStrategyInTrip.setText(mValues.get(value));
+            mBind.tvPosStrategyInTrip.setText(mValues[value]);
         });
         dialog.show(getSupportFragmentManager());
     }
@@ -375,21 +336,21 @@ public class MotionModeActivity extends Lw006BaseActivity {
     public void selectPosStrategyEnd(View view) {
         if (isWindowLocked()) return;
         BottomDialog dialog = new BottomDialog();
-        dialog.setDatas(mValues, mEndSelected);
+        dialog.setDatas(new ArrayList<>(Arrays.asList(mValues)), mEndSelected);
         dialog.setListener(value -> {
             mEndSelected = value;
-            mBind.tvPosStrategyOnEnd.setText(mValues.get(value));
+            mBind.tvPosStrategyOnEnd.setText(mValues[value]);
         });
         dialog.show(getSupportFragmentManager());
     }
 
-    public void selectPosStrategyStationary(View view){
+    public void selectPosStrategyStationary(View view) {
         if (isWindowLocked()) return;
         BottomDialog dialog = new BottomDialog();
-        dialog.setDatas(mValues, stationarySelected);
+        dialog.setDatas(new ArrayList<>(Arrays.asList(mValues)), stationarySelected);
         dialog.setListener(value -> {
             stationarySelected = value;
-            mBind.tvPosStrategyOnStationary.setText(mValues.get(value));
+            mBind.tvPosStrategyOnStationary.setText(mValues[value]);
         });
         dialog.show(getSupportFragmentManager());
     }

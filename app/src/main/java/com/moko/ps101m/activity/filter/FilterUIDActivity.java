@@ -75,12 +75,9 @@ public class FilterUIDActivity extends Lw006BaseActivity {
                         int header = value[0] & 0xFF;// 0xED
                         int flag = value[1] & 0xFF;// read or write
                         int cmd = value[2] & 0xFF;
-                        if (header != 0xED)
-                            return;
+                        if (header != 0xED) return;
                         ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
-                        if (configKeyEnum == null) {
-                            return;
-                        }
+                        if (configKeyEnum == null) return;
                         int length = value[3] & 0xFF;
                         if (flag == 0x01) {
                             // write
@@ -149,9 +146,7 @@ public class FilterUIDActivity extends Lw006BaseActivity {
         if (!TextUtils.isEmpty(mBind.etUidNamespace.getText())) {
             final String namespace = mBind.etUidNamespace.getText().toString();
             int length = namespace.length();
-            if (length % 2 != 0) {
-                return false;
-            }
+            if (length % 2 != 0) return false;
         }
         if (!TextUtils.isEmpty(mBind.etUidInstanceId.getText())) {
             final String instanceId = mBind.etUidInstanceId.getText().toString();

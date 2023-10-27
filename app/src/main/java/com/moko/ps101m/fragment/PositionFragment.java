@@ -27,15 +27,12 @@ public class PositionFragment extends Fragment {
     public PositionFragment() {
     }
 
-
     public static PositionFragment newInstance() {
-        PositionFragment fragment = new PositionFragment();
-        return fragment;
+        return new PositionFragment();
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
         mBind = Lw006FragmentPosBinding.inflate(inflater, container, false);
         activity = (DeviceInfoActivity) getActivity();

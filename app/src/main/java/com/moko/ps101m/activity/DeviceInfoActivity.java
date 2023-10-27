@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.RadioGroup;
@@ -62,14 +63,8 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
     private PositionFragment posFragment;
     private GeneralFragment generalFragment;
     private DeviceFragment deviceFragment;
-    private final String[] mUploadMode = {"ABP", "OTAA"};
-    private final String[] mRegions = {"AS923", "AU915", "CN470", "CN779", "EU433", "EU868", "KR920", "IN865", "US915", "RU864", "AS923-2", "AS923-3", "AS923-4"};
-    private int mSelectedRegion;
-    private int mSelectUploadMode;
     private boolean mReceiverTag = false;
     private int disConnectType;
-    // 0x00:LR1110,0x01:L76
-    private int mDeviceType;
     private boolean savedParamsError;
 
     @Override
@@ -77,17 +72,20 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
         super.onCreate(savedInstanceState);
         mBind = Lw006ActivityDeviceInfoBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
-        mDeviceType = getIntent().getIntExtra(AppConstants.EXTRA_KEY_DEVICE_TYPE, 0);
         fragmentManager = getSupportFragmentManager();
         initFragment();
-        mBind.radioBtnLora.setChecked(true);
+        mBind.radioBtnNetwork.setChecked(true);
         mBind.tvTitle.setText(R.string.title_lora);
         mBind.rgOptions.setOnCheckedChangeListener(this);
         EventBus.getDefault().register(this);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
-        registerReceiver(mReceiver, filter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(mReceiver, filter, RECEIVER_EXPORTED);
+        } else {
+            registerReceiver(mReceiver, filter);
+        }
         mReceiverTag = true;
         if (!LoRaLW006MokoSupport.getInstance().isBluetoothOpen()) {
             LoRaLW006MokoSupport.getInstance().enableBluetooth();
@@ -154,8 +152,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
                 byte[] value = response.responseValue;
                 if (orderCHAR == OrderCHAR.CHAR_DISCONNECTED_NOTIFY) {
                     final int length = value.length;
-                    if (length != 5)
-                        return;
+                    if (length != 5) return;
                     int header = value[0] & 0xFF;
                     int flag = value[1] & 0xFF;
                     int cmd = value[2] & 0xFF;
@@ -202,8 +199,8 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
                                         ToastUtils.showToast(this, "Time sync completed!");
                                     break;
                                 case KEY_NETWORK_RECONNECT_INTERVAL:
-                                case KEY_LOW_POWER_PERCENT:
                                 case KEY_HEARTBEAT_INTERVAL:
+                                case KEY_LOW_POWER_PERCENT:
                                 case KEY_TIME_ZONE:
                                 case KEY_BUZZER_SOUND_CHOOSE:
                                 case KEY_VIBRATION_INTENSITY:
@@ -240,6 +237,15 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
                                         networkFragment.setNetworkReconnectInterval(interval);
                                     }
                                     break;
+
+                                case KEY_HEARTBEAT_INTERVAL:
+                                    if (length == 2) {
+                                        int interval = MokoUtils.toInt(Arrays.copyOfRange(value, 4, value.length));
+                                        generalFragment.setHeartbeatInterval(interval);
+                                    }
+                                    break;
+
+
                                 case KEY_TIME_ZONE:
                                     if (length > 0) {
                                         int timeZone = value[4];
@@ -469,7 +475,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
 
     @Override
     public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
-        if (checkedId == R.id.radioBtn_lora) {
+        if (checkedId == R.id.radioBtnNetwork) {
             showLoRaAndGetData();
         } else if (checkedId == R.id.radioBtn_position) {
             showPosAndGetData();
@@ -587,11 +593,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
 
     public void onGPSFix(View view) {
         if (isWindowLocked()) return;
-        Intent intent;
-        if (mDeviceType == 0x00)
-            intent = new Intent(this, PosGpsL76CFixActivity.class);
-        else
-            intent = new Intent(this, PosGpsLR1110FixActivity.class);
+        Intent intent = new Intent(this, PosGpsL76CFixActivity.class);
         startActivity(intent);
     }
 

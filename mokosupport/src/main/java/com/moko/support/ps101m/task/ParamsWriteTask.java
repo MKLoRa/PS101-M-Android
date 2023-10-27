@@ -29,6 +29,18 @@ public class ParamsWriteTask extends OrderTask {
         return data;
     }
 
+    public void setAxisDataReportInterval(@IntRange(from = 0, to = 65535) int interval) {
+        byte[] bytes = MokoUtils.toByteArray(interval, 2);
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_AXIS_REPORT_INTERVAL.getParamsKey(),
+                (byte) 0x02,
+                bytes[0],
+                bytes[1]
+        };
+    }
+
     //mqtt参数
     public void setMQTTHost(String mqttHost) {
         byte[] bytes = mqttHost.getBytes();
@@ -596,16 +608,22 @@ public class ParamsWriteTask extends OrderTask {
         response.responseValue = data;
     }
 
-    public void setAdvName(String advName) {
-        byte[] advNameBytes = advName.getBytes();
-        int length = advNameBytes.length;
-        data = new byte[length + 4];
-        data[0] = (byte) 0xED;
-        data[1] = (byte) 0x01;
-        data[2] = (byte) ParamsKeyEnum.KEY_ADV_NAME.getParamsKey();
-        data[3] = (byte) length;
-        for (int i = 0; i < advNameBytes.length; i++) {
-            data[i + 4] = advNameBytes[i];
+    public void setAdvName(@Nullable String advName) {
+        if (TextUtils.isEmpty(advName)) {
+            data = new byte[4];
+            data[0] = (byte) 0xED;
+            data[1] = (byte) 0x01;
+            data[2] = (byte) ParamsKeyEnum.KEY_ADV_NAME.getParamsKey();
+            data[3] = (byte) 0;
+        } else {
+            byte[] advNameBytes = advName.getBytes();
+            int length = advNameBytes.length;
+            data = new byte[length + 4];
+            data[0] = (byte) 0xED;
+            data[1] = (byte) 0x01;
+            data[2] = (byte) ParamsKeyEnum.KEY_ADV_NAME.getParamsKey();
+            data[3] = (byte) length;
+            System.arraycopy(advNameBytes, 0, data, 4, advNameBytes.length);
         }
         response.responseValue = data;
     }
@@ -696,17 +714,6 @@ public class ParamsWriteTask extends OrderTask {
                 (byte) ParamsKeyEnum.KEY_MOTION_MODE_EVENT.getParamsKey(),
                 (byte) 0x01,
                 (byte) event
-        };
-        response.responseValue = data;
-    }
-
-    public void setMotionModeStartNumber(@IntRange(from = 1, to = 255) int number) {
-        data = new byte[]{
-                (byte) 0xED,
-                (byte) 0x01,
-                (byte) ParamsKeyEnum.KEY_MOTION_MODE_START_NUMBER.getParamsKey(),
-                (byte) 0x01,
-                (byte) number
         };
         response.responseValue = data;
     }
@@ -819,15 +826,14 @@ public class ParamsWriteTask extends OrderTask {
         };
     }
 
-    public void setWifiPosDataType(@IntRange(from = 0, to = 1) int type) {
-        data = new byte[]{
+    public void setWifiRssiFilter(@IntRange(from = -127, to = 0) int rssi) {
+        response.responseValue = data = new byte[]{
                 (byte) 0xED,
                 (byte) 0x01,
-                (byte) ParamsKeyEnum.KEY_WIFI_POS_DATA_TYPE.getParamsKey(),
+                (byte) ParamsKeyEnum.KEY_WIFI_RSSI_FILTER.getParamsKey(),
                 (byte) 0x01,
-                (byte) type
+                (byte) rssi
         };
-        response.responseValue = data;
     }
 
     public void setWifiPosMechanism(@IntRange(from = 0, to = 1) int type) {
@@ -1077,9 +1083,7 @@ public class ParamsWriteTask extends OrderTask {
             data[1] = (byte) 0x01;
             data[2] = (byte) ParamsKeyEnum.KEY_FILTER_IBEACON_UUID.getParamsKey();
             data[3] = (byte) length;
-            for (int i = 0; i < uuidBytes.length; i++) {
-                data[i + 4] = uuidBytes[i];
-            }
+            System.arraycopy(uuidBytes, 0, data, 4, uuidBytes.length);
         }
         response.responseValue = data;
     }
@@ -1354,9 +1358,7 @@ public class ParamsWriteTask extends OrderTask {
             data[1] = (byte) 0x01;
             data[2] = (byte) ParamsKeyEnum.KEY_FILTER_EDDYSTONE_UID_NAMESPACE.getParamsKey();
             data[3] = (byte) length;
-            for (int i = 0; i < dataBytes.length; i++) {
-                data[i + 4] = dataBytes[i];
-            }
+            System.arraycopy(dataBytes, 0, data, 4, dataBytes.length);
         }
         response.responseValue = data;
     }
@@ -1376,9 +1378,7 @@ public class ParamsWriteTask extends OrderTask {
             data[1] = (byte) 0x01;
             data[2] = (byte) ParamsKeyEnum.KEY_FILTER_EDDYSTONE_UID_INSTANCE.getParamsKey();
             data[3] = (byte) length;
-            for (int i = 0; i < dataBytes.length; i++) {
-                data[i + 4] = dataBytes[i];
-            }
+            System.arraycopy(dataBytes, 0, data, 4, dataBytes.length);
         }
         response.responseValue = data;
     }
@@ -1409,9 +1409,7 @@ public class ParamsWriteTask extends OrderTask {
             data[1] = (byte) 0x01;
             data[2] = (byte) ParamsKeyEnum.KEY_FILTER_EDDYSTONE_URL.getParamsKey();
             data[3] = (byte) length;
-            for (int i = 0; i < dataBytes.length; i++) {
-                data[i + 4] = dataBytes[i];
-            }
+            System.arraycopy(dataBytes, 0, data, 4, dataBytes.length);
         }
         response.responseValue = data;
     }
@@ -1546,17 +1544,6 @@ public class ParamsWriteTask extends OrderTask {
                 (byte) 0xED,
                 (byte) 0x01,
                 (byte) ParamsKeyEnum.KEY_GPS_PDOP_LIMIT_L76C.getParamsKey(),
-                (byte) 0x01,
-                (byte) limit,
-        };
-        response.responseValue = data;
-    }
-
-    public void setGPSExtremeModeL76(@IntRange(from = 0, to = 1) int limit) {
-        data = new byte[]{
-                (byte) 0xED,
-                (byte) 0x01,
-                (byte) ParamsKeyEnum.KEY_GPS_EXTREME_MODE_L76C.getParamsKey(),
                 (byte) 0x01,
                 (byte) limit,
         };

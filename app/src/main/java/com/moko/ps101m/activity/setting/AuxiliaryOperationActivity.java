@@ -16,12 +16,10 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 public class AuxiliaryOperationActivity extends Lw006BaseActivity {
-    private Lw006ActivityAuxiliaryOperationBinding mBind;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityAuxiliaryOperationBinding.inflate(getLayoutInflater());
+        Lw006ActivityAuxiliaryOperationBinding mBind = Lw006ActivityAuxiliaryOperationBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
     }
@@ -36,23 +34,6 @@ public class AuxiliaryOperationActivity extends Lw006BaseActivity {
         });
     }
 
-    @Subscribe(threadMode = ThreadMode.POSTING, priority = 200)
-    public void onOrderTaskResponseEvent(OrderTaskResponseEvent event) {
-        final String action = event.getAction();
-        if (!MokoConstants.ACTION_CURRENT_DATA.equals(action))
-            EventBus.getDefault().cancelEventDelivery(event);
-        runOnUiThread(() -> {
-            if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
-            }
-            if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
-                dismissSyncProgressDialog();
-            }
-            if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
-                OrderTaskResponse response = event.getResponse();
-            }
-        });
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -60,16 +41,6 @@ public class AuxiliaryOperationActivity extends Lw006BaseActivity {
     }
 
     public void onBack(View view) {
-        backHome();
-    }
-
-    @Override
-    public void onBackPressed() {
-        backHome();
-    }
-
-    private void backHome() {
-        setResult(RESULT_OK);
         finish();
     }
 

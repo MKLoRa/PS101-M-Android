@@ -259,12 +259,6 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask getMotionModeStartNumber() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_MOTION_MODE_START_NUMBER);
-        return task;
-    }
-
     public static OrderTask getMotionStartPosStrategy() {
         ParamsReadTask task = new ParamsReadTask();
         task.setData(ParamsKeyEnum.KEY_MOTION_MODE_START_POS_STRATEGY);
@@ -320,9 +314,9 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask getWifiPosDataType() {
+    public static OrderTask getWifiRssiFilter() {
         ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_WIFI_POS_DATA_TYPE);
+        task.setData(ParamsKeyEnum.KEY_WIFI_RSSI_FILTER);
         return task;
     }
 
@@ -641,12 +635,6 @@ public class OrderTaskAssembler {
     public static OrderTask getGPSPDOPLimitL76() {
         ParamsReadTask task = new ParamsReadTask();
         task.setData(ParamsKeyEnum.KEY_GPS_PDOP_LIMIT_L76C);
-        return task;
-    }
-
-    public static OrderTask getGPSExtremeModeL76() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_GPS_EXTREME_MODE_L76C);
         return task;
     }
 
@@ -1052,10 +1040,22 @@ public class OrderTaskAssembler {
         return task;
     }
 
+    public static OrderTask getAxisDataReportInterval() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_AXIS_REPORT_INTERVAL);
+        return task;
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////
     // WRITE
     ///////////////////////////////////////////////////////////////////////////
+    public static OrderTask setAxisDataReportInterval(@IntRange(from = 0, to = 65535) int interval) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setAxisDataReportInterval(interval);
+        return task;
+    }
+
     public static OrderTask setMQTTHost(String mqttHost) {
         ParamsWriteTask task = new ParamsWriteTask();
         task.setMQTTHost(mqttHost);
@@ -1317,7 +1317,7 @@ public class OrderTaskAssembler {
     }
 
 
-    public static OrderTask setAdvName(String advName) {
+    public static OrderTask setAdvName(@Nullable String advName) {
         ParamsWriteTask task = new ParamsWriteTask();
         task.setAdvName(advName);
         return task;
@@ -1362,12 +1362,6 @@ public class OrderTaskAssembler {
     public static OrderTask setMotionModeEvent(@IntRange(from = 0, to = 31) int event) {
         ParamsWriteTask task = new ParamsWriteTask();
         task.setMotionModeEvent(event);
-        return task;
-    }
-
-    public static OrderTask setMotionModeStartNumber(@IntRange(from = 1, to = 255) int number) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setMotionModeStartNumber(number);
         return task;
     }
 
@@ -1426,9 +1420,9 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask setWifiPosDataType(@IntRange(from = 0, to = 1) int type) {
+    public static OrderTask setWifiRssiFilter(@IntRange(from = -127, to = 0) int rssi) {
         ParamsWriteTask task = new ParamsWriteTask();
-        task.setWifiPosDataType(type);
+        task.setWifiRssiFilter(rssi);
         return task;
     }
 
@@ -1751,12 +1745,6 @@ public class OrderTaskAssembler {
     public static OrderTask setGPSPDOPLimitL76C(@IntRange(from = 25, to = 100) int limit) {
         ParamsWriteTask task = new ParamsWriteTask();
         task.setGPSPDOPLimitL76(limit);
-        return task;
-    }
-
-    public static OrderTask setGPSExtremeModeL76C(@IntRange(from = 0, to = 1) int limit) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setGPSExtremeModeL76(limit);
         return task;
     }
 

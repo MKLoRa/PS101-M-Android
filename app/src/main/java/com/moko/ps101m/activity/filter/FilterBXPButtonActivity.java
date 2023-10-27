@@ -40,7 +40,6 @@ public class FilterBXPButtonActivity extends Lw006BaseActivity {
         LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
-
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 400)
     public void onConnectStatusEvent(ConnectStatusEvent event) {
         final String action = event.getAction();
@@ -65,19 +64,15 @@ public class FilterBXPButtonActivity extends Lw006BaseActivity {
             if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
                 OrderTaskResponse response = event.getResponse();
                 OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
-                int responseType = response.responseType;
                 byte[] value = response.responseValue;
                 if (orderCHAR == OrderCHAR.CHAR_PARAMS) {
                     if (value.length >= 4) {
                         int header = value[0] & 0xFF;// 0xED
                         int flag = value[1] & 0xFF;// read or write
                         int cmd = value[2] & 0xFF;
-                        if (header != 0xED)
-                            return;
+                        if (header != 0xED) return;
                         ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
-                        if (configKeyEnum == null) {
-                            return;
-                        }
+                        if (configKeyEnum == null) return;
                         int length = value[3] & 0xFF;
                         if (flag == 0x01) {
                             // write
@@ -127,14 +122,8 @@ public class FilterBXPButtonActivity extends Lw006BaseActivity {
 
     public void onSave(View view) {
         if (isWindowLocked()) return;
-        if (isValid()) {
-            showSyncingProgressDialog();
-            saveParams();
-        }
-    }
-
-    private boolean isValid() {
-        return true;
+        showSyncingProgressDialog();
+        saveParams();
     }
 
     private void saveParams() {
@@ -156,17 +145,6 @@ public class FilterBXPButtonActivity extends Lw006BaseActivity {
     }
 
     public void onBack(View view) {
-        backHome();
-    }
-
-    @Override
-    public void onBackPressed() {
-        backHome();
-    }
-
-    private void backHome() {
-        EventBus.getDefault().unregister(this);
-        setResult(RESULT_OK);
         finish();
     }
 }

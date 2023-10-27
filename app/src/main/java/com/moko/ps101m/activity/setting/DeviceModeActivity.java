@@ -26,12 +26,13 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class DeviceModeActivity extends Lw006BaseActivity {
     private Lw006ActivityDeviceModeBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
-    private ArrayList<String> mValues;
+    private final String[] mValues = {"Standby Mode", "Timing Mode", "Periodic Mode", "Motion Mode"};
     private int mSelected;
 
     @Override
@@ -39,11 +40,6 @@ public class DeviceModeActivity extends Lw006BaseActivity {
         super.onCreate(savedInstanceState);
         mBind = Lw006ActivityDeviceModeBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
-        mValues = new ArrayList<>();
-        mValues.add("Standby Mode");
-        mValues.add("Timing Mode");
-        mValues.add("Periodic Mode");
-        mValues.add("Motion Mode");
         EventBus.getDefault().register(this);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
@@ -74,15 +70,12 @@ public class DeviceModeActivity extends Lw006BaseActivity {
         if (!MokoConstants.ACTION_CURRENT_DATA.equals(action))
             EventBus.getDefault().cancelEventDelivery(event);
         runOnUiThread(() -> {
-            if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
-            }
             if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
                 dismissSyncProgressDialog();
             }
             if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
                 OrderTaskResponse response = event.getResponse();
                 OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
-                int responseType = response.responseType;
                 byte[] value = response.responseValue;
                 if (orderCHAR == OrderCHAR.CHAR_PARAMS) {
                     if (value.length >= 4) {
@@ -91,9 +84,7 @@ public class DeviceModeActivity extends Lw006BaseActivity {
                         int cmd = value[2] & 0xFF;
                         if (header != 0xED) return;
                         ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
-                        if (configKeyEnum == null) {
-                            return;
-                        }
+                        if (configKeyEnum == null) return;
                         int length = value[3] & 0xFF;
                         if (flag == 0x01) {
                             // write
@@ -114,7 +105,7 @@ public class DeviceModeActivity extends Lw006BaseActivity {
                             if (configKeyEnum == ParamsKeyEnum.KEY_DEVICE_MODE) {
                                 if (length > 0) {
                                     mSelected = value[4] & 0xff;
-                                    mBind.tvDeviceMode.setText(mValues.get(mSelected));
+                                    mBind.tvDeviceMode.setText(mValues[mSelected]);
                                 }
                             }
                         }
@@ -153,26 +144,16 @@ public class DeviceModeActivity extends Lw006BaseActivity {
     }
 
     public void onBack(View view) {
-        backHome();
-    }
-
-    @Override
-    public void onBackPressed() {
-        backHome();
-    }
-
-    private void backHome() {
-        setResult(RESULT_OK);
         finish();
     }
 
     public void selectDeviceMode(View view) {
         if (isWindowLocked()) return;
         BottomDialog dialog = new BottomDialog();
-        dialog.setDatas(mValues, mSelected);
+        dialog.setDatas(new ArrayList<>(Arrays.asList(mValues)), mSelected);
         dialog.setListener(value -> {
             mSelected = value;
-            mBind.tvDeviceMode.setText(mValues.get(value));
+            mBind.tvDeviceMode.setText(mValues[value]);
             savedParamsError = false;
             showSyncingProgressDialog();
             LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setDeviceMode(value));

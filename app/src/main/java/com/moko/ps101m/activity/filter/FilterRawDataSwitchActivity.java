@@ -4,14 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import androidx.annotation.Nullable;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
-import com.moko.ps101m.AppConstants;
 import com.moko.ps101m.R;
 import com.moko.ps101m.activity.Lw006BaseActivity;
 import com.moko.ps101m.databinding.Lw006ActivityFilterRawDataSwitchBinding;
@@ -75,12 +75,9 @@ public class FilterRawDataSwitchActivity extends Lw006BaseActivity {
                         int header = value[0] & 0xFF;// 0xED
                         int flag = value[1] & 0xFF;// read or write
                         int cmd = value[2] & 0xFF;
-                        if (header != 0xED)
-                            return;
+                        if (header != 0xED) return;
                         ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
-                        if (configKeyEnum == null) {
-                            return;
-                        }
+                        if (configKeyEnum == null) return;
                         int length = value[3] & 0xFF;
                         if (flag == 0x01) {
                             // write
@@ -129,7 +126,6 @@ public class FilterRawDataSwitchActivity extends Lw006BaseActivity {
         });
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -137,47 +133,37 @@ public class FilterRawDataSwitchActivity extends Lw006BaseActivity {
     }
 
     public void onBack(View view) {
-        backHome();
-    }
-
-    @Override
-    public void onBackPressed() {
-        backHome();
-    }
-
-    private void backHome() {
-        setResult(RESULT_OK);
         finish();
     }
 
     public void onFilterByIBeacon(View view) {
         if (isWindowLocked()) return;
         Intent i = new Intent(this, FilterIBeaconActivity.class);
-        startActivityForResult(i, AppConstants.REQUEST_CODE_FILTER_RAW_DATA);
+        launcher.launch(i);
     }
 
     public void onFilterByUid(View view) {
         if (isWindowLocked()) return;
         Intent i = new Intent(this, FilterUIDActivity.class);
-        startActivityForResult(i, AppConstants.REQUEST_CODE_FILTER_RAW_DATA);
+        launcher.launch(i);
     }
 
     public void onFilterByUrl(View view) {
         if (isWindowLocked()) return;
         Intent i = new Intent(this, FilterUrlActivity.class);
-        startActivityForResult(i, AppConstants.REQUEST_CODE_FILTER_RAW_DATA);
+        launcher.launch(i);
     }
 
     public void onFilterByTlm(View view) {
         if (isWindowLocked()) return;
         Intent i = new Intent(this, FilterTLMActivity.class);
-        startActivityForResult(i, AppConstants.REQUEST_CODE_FILTER_RAW_DATA);
+        launcher.launch(i);
     }
 
     public void onFilterByBXPiBeacon(View view) {
         if (isWindowLocked()) return;
         Intent i = new Intent(this, FilterBXPIBeaconActivity.class);
-        startActivityForResult(i, AppConstants.REQUEST_CODE_FILTER_RAW_DATA);
+        launcher.launch(i);
     }
 
     public void onFilterByBXPDevice(View view) {
@@ -216,33 +202,29 @@ public class FilterRawDataSwitchActivity extends Lw006BaseActivity {
     public void onFilterByBXPButton(View view) {
         if (isWindowLocked()) return;
         Intent i = new Intent(this, FilterBXPButtonActivity.class);
-        startActivityForResult(i, AppConstants.REQUEST_CODE_FILTER_RAW_DATA);
+        launcher.launch(i);
     }
 
     public void onFilterByBXPTag(View view) {
         if (isWindowLocked()) return;
         Intent i = new Intent(this, FilterBXPTagIdActivity.class);
-        startActivityForResult(i, AppConstants.REQUEST_CODE_FILTER_RAW_DATA);
+        launcher.launch(i);
     }
 
     public void onFilterByMkPir(View view) {
         if (isWindowLocked()) return;
         Intent i = new Intent(this, FilterMkPirActivity.class);
-        startActivityForResult(i, AppConstants.REQUEST_CODE_FILTER_RAW_DATA);
+        launcher.launch(i);
     }
 
     public void onFilterByOther(View view) {
         if (isWindowLocked()) return;
         Intent i = new Intent(this, FilterOtherActivity.class);
-        startActivityForResult(i, AppConstants.REQUEST_CODE_FILTER_RAW_DATA);
+        launcher.launch(i);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == AppConstants.REQUEST_CODE_FILTER_RAW_DATA) {
-            showSyncingProgressDialog();
-            mBind.tvFilterByMkPir.postDelayed(()-> LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getFilterRawData()),200);
-        }
-    }
+    private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        showSyncingProgressDialog();
+        mBind.tvFilterByMkPir.postDelayed(() -> LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getFilterRawData()), 200);
+    });
 }

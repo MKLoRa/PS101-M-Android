@@ -38,13 +38,15 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class TimingModeActivity extends Lw006BaseActivity implements BaseQuickAdapter.OnItemChildClickListener {
     private Lw006ActivityTimingModeBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
-    private ArrayList<String> mValues;
+    private final String[] mValues = {"Standby Mode", "Timing Mode", "Periodic Mode", "Motion Mode"};
     private int mSelected;
     private ArrayList<TimePoint> mTimePoints;
     private TimePointAdapter mAdapter;
@@ -56,21 +58,13 @@ public class TimingModeActivity extends Lw006BaseActivity implements BaseQuickAd
         super.onCreate(savedInstanceState);
         mBind = Lw006ActivityTimingModeBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
-        mValues = new ArrayList<>();
-        mValues.add("WIFI");
-        mValues.add("BLE");
-        mValues.add("GPS");
-        mValues.add("WIFI+GPS");
-        mValues.add("BLE+GPS");
-        mValues.add("WIFI+BLE");
-        mValues.add("WIFI+BLE+GPS");
         mHourValues = new ArrayList<>();
         for (int i = 0; i < 24; i++) {
-            mHourValues.add(String.format("%02d", i));
+            mHourValues.add(String.format(Locale.getDefault(), "%02d", i));
         }
         mMinValues = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
-            mMinValues.add(String.format("%02d", i * 15));
+            mMinValues.add(String.format(Locale.getDefault(), "%02d", i * 15));
         }
         mTimePoints = new ArrayList<>();
         mAdapter = new TimePointAdapter(mTimePoints);
@@ -123,7 +117,6 @@ public class TimingModeActivity extends Lw006BaseActivity implements BaseQuickAd
         }
     };
 
-
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 300)
     public void onConnectStatusEvent(ConnectStatusEvent event) {
         final String action = event.getAction();
@@ -148,19 +141,15 @@ public class TimingModeActivity extends Lw006BaseActivity implements BaseQuickAd
             if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
                 OrderTaskResponse response = event.getResponse();
                 OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
-                int responseType = response.responseType;
                 byte[] value = response.responseValue;
                 if (orderCHAR == OrderCHAR.CHAR_PARAMS) {
                     if (value.length >= 4) {
                         int header = value[0] & 0xFF;// 0xED
                         int flag = value[1] & 0xFF;// read or write
                         int cmd = value[2] & 0xFF;
-                        if (header != 0xED)
-                            return;
+                        if (header != 0xED) return;
                         ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
-                        if (configKeyEnum == null) {
-                            return;
-                        }
+                        if (configKeyEnum == null) return;
                         int length = value[3] & 0xFF;
                         if (flag == 0x01) {
                             // write
@@ -189,7 +178,7 @@ public class TimingModeActivity extends Lw006BaseActivity implements BaseQuickAd
                                 case KEY_TIME_MODE_POS_STRATEGY:
                                     if (length > 0) {
                                         mSelected = value[4] & 0xFF;
-                                        mBind.tvTimingPosStrategy.setText(mValues.get(mSelected));
+                                        mBind.tvTimingPosStrategy.setText(mValues[mSelected]);
                                     }
                                     break;
                                 case KEY_TIME_MODE_REPORT_TIME_POINT:
@@ -250,16 +239,6 @@ public class TimingModeActivity extends Lw006BaseActivity implements BaseQuickAd
     }
 
     public void onBack(View view) {
-        backHome();
-    }
-
-    @Override
-    public void onBackPressed() {
-        backHome();
-    }
-
-    private void backHome() {
-        setResult(RESULT_OK);
         finish();
     }
 
@@ -292,10 +271,10 @@ public class TimingModeActivity extends Lw006BaseActivity implements BaseQuickAd
     public void selectPosStrategy(View view) {
         if (isWindowLocked()) return;
         BottomDialog dialog = new BottomDialog();
-        dialog.setDatas(mValues, mSelected);
+        dialog.setDatas(new ArrayList<>(Arrays.asList(mValues)), mSelected);
         dialog.setListener(value -> {
             mSelected = value;
-            mBind.tvTimingPosStrategy.setText(mValues.get(value));
+            mBind.tvTimingPosStrategy.setText(mValues[value]);
         });
         dialog.show(getSupportFragmentManager());
     }

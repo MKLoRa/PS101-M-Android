@@ -5,15 +5,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.SeekBar;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
+import com.moko.ps101m.R;
 import com.moko.ps101m.databinding.Lw006ActivityPosWifiBinding;
 import com.moko.ps101m.dialog.BottomDialog;
 import com.moko.ps101m.utils.ToastUtils;
@@ -27,18 +30,17 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
-public class PosWifiFixActivity extends Lw006BaseActivity {
+public class PosWifiFixActivity extends Lw006BaseActivity implements SeekBar.OnSeekBarChangeListener {
     private Lw006ActivityPosWifiBinding mBind;
-    private final ArrayList<String> mValues = new ArrayList<>(2);
-    private int mSelected;
     private boolean mReceiverTag = false;
-    private final ArrayList<String> posMechanism = new ArrayList<>(2);
+    private final String[] posMechanism = {"RSSI Priority", "Time Priority"};
     private int posMechanismIndex;
     private int posTimeoutFlag;
     private int numBssidFlag;
-    private int wifiDataTypeFlag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,32 +48,33 @@ public class PosWifiFixActivity extends Lw006BaseActivity {
         mBind = Lw006ActivityPosWifiBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
-        mValues.add("DAS");
-        mValues.add("Customer");
-        posMechanism.add("RSSI Priority");
-        posMechanism.add("Time Priority");
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
-        registerReceiver(mReceiver, filter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(mReceiver, filter, RECEIVER_EXPORTED);
+        } else {
+            registerReceiver(mReceiver, filter);
+        }
         mReceiverTag = true;
         showSyncingProgressDialog();
-        List<OrderTask> orderTasks = new ArrayList<>();
+        List<OrderTask> orderTasks = new ArrayList<>(4);
         orderTasks.add(OrderTaskAssembler.getWifiPosTimeout());
         orderTasks.add(OrderTaskAssembler.getWifiPosBSSIDNumber());
-        orderTasks.add(OrderTaskAssembler.getWifiPosDataType());
         orderTasks.add(OrderTaskAssembler.getWifiPosMechanism());
+        orderTasks.add(OrderTaskAssembler.getWifiRssiFilter());
         LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         mBind.tvWifiFixMechanism.setOnClickListener(v -> {
             if (isWindowLocked()) return;
             BottomDialog dialog = new BottomDialog();
-            dialog.setDatas(posMechanism, posMechanismIndex);
+            dialog.setDatas(new ArrayList<>(Arrays.asList(posMechanism)), posMechanismIndex);
             dialog.setListener(value -> {
                 posMechanismIndex = value;
-                mBind.tvWifiFixMechanism.setText(posMechanism.get(value));
+                mBind.tvWifiFixMechanism.setText(posMechanism[value]);
             });
             dialog.show(getSupportFragmentManager());
         });
+        mBind.sbRssiFilter.setOnSeekBarChangeListener(this);
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 200)
@@ -120,12 +123,8 @@ public class PosWifiFixActivity extends Lw006BaseActivity {
                                     numBssidFlag = result;
                                     break;
 
-                                case KEY_WIFI_POS_DATA_TYPE:
-                                    wifiDataTypeFlag = result;
-                                    break;
-
                                 case KEY_WIFI_POS_MECHANISM:
-                                    if (posTimeoutFlag == 1 && numBssidFlag == 1 && wifiDataTypeFlag == 1 && result == 1) {
+                                    if (posTimeoutFlag == 1 && numBssidFlag == 1 && result == 1) {
                                         ToastUtils.showToast(this, "Save Successfully！");
                                     } else {
                                         ToastUtils.showToast(this, "Opps！Save failed. Please check the input characters and try again.");
@@ -143,6 +142,7 @@ public class PosWifiFixActivity extends Lw006BaseActivity {
                                         mBind.etPosTimeout.setSelection(mBind.etPosTimeout.getText().length());
                                     }
                                     break;
+
                                 case KEY_WIFI_POS_BSSID_NUMBER:
                                     if (length > 0) {
                                         int number = value[4] & 0xFF;
@@ -150,17 +150,20 @@ public class PosWifiFixActivity extends Lw006BaseActivity {
                                         mBind.etBssidNumber.setSelection(mBind.etBssidNumber.getText().length());
                                     }
                                     break;
-                                case KEY_WIFI_POS_DATA_TYPE:
-                                    if (length > 0) {
-                                        mSelected = value[4] & 0xFF;
-                                        mBind.tvWifiDataType.setText(mValues.get(mSelected));
-                                    }
-                                    break;
 
                                 case KEY_WIFI_POS_MECHANISM:
                                     if (length == 1) {
                                         posMechanismIndex = value[4] & 0xff;
-                                        mBind.tvWifiFixMechanism.setText(posMechanism.get(posMechanismIndex));
+                                        mBind.tvWifiFixMechanism.setText(posMechanism[posMechanismIndex]);
+                                    }
+                                    break;
+
+                                case KEY_WIFI_RSSI_FILTER:
+                                    if (length == 1) {
+                                        final int rssi = value[4];
+                                        int progress = rssi + 127;
+                                        mBind.sbRssiFilter.setProgress(progress);
+                                        mBind.tvRssiFilterTips.setText(getString(R.string.wifi_fix_filter, rssi));
                                     }
                                     break;
                             }
@@ -171,22 +174,10 @@ public class PosWifiFixActivity extends Lw006BaseActivity {
         });
     }
 
-    public void onWifiDataType(View view) {
-        if (isWindowLocked()) return;
-        BottomDialog dialog = new BottomDialog();
-        dialog.setDatas(mValues, mSelected);
-        dialog.setListener(value -> {
-            mSelected = value;
-            mBind.tvWifiDataType.setText(mValues.get(value));
-        });
-        dialog.show(getSupportFragmentManager());
-    }
-
     public void onSave(View view) {
         if (isWindowLocked()) return;
         if (isValid()) {
             showSyncingProgressDialog();
-            wifiDataTypeFlag = 0;
             numBssidFlag = 0;
             posTimeoutFlag = 0;
             saveParams();
@@ -196,30 +187,26 @@ public class PosWifiFixActivity extends Lw006BaseActivity {
     }
 
     private boolean isValid() {
+        if (TextUtils.isEmpty(mBind.etPosTimeout.getText())) return false;
         final String posTimeoutStr = mBind.etPosTimeout.getText().toString();
-        if (TextUtils.isEmpty(posTimeoutStr))
-            return false;
         final int posTimeout = Integer.parseInt(posTimeoutStr);
-        if (posTimeout < 1 || posTimeout > 10) {
-            return false;
-        }
+        if (posTimeout < 1 || posTimeout > 10) return false;
+        if (TextUtils.isEmpty(mBind.etBssidNumber.getText())) return false;
         final String numberStr = mBind.etBssidNumber.getText().toString();
-        if (TextUtils.isEmpty(numberStr)) return false;
         final int number = Integer.parseInt(numberStr);
         return number >= 1 && number <= 15;
     }
-
 
     private void saveParams() {
         final String posTimeoutStr = mBind.etPosTimeout.getText().toString();
         final String numberStr = mBind.etBssidNumber.getText().toString();
         final int posTimeout = Integer.parseInt(posTimeoutStr);
         final int number = Integer.parseInt(numberStr);
-        List<OrderTask> orderTasks = new ArrayList<>();
+        List<OrderTask> orderTasks = new ArrayList<>(4);
         orderTasks.add(OrderTaskAssembler.setWifiPosTimeout(posTimeout));
         orderTasks.add(OrderTaskAssembler.setWifiPosBSSIDNumber(number));
-        orderTasks.add(OrderTaskAssembler.setWifiPosDataType(mSelected));
         orderTasks.add(OrderTaskAssembler.setWifiPosMechanism(posMechanismIndex));
+        orderTasks.add(OrderTaskAssembler.setWifiRssiFilter(mBind.sbRssiFilter.getProgress() - 127));
         LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
@@ -262,5 +249,22 @@ public class PosWifiFixActivity extends Lw006BaseActivity {
     private void backHome() {
         setResult(RESULT_OK);
         finish();
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        int rssi = progress - 127;
+        mBind.tvRssiFilterValue.setText(String.format(Locale.getDefault(), "%ddBm", rssi));
+        mBind.tvRssiFilterTips.setText(getString(R.string.wifi_fix_filter, rssi));
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
     }
 }

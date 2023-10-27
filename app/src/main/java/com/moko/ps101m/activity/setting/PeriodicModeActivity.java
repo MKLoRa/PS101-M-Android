@@ -36,7 +36,7 @@ public class PeriodicModeActivity extends Lw006BaseActivity {
     private Lw006ActivityPeriodicModeBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
-    private ArrayList<String> mValues;
+    private final String[] mValues = {"WIFI", "BLE", "GPS", "WIFI+GPS", "BLE+GPS", "WIFI+BLE", "WIFI+BLE+GPS"};
     private int mSelected;
 
     @Override
@@ -44,14 +44,6 @@ public class PeriodicModeActivity extends Lw006BaseActivity {
         super.onCreate(savedInstanceState);
         mBind = Lw006ActivityPeriodicModeBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
-        mValues = new ArrayList<>();
-        mValues.add("WIFI");
-        mValues.add("BLE");
-        mValues.add("GPS");
-        mValues.add("WIFI+GPS");
-        mValues.add("BLE+GPS");
-        mValues.add("WIFI+BLE");
-        mValues.add("WIFI+BLE+GPS");
         EventBus.getDefault().register(this);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
@@ -81,8 +73,6 @@ public class PeriodicModeActivity extends Lw006BaseActivity {
         if (!MokoConstants.ACTION_CURRENT_DATA.equals(action))
             EventBus.getDefault().cancelEventDelivery(event);
         runOnUiThread(() -> {
-            if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
-            }
             if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
                 dismissSyncProgressDialog();
             }
@@ -126,7 +116,7 @@ public class PeriodicModeActivity extends Lw006BaseActivity {
                                 case KEY_PERIODIC_MODE_POS_STRATEGY:
                                     if (length > 0) {
                                         mSelected = value[4] & 0xFF;
-                                        mBind.tvPeriodicPosStrategy.setText(mValues.get(mSelected));
+                                        mBind.tvPeriodicPosStrategy.setText(mValues[mSelected]);
                                     }
                                     break;
                                 case KEY_PERIODIC_MODE_REPORT_INTERVAL:
@@ -174,26 +164,16 @@ public class PeriodicModeActivity extends Lw006BaseActivity {
     }
 
     public void onBack(View view) {
-        backHome();
-    }
-
-    @Override
-    public void onBackPressed() {
-        backHome();
-    }
-
-    private void backHome() {
-        setResult(RESULT_OK);
         finish();
     }
 
     public void selectPosStrategy(View view) {
         if (isWindowLocked()) return;
         BottomDialog dialog = new BottomDialog();
-        dialog.setDatas(mValues, mSelected);
+        dialog.setDatas(new ArrayList<>(Arrays.asList(mValues)), mSelected);
         dialog.setListener(value -> {
             mSelected = value;
-            mBind.tvPeriodicPosStrategy.setText(mValues.get(value));
+            mBind.tvPeriodicPosStrategy.setText(mValues[value]);
         });
         dialog.show(getSupportFragmentManager());
     }
