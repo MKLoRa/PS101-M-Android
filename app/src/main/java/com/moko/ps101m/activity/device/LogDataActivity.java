@@ -37,6 +37,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Objects;
 
 public class LogDataActivity extends Lw006BaseActivity implements BaseQuickAdapter.OnItemClickListener {
     public static String TAG = LogDataActivity.class.getSimpleName();
@@ -46,7 +47,6 @@ public class LogDataActivity extends Lw006BaseActivity implements BaseQuickAdapt
     private boolean isSync;
     private LogDataListAdapter adapter;
     private String logDirPath;
-    private String mDeviceMac;
     private int selectedCount;
     private String syncTime;
     private Animation animation = null;
@@ -58,7 +58,7 @@ public class LogDataActivity extends Lw006BaseActivity implements BaseQuickAdapt
         super.onCreate(savedInstanceState);
         mBind = Lw006ActivityLogDataBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
-        mDeviceMac = getIntent().getStringExtra(AppConstants.EXTRA_KEY_DEVICE_MAC).replaceAll(":", "");
+        String mDeviceMac = getIntent().getStringExtra(AppConstants.EXTRA_KEY_DEVICE_MAC).replaceAll(":", "");
         logDirPath = LoRaLW006MainActivity.PATH_LOGCAT + File.separator + mDeviceMac;
         LogDatas = new ArrayList<>();
         adapter = new LogDataListAdapter();
@@ -124,13 +124,10 @@ public class LogDataActivity extends Lw006BaseActivity implements BaseQuickAdapt
             if (MokoConstants.ACTION_CURRENT_DATA.equals(action)) {
                 OrderTaskResponse response = event.getResponse();
                 OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
-                int responseType = response.responseType;
                 byte[] value = response.responseValue;
-                switch (orderCHAR) {
-                    case CHAR_LOG:
-                        String log = new String(value);
-                        storeString.append(log);
-                        break;
+                if (Objects.requireNonNull(orderCHAR) == OrderCHAR.CHAR_LOG) {
+                    String log = new String(value);
+                    storeString.append(log);
                 }
             }
         });

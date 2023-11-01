@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey_ebebeb"
+    android:background="@color/grey_f2f2f2"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -16,13 +16,11 @@
             android:id="@+id/tv_back"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:clickable="true"
             android:drawableLeft="@drawable/lw006_ic_back"
             android:drawablePadding="6dp"
             android:gravity="center_vertical"
             android:onClick="onBack"
             android:paddingLeft="16dp"
-            android:text=""
             android:textColor="@color/white_ffffff"
             android:textSize="15sp" />
 
@@ -115,7 +113,6 @@
                     android:layout_width="70dp"
                     android:layout_height="40dp"
                     android:background="@drawable/shape_radius_blue_btn_bg"
-                    android:clickable="true"
                     android:gravity="center"
                     android:onClick="onUpdateFirmware"
                     android:text="DFU"
@@ -149,7 +146,6 @@
                     android:layout_height="40dp"
                     android:layout_marginTop="20dp"
                     android:gravity="center_vertical"
-                    android:text=""
                     android:textColor="@color/black_333333"
                     android:textSize="15sp"
                     app:layout_constraintRight_toRightOf="parent"
@@ -214,7 +210,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:gravity="center_vertical"
-                    android:text=""
                     android:textColor="@color/black_333333"
                     android:textSize="15sp"
                     app:layout_constraintRight_toRightOf="parent"
@@ -245,7 +240,6 @@
                     android:layout_height="40dp"
                     android:layout_marginTop="20dp"
                     android:gravity="center_vertical"
-                    android:text=""
                     android:textColor="@color/black_333333"
                     android:textSize="15sp"
                     app:layout_constraintRight_toRightOf="parent"
@@ -294,7 +288,6 @@
                 android:layout_height="55dp"
                 android:layout_marginTop="10dp"
                 android:background="@color/white_ffffff"
-                android:clickable="true"
                 android:drawableRight="@drawable/lw006_ic_arrow_right"
                 android:gravity="center_vertical"
                 android:onClick="onDebuggerMode"
@@ -311,7 +304,6 @@
             <View
                 android:layout_width="0dp"
                 android:layout_height="200dp"
-                android:clickable="true"
                 android:onClick="onTest"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"

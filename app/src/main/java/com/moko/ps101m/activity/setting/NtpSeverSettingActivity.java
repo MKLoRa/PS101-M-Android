@@ -1,4 +1,4 @@
-package com.moko.ps101m.activity.lora;
+package com.moko.ps101m.activity.setting;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
@@ -14,8 +14,9 @@ import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
+import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.databinding.Lw006ActivityAppSettingBinding;
+import com.moko.ps101m.databinding.ActivityNtpSeverSettingBinding;
 import com.moko.ps101m.utils.ToastUtils;
 import com.moko.support.ps101m.LoRaLW006MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
@@ -27,17 +28,23 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class LoRaAppSettingActivity extends Lw006BaseActivity {
-    private Lw006ActivityAppSettingBinding mBind;
+/**
+ * @author: jun.liu
+ * @date: 2023/10/27 20:07
+ * @des:
+ */
+public class NtpSeverSettingActivity extends Lw006BaseActivity {
+    private ActivityNtpSeverSettingBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityAppSettingBinding.inflate(getLayoutInflater());
+        mBind = ActivityNtpSeverSettingBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         // 注册广播接收器
@@ -45,14 +52,12 @@ public class LoRaAppSettingActivity extends Lw006BaseActivity {
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(mReceiver, filter);
         mReceiverTag = true;
+
         showSyncingProgressDialog();
-        mBind.etSyncInterval.postDelayed(() -> {
-            List<OrderTask> orderTasks = new ArrayList<>();
-            orderTasks.add(OrderTaskAssembler.getLoraTimeSyncInterval());
-            orderTasks.add(OrderTaskAssembler.getLoraNetworkCheckInterval());
-            LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-        }, 300);
-        mBind.layoutMsgTypeSetting.setOnClickListener(v -> startActivity(new Intent(this, MessageTypeSettingsActivity.class)));
+        List<OrderTask> orderTasks = new ArrayList<>(2);
+        orderTasks.add(OrderTaskAssembler.getNtpServer());
+        orderTasks.add(OrderTaskAssembler.getNtpSyncInterval());
+        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[0]));
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 200)
@@ -71,8 +76,6 @@ public class LoRaAppSettingActivity extends Lw006BaseActivity {
         if (!MokoConstants.ACTION_CURRENT_DATA.equals(action))
             EventBus.getDefault().cancelEventDelivery(event);
         runOnUiThread(() -> {
-            if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
-            }
             if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
                 dismissSyncProgressDialog();
             }
@@ -93,15 +96,12 @@ public class LoRaAppSettingActivity extends Lw006BaseActivity {
                             // write
                             int result = value[4] & 0xFF;
                             switch (configKeyEnum) {
-                                case KEY_LORA_TIME_SYNC_INTERVAL:
-                                    if (result != 1) {
-                                        savedParamsError = true;
-                                    }
+                                case KEY_NTP_SERVER:
+                                    if (result != 1) savedParamsError = true;
                                     break;
-                                case KEY_LORA_NETWORK_CHECK_INTERVAL:
-                                    if (result != 1) {
-                                        savedParamsError = true;
-                                    }
+
+                                case KEY_NTP_SYNC_INTERVAL:
+                                    if (result != 1) savedParamsError = true;
                                     if (savedParamsError) {
                                         ToastUtils.showToast(this, "Opps！Save failed. Please check the input characters and try again.");
                                     } else {
@@ -113,18 +113,19 @@ public class LoRaAppSettingActivity extends Lw006BaseActivity {
                         if (flag == 0x00) {
                             // read
                             switch (configKeyEnum) {
-                                case KEY_LORA_TIME_SYNC_INTERVAL:
+                                case KEY_NTP_SERVER:
                                     if (length > 0) {
-                                        int interval = value[4] & 0xFF;
-                                        mBind.etSyncInterval.setText(String.valueOf(interval));
-                                        mBind.etSyncInterval.setSelection(mBind.etSyncInterval.getText().length());
+                                        String ntpServer = new String(Arrays.copyOfRange(value, 4, value.length));
+                                        mBind.etNtpUrl.setText(ntpServer);
+                                        mBind.etNtpUrl.setSelection(mBind.etNtpUrl.getText().length());
                                     }
                                     break;
-                                case KEY_LORA_NETWORK_CHECK_INTERVAL:
-                                    if (length > 0) {
-                                        int interval = value[4] & 0xFF;
-                                        mBind.etNetworkCheckInterval.setText(String.valueOf(interval));
-                                        mBind.etNetworkCheckInterval.setSelection(mBind.etNetworkCheckInterval.getText().length());
+
+                                case KEY_NTP_SYNC_INTERVAL:
+                                    if (length == 2) {
+                                        int interval = MokoUtils.toInt(Arrays.copyOfRange(value, 4, value.length));
+                                        mBind.etInterval.setText(String.valueOf(interval));
+                                        mBind.etInterval.setSelection(mBind.etInterval.getText().length());
                                     }
                                     break;
                             }
@@ -135,40 +136,6 @@ public class LoRaAppSettingActivity extends Lw006BaseActivity {
         });
     }
 
-    public void onSave(View view) {
-        if (isWindowLocked()) return;
-        if (isValid()) {
-            showSyncingProgressDialog();
-            saveParams();
-        } else {
-            ToastUtils.showToast(this, "Para error!");
-        }
-    }
-
-    private boolean isValid() {
-        if (TextUtils.isEmpty(mBind.etSyncInterval.getText())) return false;
-        final String syncIntervalStr = mBind.etSyncInterval.getText().toString();
-        final int syncInterval = Integer.parseInt(syncIntervalStr);
-        if (syncInterval > 255) return false;
-
-        if (TextUtils.isEmpty(mBind.etNetworkCheckInterval.getText())) return false;
-        final String networkCheckIntervalStr = mBind.etNetworkCheckInterval.getText().toString();
-        final int networkCheckInterval = Integer.parseInt(networkCheckIntervalStr);
-        return networkCheckInterval <= 255;
-    }
-
-
-    private void saveParams() {
-        final String syncIntervalStr = mBind.etSyncInterval.getText().toString();
-        final String networkCheckIntervalStr = mBind.etNetworkCheckInterval.getText().toString();
-        final int syncInterval = Integer.parseInt(syncIntervalStr);
-        final int networkCheckInterval = Integer.parseInt(networkCheckIntervalStr);
-        savedParamsError = false;
-        List<OrderTask> orderTasks = new ArrayList<>();
-        orderTasks.add(OrderTaskAssembler.setLoraTimeSyncInterval(syncInterval));
-        orderTasks.add(OrderTaskAssembler.setLoraNetworkInterval(networkCheckInterval));
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-    }
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -198,15 +165,21 @@ public class LoRaAppSettingActivity extends Lw006BaseActivity {
     }
 
     public void onBack(View view) {
-        backHome();
-    }
-
-    @Override
-    public void onBackPressed() {
-        backHome();
-    }
-
-    private void backHome() {
         finish();
+    }
+
+    public void onSave(View view) {
+        if (isWindowLocked()) return;
+        if (TextUtils.isEmpty(mBind.etInterval.getText())) {
+            ToastUtils.showToast(this, "Para error!");
+            return;
+        }
+        int interval = Integer.parseInt(mBind.etInterval.getText().toString());
+        String ntpServer = TextUtils.isEmpty(mBind.etNtpUrl.getText()) ? null : mBind.etNtpUrl.getText().toString();
+        showSyncingProgressDialog();
+        List<OrderTask> orderTasks = new ArrayList<>(2);
+        orderTasks.add(OrderTaskAssembler.setNtpServer(ntpServer));
+        orderTasks.add(OrderTaskAssembler.setNtpSyncInterval(interval));
+        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[0]));
     }
 }

@@ -29,7 +29,6 @@ public class AdvInfoAnalysisImpl implements DeviceInfoParseable<AdvInfo> {
         if (null == record) return null;
         byte[] bytes = record.getServiceData(new ParcelUuid(OrderServices.SERVICE_ADV.getUuid()));
         if (null == bytes || bytes.length != 16) return null;
-        int deviceType = bytes[0] & 0xFF;
         int txPower = bytes[7];
         int powerPercent = bytes[8] & 0xff;
         int batteryVoltage = MokoUtils.toInt(Arrays.copyOfRange(bytes, 9, 11));
@@ -42,7 +41,6 @@ public class AdvInfoAnalysisImpl implements DeviceInfoParseable<AdvInfo> {
             advInfo.rssi = deviceInfo.rssi;
             advInfo.powerPercent = powerPercent;
             advInfo.batteryVoltage = batteryVoltage;
-            advInfo.deviceType = deviceType;
             long currentTime = SystemClock.elapsedRealtime();
             advInfo.intervalTime = currentTime - advInfo.scanTime;
             advInfo.scanTime = currentTime;
@@ -56,7 +54,6 @@ public class AdvInfoAnalysisImpl implements DeviceInfoParseable<AdvInfo> {
             advInfo.rssi = deviceInfo.rssi;
             advInfo.batteryVoltage = batteryVoltage;
             advInfo.powerPercent = powerPercent;
-            advInfo.deviceType = deviceType;
             advInfo.scanTime = SystemClock.elapsedRealtime();
             advInfo.txPower = txPower;
             advInfo.verifyEnable = verifyEnable;

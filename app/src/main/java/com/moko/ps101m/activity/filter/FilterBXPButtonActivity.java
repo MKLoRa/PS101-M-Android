@@ -145,6 +145,17 @@ public class FilterBXPButtonActivity extends Lw006BaseActivity {
     }
 
     public void onBack(View view) {
+        backHome();
+    }
+
+    @Override
+    public void onBackPressed() {
+        backHome();
+    }
+
+    private void backHome() {
+        EventBus.getDefault().unregister(this);
+        setResult(RESULT_OK);
         finish();
     }
 }

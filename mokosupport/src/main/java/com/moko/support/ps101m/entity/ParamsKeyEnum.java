@@ -50,18 +50,17 @@ public enum ParamsKeyEnum implements Serializable {
     KEY_RESET_MOTOR_STATE(0x26),
     // 指示灯开关
     KEY_INDICATOR_STATUS(0x27),
-    // 电池信息信息
-    KEY_BATTERY_INFO(0x28),
-    // 电池信息清除
-    KEY_BATTERY_RESET(0x29A),
     //充电自动开机
-    KEY_AUTO_POWER_ON_ENABLE(0x2B),
-    //硬件版本
-    KEY_HARDWARE_VERSION(0x2C),
+    KEY_AUTO_POWER_ON_ENABLE(0x28),
     //网络状态
     KEY_NETWORK_STATUS(0x29),
     //MQTT连接状态
     KEY_MQTT_CONNECT_STATUS(0x2A),
+    //ntp服务器
+    KEY_NTP_SERVER(0x2B),
+    //ntp同步时间间隔
+    KEY_NTP_SYNC_INTERVAL(0x2C),
+
 
 
     //// 蓝牙相关参数
@@ -134,14 +133,14 @@ public enum ParamsKeyEnum implements Serializable {
     KEY_FILTER_NAME_RULES(0x58),
     // 过滤设备类型开关
     KEY_FILTER_RAW_DATA(0x59),
-    // iBeacon类型过滤开关
-    KEY_FILTER_IBEACON_ENABLE(0x65),
-    // iBeacon类型Major范围
-    KEY_FILTER_IBEACON_MAJOR_RANGE(0x66),
-    // iBeacon类型Minor范围
-    KEY_FILTER_IBEACON_MINOR_RANGE(0x67),
-    // iBeacon类型UUID
-    KEY_FILTER_IBEACON_UUID(0x68),
+    // BXP-iBeacon类型过滤开关
+    KEY_FILTER_BXP_IBEACON_ENABLE(0x5A),
+    // BXP-iBeacon类型Major范围
+    KEY_FILTER_BXP_IBEACON_MAJOR_RANGE(0x5B),
+    // BXP-iBeacon类型Minor范围
+    KEY_FILTER_BXP_IBEACON_MINOR_RANGE(0x5C),
+    // BXP-iBeacon类型UUID
+    KEY_FILTER_BXP_IBEACON_UUID(0x5D),
     // eddystone-UID类型过滤开关
     KEY_FILTER_EDDYSTONE_UID_ENABLE(0x5E),
     // eddystone-UID类型Namespace
@@ -156,14 +155,14 @@ public enum ParamsKeyEnum implements Serializable {
     KEY_FILTER_EDDYSTONE_TLM_ENABLE(0x63),
     // eddystone- TLM类型TLMVersion
     KEY_FILTER_EDDYSTONE_TLM_VERSION(0x64),
-    // BXP-iBeacon类型过滤开关
-    KEY_FILTER_BXP_IBEACON_ENABLE(0x5A),
-    // BXP-iBeacon类型Major范围
-    KEY_FILTER_BXP_IBEACON_MAJOR_RANGE(0x5B),
-    // BXP-iBeacon类型Minor范围
-    KEY_FILTER_BXP_IBEACON_MINOR_RANGE(0x5C),
-    // BXP-iBeacon类型UUID
-    KEY_FILTER_BXP_IBEACON_UUID(0x5D),
+    // iBeacon类型过滤开关
+    KEY_FILTER_IBEACON_ENABLE(0x65),
+    // iBeacon类型Major范围
+    KEY_FILTER_IBEACON_MAJOR_RANGE(0x66),
+    // iBeacon类型Minor范围
+    KEY_FILTER_IBEACON_MINOR_RANGE(0x67),
+    // iBeacon类型UUID
+    KEY_FILTER_IBEACON_UUID(0x68),
     // BXP-Device类型过滤开关
     KEY_FILTER_BXP_DEVICE(0x69),
     // BeaconX Pro-ACC设备过滤开关
@@ -225,78 +224,19 @@ public enum ParamsKeyEnum implements Serializable {
     KEY_BLE_POS_TIMEOUT(0x84),
     // 蓝牙定位成功MAC数量
     KEY_BLE_POS_MAC_NUMBER(0x85),
-    //gps型号选择
-    KEY_GPS_MODULE(0x84a),
     // GPS定位超时时间（L76版本）
     KEY_GPS_POS_TIMEOUT_L76C(0x86),
     // GPS位置精度因子PDOP（L76版本）
     KEY_GPS_PDOP_LIMIT_L76C(0x87),
     // GPS定位数据格式（LR1110版本）
-    KEY_GPS_POS_DATA_TYPE(0x88),
-    // GPS定位超时时间（LR1110版本）
-    KEY_GPS_POS_TIMEOUT(0x89),
-    // GPS搜星数量（LR1110版本）
-    KEY_GPS_POS_SATELLITE_THRESHOLD(0x8A),
-    // GPS定位星座（LR1110版本）
-    KEY_GPS_POS_SYSTEM(0x8B),
-    // 定位方式选择（LR1110版本）
-    KEY_GPS_POS_AUTONMOUS_AIDING_ENABLE(0x8C),
-    // 辅助定位经纬度（LR1110版本）
-    KEY_GPS_POS_AUXILIARY_LAT_LON(0x8D),
-    // 星历开始更新事件开关
-    KEY_GPS_POS_EPHEMERIS_NOTIFY_ENABLE(0x8E),
-    // 离线定位功能开关
-    KEY_OFFLINE_LOCATION_ENABLE(0x8F),
 
 
-
-    //// LoRaWAN参数
-    // LoRaWAN网络状态
-    KEY_LORA_NETWORK_STATUS(0x90A),
-    // 频段
-    KEY_LORA_REGION(0x91A),
-    // 入网类型
-    KEY_LORA_MODE(0x92A),
-    KEY_LORA_DEV_EUI(0x93A),
-    KEY_LORA_APP_EUI(0x94A),
-    KEY_LORA_APP_KEY(0x95A),
-    KEY_LORA_DEV_ADDR(0x96A),
-    KEY_LORA_APP_SKEY(0x97A),
-    KEY_LORA_NWK_SKEY(0x98A),
-    // CH
-    KEY_LORA_CH(0x99A),
-    // 入网DR
-    KEY_LORA_DR(0x9AA),
-    // 数据发送策略
-    KEY_LORA_UPLINK_STRATEGY(0x9BA),
-    // DUTYCYCLE
-    KEY_LORA_DUTYCYCLE(0x9CA),
-    //ADR_ACK_LIMIT
-    KEY_LORA_ADR_ACK_LIMIT(0x9DA),
-    //ADR_ACK_DELAY
-    KEY_LORA_ADR_ACK_DELAY(0x9EA),
-    //devtime同步间隔
-    KEY_LORA_TIME_SYNC_INTERVAL(0x9FA),
-    // 网络检查间隔
-    KEY_LORA_NETWORK_CHECK_INTERVAL(0xA0A),
-    //设备信息包上行配置
-    KEY_DEVICE_INFO_PAYLOAD(0xA1A),
-    //心跳数据包上行配置
-    KEY_HEARTBEAT_PAYLOAD(0xA2A),
-    //低电状态数据包上行配置
-    KEY_LOW_POWER_PAYLOAD(0xA3A),
-    //事件信息包上行配置
-    KEY_EVENT_PAYLOAD(0xA4A),
-    //GPS极限定位数据包上行配置
-    KEY_GPS_LIMIT_PAYLOAD(0xA5A),
-    //定位数据包上行配置
-    KEY_POSITIONING_PAYLOAD(0xA6A),
 
     ////网络通信参数
     //网络重连间隔
     KEY_APN(0x90),
     KEY_NETWORK_FORMAT(0x91),
-    KEY_DATA_COMMUNICATION(0x92),
+    KEY_DATA_COMMUNICATION_TYPE(0x92),
     KEY_NETWORK_RECONNECT_INTERVAL(0x93),
 
 
@@ -321,8 +261,6 @@ public enum ParamsKeyEnum implements Serializable {
     KEY_MQTT_CA(0xA5),
     KEY_MQTT_CLIENT_CERT(0xA6),
     KEY_MQTT_CLIENT_KEY(0xA7),
-
-
 
 
 

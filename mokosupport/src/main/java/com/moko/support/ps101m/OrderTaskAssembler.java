@@ -1,7 +1,6 @@
 package com.moko.support.ps101m;
 
 import androidx.annotation.IntRange;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.moko.ble.lib.task.OrderTask;
@@ -114,12 +113,6 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask getOfflineLocationEnable() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_OFFLINE_LOCATION_ENABLE);
-        return task;
-    }
-
     public static OrderTask getLowPowerPayloadEnable() {
         ParamsReadTask task = new ParamsReadTask();
         task.setData(ParamsKeyEnum.KEY_LOW_POWER_PAYLOAD_ENABLE);
@@ -135,12 +128,6 @@ public class OrderTaskAssembler {
     public static OrderTask getVibrationIntensity() {
         ParamsReadTask task = new ParamsReadTask();
         task.setData(ParamsKeyEnum.KEY_VIBRATION_INTENSITY);
-        return task;
-    }
-
-    public static OrderTask setBatteryReset() {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setBatteryReset();
         return task;
     }
 
@@ -168,21 +155,9 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask getBatteryInfo() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_BATTERY_INFO);
-        return task;
-    }
-
     public static OrderTask getMotorState() {
         ParamsReadTask task = new ParamsReadTask();
         task.setData(ParamsKeyEnum.KEY_MOTOR_STATE);
-        return task;
-    }
-
-    public static OrderTask getHwVersion() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_HARDWARE_VERSION);
         return task;
     }
 
@@ -542,12 +517,6 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask getGpsModule() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_GPS_MODULE);
-        return task;
-    }
-
     public static OrderTask getFilterEddystoneUidEnable() {
         ParamsReadTask task = new ParamsReadTask();
         task.setData(ParamsKeyEnum.KEY_FILTER_EDDYSTONE_UID_ENABLE);
@@ -635,150 +604,6 @@ public class OrderTaskAssembler {
     public static OrderTask getGPSPDOPLimitL76() {
         ParamsReadTask task = new ParamsReadTask();
         task.setData(ParamsKeyEnum.KEY_GPS_PDOP_LIMIT_L76C);
-        return task;
-    }
-
-    public static OrderTask getGPSPosTimeout() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_GPS_POS_TIMEOUT);
-        return task;
-    }
-
-    public static OrderTask getGPSPosSatelliteThreshold() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_GPS_POS_SATELLITE_THRESHOLD);
-        return task;
-    }
-
-    public static OrderTask getGPSPosDataType() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_GPS_POS_DATA_TYPE);
-        return task;
-    }
-
-    public static OrderTask getGPSPosSystem() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_GPS_POS_SYSTEM);
-        return task;
-    }
-
-    public static OrderTask getGPSPosAutoEnable() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_GPS_POS_AUTONMOUS_AIDING_ENABLE);
-        return task;
-    }
-
-    public static OrderTask getGPSPosAuxiliaryLatLon() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_GPS_POS_AUXILIARY_LAT_LON);
-        return task;
-    }
-
-    public static OrderTask getGPSPosEphemerisNotifyEnable() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_GPS_POS_EPHEMERIS_NOTIFY_ENABLE);
-        return task;
-    }
-
-    public static OrderTask getLoraNetworkStatus() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_LORA_NETWORK_STATUS);
-        return task;
-    }
-
-    public static OrderTask getLoraRegion() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_LORA_REGION);
-        return task;
-    }
-
-    public static OrderTask getLoraUploadMode() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_LORA_MODE);
-        return task;
-    }
-
-    public static OrderTask getLoraDevEUI() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_LORA_DEV_EUI);
-        return task;
-    }
-
-    public static OrderTask getLoraAppEUI() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_LORA_APP_EUI);
-        return task;
-    }
-
-    public static OrderTask getLoraAppKey() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_LORA_APP_KEY);
-        return task;
-    }
-
-    public static OrderTask getLoraDevAddr() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_LORA_DEV_ADDR);
-        return task;
-    }
-
-    public static OrderTask getLoraAppSKey() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_LORA_APP_SKEY);
-        return task;
-    }
-
-    public static OrderTask getLoraNwkSKey() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_LORA_NWK_SKEY);
-        return task;
-    }
-
-    public static OrderTask getLoraCH() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_LORA_CH);
-        return task;
-    }
-
-    public static OrderTask getLoraDR() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_LORA_DR);
-        return task;
-    }
-
-    public static OrderTask getLoraUplinkStrategy() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_LORA_UPLINK_STRATEGY);
-        return task;
-    }
-
-    public static OrderTask getLoraDutyCycleEnable() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_LORA_DUTYCYCLE);
-        return task;
-    }
-
-    public static OrderTask getLoraTimeSyncInterval() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_LORA_TIME_SYNC_INTERVAL);
-        return task;
-    }
-
-    public static OrderTask getLoraNetworkCheckInterval() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_LORA_NETWORK_CHECK_INTERVAL);
-        return task;
-    }
-
-    public static OrderTask getLoraAdrAckLimit() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_LORA_ADR_ACK_LIMIT);
-        return task;
-    }
-
-    public static OrderTask getLoraAdrAckDelay() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_LORA_ADR_ACK_DELAY);
         return task;
     }
 
@@ -875,42 +700,6 @@ public class OrderTaskAssembler {
     public static OrderTask getAlarmSosNotifyEnable() {
         ParamsReadTask task = new ParamsReadTask();
         task.setData(ParamsKeyEnum.KEY_ALARM_SOS_NOTIFY_ENABLE);
-        return task;
-    }
-
-    public static OrderTask getDeviceInfoPayload() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_DEVICE_INFO_PAYLOAD);
-        return task;
-    }
-
-    public static OrderTask getHeartbeatPayload() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_HEARTBEAT_PAYLOAD);
-        return task;
-    }
-
-    public static OrderTask getLowPowerPayload() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_LOW_POWER_PAYLOAD);
-        return task;
-    }
-
-    public static OrderTask getEventPayload() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_EVENT_PAYLOAD);
-        return task;
-    }
-
-    public static OrderTask getGPSLimitPayload() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_GPS_LIMIT_PAYLOAD);
-        return task;
-    }
-
-    public static OrderTask getPositioningPayload() {
-        ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_POSITIONING_PAYLOAD);
         return task;
     }
 
@@ -1046,10 +835,46 @@ public class OrderTaskAssembler {
         return task;
     }
 
+    public static OrderTask getDataFormat() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_DATA_COMMUNICATION_TYPE);
+        return task;
+    }
+
+    public static OrderTask getNtpServer() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_NTP_SERVER);
+        return task;
+    }
+
+    public static OrderTask getNtpSyncInterval() {
+        ParamsReadTask task = new ParamsReadTask();
+        task.setData(ParamsKeyEnum.KEY_NTP_SYNC_INTERVAL);
+        return task;
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////
     // WRITE
     ///////////////////////////////////////////////////////////////////////////
+    public static OrderTask setNtpServer(@Nullable String ntpServer) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setNtpServer(ntpServer);
+        return task;
+    }
+
+    public static OrderTask setNtpSyncInterval(@IntRange(from = 0, to = 720) int interval) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setNtpSyncInterval(interval);
+        return task;
+    }
+
+    public static OrderTask setDataFormat(@IntRange(from = 0, to = 1) int format) {
+        ParamsWriteTask task = new ParamsWriteTask();
+        task.setDataFormat(format);
+        return task;
+    }
+
     public static OrderTask setAxisDataReportInterval(@IntRange(from = 0, to = 65535) int interval) {
         ParamsWriteTask task = new ParamsWriteTask();
         task.setAxisDataReportInterval(interval);
@@ -1164,19 +989,19 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask setCA(File file) throws Exception {
+    public static OrderTask setCA(@Nullable File file) throws Exception {
         ParamsWriteTask task = new ParamsWriteTask();
         task.setFile(ParamsKeyEnum.KEY_MQTT_CA, file);
         return task;
     }
 
-    public static OrderTask setClientCert(File file) throws Exception {
+    public static OrderTask setClientCert(@Nullable File file) throws Exception {
         ParamsWriteTask task = new ParamsWriteTask();
         task.setFile(ParamsKeyEnum.KEY_MQTT_CLIENT_CERT, file);
         return task;
     }
 
-    public static OrderTask setClientKey(File file) throws Exception {
+    public static OrderTask setClientKey(@Nullable File file) throws Exception {
         ParamsWriteTask task = new ParamsWriteTask();
         task.setFile(ParamsKeyEnum.KEY_MQTT_CLIENT_KEY, file);
         return task;
@@ -1248,7 +1073,7 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask setIndicatorStatus(@IntRange(from = 0, to = 2047) int status) {
+    public static OrderTask setIndicatorStatus(int status) {
         ParamsWriteTask task = new ParamsWriteTask();
         task.setIndicatorStatus(status);
         return task;
@@ -1272,31 +1097,17 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask setOfflineLocationEnable(@IntRange(from = 0, to = 1) int enable) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setOfflineLocationEnable(enable);
-        return task;
-    }
-
     public static OrderTask setLowPowerReportEnable(@IntRange(from = 0, to = 1) int enable) {
         ParamsWriteTask task = new ParamsWriteTask();
         task.setLowPowerReportEnable(enable);
         return task;
     }
 
-//    public static OrderTask setLowPowerPercent(@IntRange(from = 0, to = 1) int percent) {
-//        ParamsWriteTask task = new ParamsWriteTask();
-//        task.setLowPowerPercent(percent);
-//        return task;
-//    }
-
-
     public static OrderTask setPasswordVerifyEnable(@IntRange(from = 0, to = 1) int enable) {
         ParamsWriteTask task = new ParamsWriteTask();
         task.setPasswordVerifyEnable(enable);
         return task;
     }
-
 
     public static OrderTask changePassword(String password) {
         ParamsWriteTask task = new ParamsWriteTask();
@@ -1315,7 +1126,6 @@ public class OrderTaskAssembler {
         task.setAdvTxPower(txPower);
         return task;
     }
-
 
     public static OrderTask setAdvName(@Nullable String advName) {
         ParamsWriteTask task = new ParamsWriteTask();
@@ -1353,7 +1163,7 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask setTimePosReportPoints(ArrayList<Integer> timePoints) {
+    public static OrderTask setTimePosReportPoints(@Nullable ArrayList<Integer> timePoints) {
         ParamsWriteTask task = new ParamsWriteTask();
         task.setTimePosReportPoints(timePoints);
         return task;
@@ -1748,153 +1558,9 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask setGpsModule(@IntRange(from = 0, to = 1) int module) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setGpsModule(module);
-        return task;
-    }
-
-    public static OrderTask setGPSPosTimeout(@IntRange(from = 1, to = 5) int timeout) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setGPSPosTimeout(timeout);
-        return task;
-    }
-
-    public static OrderTask setGPSPosSatelliteThreshold(@IntRange(from = 4, to = 10) int threshold) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setGPSPosSatelliteThreshold(threshold);
-        return task;
-    }
-
-    public static OrderTask setGPSPosDataType(@IntRange(from = 0, to = 1) int type) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setGPSPosDataType(type);
-        return task;
-    }
-
-    public static OrderTask setGPSPosSystem(@IntRange(from = 0, to = 2) int type) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setGPSPosSystem(type);
-        return task;
-    }
-
-    public static OrderTask setGPSPosAutonmousAidingEnable(@IntRange(from = 0, to = 1) int enable) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setGPSPosAutoEnable(enable);
-        return task;
-    }
-
-    public static OrderTask setGPSPosAuxiliaryLatLon(@IntRange(from = -9000000, to = 9000000) int lat, @IntRange(from = -18000000, to = 18000000) int lon) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setGPSPosAuxiliaryLatLon(lat, lon);
-        return task;
-    }
-
-    public static OrderTask setGPSPosEphemerisNotifyEnable(int enable) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setGPSPosEphemerisNotifyEnable(enable);
-        return task;
-    }
-
     public static OrderTask setBlePosMechanism(@IntRange(from = 0, to = 1) int mechanism) {
         ParamsWriteTask task = new ParamsWriteTask();
         task.setBlePosMechanism(mechanism);
-        return task;
-    }
-
-    public static OrderTask setLoraRegion(@IntRange(from = 0, to = 13) int region) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setLoraRegion(region);
-        return task;
-    }
-
-    public static OrderTask setLoraUploadMode(@IntRange(from = 1, to = 2) int mode) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setLoraUploadMode(mode);
-        return task;
-    }
-
-    public static OrderTask setLoraDevEUI(String devEUI) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setLoraDevEUI(devEUI);
-        return task;
-    }
-
-    public static OrderTask setLoraAppEUI(String appEUI) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setLoraAppEUI(appEUI);
-        return task;
-    }
-
-    public static OrderTask setLoraAppKey(String appKey) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setLoraAppKey(appKey);
-        return task;
-    }
-
-    public static OrderTask setLoraDevAddr(String devAddr) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setLoraDevAddr(devAddr);
-        return task;
-    }
-
-    public static OrderTask setLoraAppSKey(String appSkey) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setLoraAppSKey(appSkey);
-        return task;
-    }
-
-    public static OrderTask setLoraNwkSKey(String nwkSkey) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setLoraNwkSKey(nwkSkey);
-        return task;
-    }
-
-    public static OrderTask setLoraCH(int ch1, int ch2) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setLoraCH(ch1, ch2);
-        return task;
-    }
-
-    public static OrderTask setLoraDR(int dr1) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setLoraDR(dr1);
-        return task;
-    }
-
-    public static OrderTask setLoraUplinkStrategy(int adr, int number, int dr1, int dr2) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setLoraUplinkStrategy(adr, number, dr1, dr2);
-        return task;
-    }
-
-    public static OrderTask setLoraDutyCycleEnable(@IntRange(from = 0, to = 1) int enable) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setLoraDutyCycleEnable(enable);
-        return task;
-    }
-
-    public static OrderTask setLoraTimeSyncInterval(@IntRange(from = 0, to = 255) int interval) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setLoraTimeSyncInterval(interval);
-        return task;
-    }
-
-    public static OrderTask setLoraNetworkInterval(@IntRange(from = 0, to = 255) int interval) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setLoraNetworkInterval(interval);
-        return task;
-    }
-
-    public static OrderTask setLoraAdrAckLimit(@IntRange(from = 1, to = 255) int limit) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setLoraAdrAckLimit(limit);
-        return task;
-    }
-
-    public static OrderTask setLoraAdrAckDelay(@IntRange(from = 1, to = 255) int delay) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setLoraAdrAckDelay(delay);
         return task;
     }
 
@@ -2032,42 +1698,5 @@ public class OrderTaskAssembler {
         task.clearStorageData();
         return task;
     }
-
-    public static OrderTask setDeviceInfoPayload(@IntRange(from = 0, to = 1) int flag, @IntRange(from = 1, to = 4) int times) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setPayloadInfo(flag, times, ParamsKeyEnum.KEY_DEVICE_INFO_PAYLOAD.getParamsKey());
-        return task;
-    }
-
-    public static OrderTask setHeartbeatPayload(@IntRange(from = 0, to = 1) int flag, @IntRange(from = 1, to = 4) int times) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setPayloadInfo(flag, times, ParamsKeyEnum.KEY_HEARTBEAT_PAYLOAD.getParamsKey());
-        return task;
-    }
-
-    public static OrderTask setLowPowerPayload(@IntRange(from = 0, to = 1) int flag, @IntRange(from = 1, to = 4) int times) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setPayloadInfo(flag, times, ParamsKeyEnum.KEY_LOW_POWER_PAYLOAD.getParamsKey());
-        return task;
-    }
-
-    public static OrderTask setEventPayload(@IntRange(from = 0, to = 1) int flag, @IntRange(from = 1, to = 4) int times) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setPayloadInfo(flag, times, ParamsKeyEnum.KEY_EVENT_PAYLOAD.getParamsKey());
-        return task;
-    }
-
-    public static OrderTask setGPSLimitPayload(@IntRange(from = 0, to = 1) int flag, @IntRange(from = 1, to = 4) int times) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setPayloadInfo(flag, times, ParamsKeyEnum.KEY_GPS_LIMIT_PAYLOAD.getParamsKey());
-        return task;
-    }
-
-    public static OrderTask setPositioningPayload(@IntRange(from = 0, to = 1) int flag, @IntRange(from = 1, to = 4) int times) {
-        ParamsWriteTask task = new ParamsWriteTask();
-        task.setPayloadInfo(flag, times, ParamsKeyEnum.KEY_POSITIONING_PAYLOAD.getParamsKey());
-        return task;
-    }
-
 
 }

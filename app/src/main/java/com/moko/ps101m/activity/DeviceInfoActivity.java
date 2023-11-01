@@ -4,14 +4,16 @@ import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.RadioGroup;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.IdRes;
 import androidx.fragment.app.FragmentManager;
 
@@ -27,8 +29,6 @@ import com.moko.ps101m.activity.device.ExportDataActivity;
 import com.moko.ps101m.activity.device.IndicatorSettingsActivity;
 import com.moko.ps101m.activity.device.OnOffSettingsActivity;
 import com.moko.ps101m.activity.device.SystemInfoActivity;
-import com.moko.ps101m.activity.lora.LoRaAppSettingActivity;
-import com.moko.ps101m.activity.lora.LoRaConnSettingActivity;
 import com.moko.ps101m.activity.setting.AuxiliaryOperationActivity;
 import com.moko.ps101m.activity.setting.AxisSettingActivity;
 import com.moko.ps101m.activity.setting.BleSettingsActivity;
@@ -63,7 +63,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
     private PositionFragment posFragment;
     private GeneralFragment generalFragment;
     private DeviceFragment deviceFragment;
-    private boolean mReceiverTag = false;
+    private boolean mReceiverTag;
     private int disConnectType;
     private boolean savedParamsError;
 
@@ -75,17 +75,12 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
         fragmentManager = getSupportFragmentManager();
         initFragment();
         mBind.radioBtnNetwork.setChecked(true);
-        mBind.tvTitle.setText(R.string.title_lora);
         mBind.rgOptions.setOnCheckedChangeListener(this);
         EventBus.getDefault().register(this);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(mReceiver, filter, RECEIVER_EXPORTED);
-        } else {
-            registerReceiver(mReceiver, filter);
-        }
+        registerReceiver(mReceiver, filter);
         mReceiverTag = true;
         if (!LoRaLW006MokoSupport.getInstance().isBluetoothOpen()) {
             LoRaLW006MokoSupport.getInstance().enableBluetooth();
@@ -119,6 +114,8 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
                 .hide(generalFragment)
                 .hide(deviceFragment)
                 .commit();
+        mBind.tvTitle.setText("Network");
+        mBind.ivSave.setVisibility(View.VISIBLE);
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 100)
@@ -135,10 +132,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
                 }
                 showDisconnectDialog();
             }
-            if (MokoConstants.ACTION_DISCOVER_SUCCESS.equals(action)) {
-            }
         });
-
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 100)
@@ -160,19 +154,8 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
                     int type = value[4] & 0xFF;
                     if (header == 0xED && flag == 0x02 && cmd == 0x01 && len == 0x01) {
                         disConnectType = type;
-                        if (type == 1) {
-                            // valid password timeout
-                        } else if (type == 2) {
-                            // change password success
-                        } else if (type == 3) {
-                            // no data exchange timeout
-                        } else if (type == 4) {
-                            // reset success
-                        }
                     }
                 }
-            }
-            if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
             }
             if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
                 dismissSyncProgressDialog();
@@ -200,6 +183,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
                                     break;
                                 case KEY_NETWORK_RECONNECT_INTERVAL:
                                 case KEY_HEARTBEAT_INTERVAL:
+                                case KEY_DATA_COMMUNICATION_TYPE:
                                 case KEY_LOW_POWER_PERCENT:
                                 case KEY_TIME_ZONE:
                                 case KEY_BUZZER_SOUND_CHOOSE:
@@ -245,6 +229,11 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
                                     }
                                     break;
 
+                                case KEY_DATA_COMMUNICATION_TYPE:
+                                    if (length == 1) {
+                                        deviceFragment.setDataFormat(value[4] & 0xff);
+                                    }
+                                    break;
 
                                 case KEY_TIME_ZONE:
                                     if (length > 0) {
@@ -279,85 +268,44 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
                                     break;
                             }
                         }
-
                     }
                 }
             }
         });
     }
 
+    private void showAlertDialog(String title, String msg, String confirm) {
+        AlertMessageDialog dialog = new AlertMessageDialog();
+        if (!TextUtils.isEmpty(title)) dialog.setTitle(title);
+        dialog.setMessage(msg);
+        dialog.setConfirm(confirm);
+        dialog.setCancelGone();
+        dialog.setOnAlertConfirmListener(() -> {
+            setResult(RESULT_OK);
+            finish();
+        });
+        dialog.show(getSupportFragmentManager());
+    }
+
     private void showDisconnectDialog() {
         if (disConnectType == 2) {
-            AlertMessageDialog dialog = new AlertMessageDialog();
-            dialog.setTitle("Change Password");
-            dialog.setMessage("Password changed successfully!Please reconnect the device.");
-            dialog.setConfirm("OK");
-            dialog.setCancelGone();
-            dialog.setOnAlertConfirmListener(() -> {
-                setResult(RESULT_OK);
-                finish();
-            });
-            dialog.show(getSupportFragmentManager());
+            showAlertDialog("Change Password", "Password changed successfully!Please reconnect the device.", "OK");
         } else if (disConnectType == 3) {
-            AlertMessageDialog dialog = new AlertMessageDialog();
-            dialog.setMessage("No data communication for 3 minutes, the device is disconnected.");
-            dialog.setConfirm("OK");
-            dialog.setCancelGone();
-            dialog.setOnAlertConfirmListener(() -> {
-                setResult(RESULT_OK);
-                finish();
-            });
-            dialog.show(getSupportFragmentManager());
+            showAlertDialog(null, "No data communication for 3 minutes, the device is disconnected.", "OK");
         } else if (disConnectType == 5) {
-            AlertMessageDialog dialog = new AlertMessageDialog();
-            dialog.setTitle("Factory Reset");
-            dialog.setMessage("Factory reset successfully!\nPlease reconnect the device.");
-            dialog.setConfirm("OK");
-            dialog.setCancelGone();
-            dialog.setOnAlertConfirmListener(() -> {
-                setResult(RESULT_OK);
-                finish();
-            });
-            dialog.show(getSupportFragmentManager());
+            showAlertDialog("Factory Reset", "Factory reset successfully!\nPlease reconnect the device.", "OK");
         } else if (disConnectType == 4) {
-            AlertMessageDialog dialog = new AlertMessageDialog();
-            dialog.setTitle("Dismiss");
-            dialog.setMessage("Reboot successfully!\nPlease reconnect the device");
-            dialog.setConfirm("OK");
-            dialog.setCancelGone();
-            dialog.setOnAlertConfirmListener(() -> {
-                setResult(RESULT_OK);
-                finish();
-            });
-            dialog.show(getSupportFragmentManager());
+            showAlertDialog("Dismiss", "Reboot successfully!\nPlease reconnect the device", "OK");
         } else if (disConnectType == 1) {
-            AlertMessageDialog dialog = new AlertMessageDialog();
-            dialog.setMessage("The device is disconnected!");
-            dialog.setConfirm("OK");
-            dialog.setCancelGone();
-            dialog.setOnAlertConfirmListener(() -> {
-                setResult(RESULT_OK);
-                finish();
-            });
-            dialog.show(getSupportFragmentManager());
+            showAlertDialog(null, "The device is disconnected!", "OK");
         } else {
             if (LoRaLW006MokoSupport.getInstance().isBluetoothOpen()) {
-                AlertMessageDialog dialog = new AlertMessageDialog();
-                dialog.setTitle("Dismiss");
-                dialog.setMessage("The device disconnected!");
-                dialog.setConfirm("Exit");
-                dialog.setCancelGone();
-                dialog.setOnAlertConfirmListener(() -> {
-                    setResult(RESULT_OK);
-                    finish();
-                });
-                dialog.show(getSupportFragmentManager());
+                showAlertDialog("Dismiss", "The device disconnected!", "Exit");
             }
         }
     }
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
@@ -370,12 +318,9 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
                         builder.setTitle("Dismiss");
                         builder.setCancelable(false);
                         builder.setMessage("The current system of bluetooth is not available!");
-                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                DeviceInfoActivity.this.setResult(RESULT_OK);
-                                finish();
-                            }
+                        builder.setPositiveButton("OK", (dialog, which) -> {
+                            DeviceInfoActivity.this.setResult(RESULT_OK);
+                            finish();
                         });
                         builder.show();
                     }
@@ -383,47 +328,6 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
             }
         }
     };
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == AppConstants.REQUEST_CODE_LORA_CONN_SETTING) {
-            if (resultCode == RESULT_OK) {
-                showSyncingProgressDialog();
-//                mBind.ivSave.postDelayed(() -> {
-                List<OrderTask> orderTasks = new ArrayList<>();
-                // setting
-                orderTasks.add(OrderTaskAssembler.getLoraRegion());
-                orderTasks.add(OrderTaskAssembler.getLoraUploadMode());
-                orderTasks.add(OrderTaskAssembler.getLoraNetworkStatus());
-                LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-//                }, 500);
-            }
-        } else if (requestCode == AppConstants.REQUEST_CODE_SYSTEM_INFO) {
-            if (resultCode == RESULT_OK) {
-                AlertMessageDialog dialog = new AlertMessageDialog();
-                dialog.setTitle("Update Firmware");
-                dialog.setMessage("Update firmware successfully!\nPlease reconnect the device.");
-                dialog.setConfirm("OK");
-                dialog.setCancelGone();
-                dialog.setOnAlertConfirmListener(() -> {
-                    setResult(RESULT_OK);
-                    finish();
-                });
-                dialog.show(getSupportFragmentManager());
-            }
-            if (resultCode == RESULT_FIRST_USER) {
-                String mac = data.getStringExtra(AppConstants.EXTRA_KEY_DEVICE_MAC);
-                mBind.frameContainer.postDelayed(() -> {
-                    if (LoRaLW006MokoSupport.getInstance().isConnDevice(mac)) {
-                        LoRaLW006MokoSupport.getInstance().disConnectBle();
-                        return;
-                    }
-                    showDisconnectDialog();
-                }, 500);
-            }
-        }
-    }
 
     @Override
     protected void onDestroy() {
@@ -461,15 +365,11 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
     }
 
     private void back() {
-        mBind.frameContainer.postDelayed(() -> {
-            LoRaLW006MokoSupport.getInstance().disConnectBle();
-        }, 500);
+        LoRaLW006MokoSupport.getInstance().disConnectBle();
     }
 
     @Override
     public void onBackPressed() {
-        if (isWindowLocked())
-            return;
         back();
     }
 
@@ -496,8 +396,9 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
                 .show(deviceFragment)
                 .commit();
         showSyncingProgressDialog();
-        List<OrderTask> orderTasks = new ArrayList<>();
+        List<OrderTask> orderTasks = new ArrayList<>(8);
         // device
+        orderTasks.add(OrderTaskAssembler.getDataFormat());
         orderTasks.add(OrderTaskAssembler.getTimeZone());
         orderTasks.add(OrderTaskAssembler.getLowPowerPercent());
         orderTasks.add(OrderTaskAssembler.getLowPowerPayloadEnable());
@@ -528,8 +429,6 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
                 .hide(generalFragment)
                 .hide(deviceFragment)
                 .commit();
-        showSyncingProgressDialog();
-        LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getOfflineLocationEnable());
     }
 
     private void showLoRaAndGetData() {
@@ -543,10 +442,9 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
                 .commit();
         showSyncingProgressDialog();
         List<OrderTask> orderTasks = new ArrayList<>();
-        // get lora params
-        orderTasks.add(OrderTaskAssembler.getLoraRegion());
-        orderTasks.add(OrderTaskAssembler.getLoraUploadMode());
-        orderTasks.add(OrderTaskAssembler.getLoraNetworkStatus());
+        orderTasks.add(OrderTaskAssembler.getNetworkStatus());
+        orderTasks.add(OrderTaskAssembler.getMqttConnectionStatus());
+        orderTasks.add(OrderTaskAssembler.getNetworkReconnectInterval());
         LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
@@ -567,18 +465,6 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
         }, 200);
     }
 
-    public void onLoRaConnSetting(View view) {
-        if (isWindowLocked()) return;
-        Intent intent = new Intent(this, LoRaConnSettingActivity.class);
-        startActivityForResult(intent, AppConstants.REQUEST_CODE_LORA_CONN_SETTING);
-    }
-
-    public void onLoRaAppSetting(View view) {
-        if (isWindowLocked()) return;
-        Intent intent = new Intent(this, LoRaAppSettingActivity.class);
-        startActivity(intent);
-    }
-
     public void onWifiFix(View view) {
         if (isWindowLocked()) return;
         Intent intent = new Intent(this, PosWifiFixActivity.class);
@@ -595,11 +481,6 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
         if (isWindowLocked()) return;
         Intent intent = new Intent(this, PosGpsL76CFixActivity.class);
         startActivity(intent);
-    }
-
-    public void onOfflineFix(View view) {
-        if (isWindowLocked()) return;
-        posFragment.changeOfflineFix();
     }
 
     public void onDeviceMode(View view) {
@@ -663,8 +544,34 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
 
     public void onDeviceInfo(View view) {
         if (isWindowLocked()) return;
-        startActivityForResult(new Intent(this, SystemInfoActivity.class), AppConstants.REQUEST_CODE_SYSTEM_INFO);
+        launcher.launch(new Intent(this, SystemInfoActivity.class));
     }
+
+    private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        int resultCode = result.getResultCode();
+        if (resultCode == RESULT_OK) {
+            AlertMessageDialog dialog = new AlertMessageDialog();
+            dialog.setTitle("Update Firmware");
+            dialog.setMessage("Update firmware successfully!\nPlease reconnect the device.");
+            dialog.setConfirm("OK");
+            dialog.setCancelGone();
+            dialog.setOnAlertConfirmListener(() -> {
+                setResult(RESULT_OK);
+                finish();
+            });
+            dialog.show(getSupportFragmentManager());
+        } else if (resultCode == RESULT_FIRST_USER) {
+            if (null == result.getData()) return;
+            String mac = result.getData().getStringExtra(AppConstants.EXTRA_KEY_DEVICE_MAC);
+            mBind.frameContainer.postDelayed(() -> {
+                if (LoRaLW006MokoSupport.getInstance().isConnDevice(mac)) {
+                    LoRaLW006MokoSupport.getInstance().disConnectBle();
+                    return;
+                }
+                showDisconnectDialog();
+            }, 500);
+        }
+    });
 
     public void onFactoryReset(View view) {
         if (isWindowLocked()) return;

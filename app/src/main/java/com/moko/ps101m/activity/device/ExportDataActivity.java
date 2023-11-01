@@ -48,7 +48,6 @@ import java.util.Calendar;
 
 public class ExportDataActivity extends Lw006BaseActivity {
     private static final String TRACKED_FILE = "tracked.txt";
-
     private static String PATH_LOGCAT;
     private Lw006ActivityExportDataBinding mBind;
     private boolean mReceiverTag = false;
@@ -125,7 +124,6 @@ public class ExportDataActivity extends Lw006BaseActivity {
             if (MokoConstants.ACTION_CURRENT_DATA.equals(action)) {
                 OrderTaskResponse response = event.getResponse();
                 OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
-                int responseType = response.responseType;
                 byte[] value = response.responseValue;
                 if (orderCHAR == OrderCHAR.CHAR_STORAGE_DATA_NOTIFY) {
                     final int length = value.length;
@@ -188,8 +186,6 @@ public class ExportDataActivity extends Lw006BaseActivity {
                         }
                     }
                 }
-            }
-            if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
             }
             if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
                 if (!mIsBack) {

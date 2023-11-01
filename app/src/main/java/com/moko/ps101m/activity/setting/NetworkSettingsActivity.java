@@ -1,7 +1,12 @@
 package com.moko.ps101m.activity.setting;
 
+import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -20,6 +25,7 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.ps101m.R;
+import com.moko.ps101m.activity.DeviceInfoActivity;
 import com.moko.ps101m.activity.LoRaLW006MainActivity;
 import com.moko.ps101m.activity.Lw006BaseActivity;
 import com.moko.ps101m.adapter.NetworkFragmentAdapter;
@@ -46,6 +52,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -53,6 +60,7 @@ import java.io.File;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class NetworkSettingsActivity extends Lw006BaseActivity implements RadioGroup.OnCheckedChangeListener {
     private ActivityNetworkSettingBinding mBind;
@@ -67,6 +75,7 @@ public class NetworkSettingsActivity extends Lw006BaseActivity implements RadioG
     private boolean isFileError;
     private final String[] netWorkFormatArray = {"NB-IOT", "eMTC", "NB-IOT->eMTC", "eMTC->NB-IOT"};
     private int networkFormatSelect;
+    private boolean mReceiverTag;
     private NetworkSettings networkSettings = new NetworkSettings();
 
     @Override
@@ -74,16 +83,22 @@ public class NetworkSettingsActivity extends Lw006BaseActivity implements RadioG
         super.onCreate(savedInstanceState);
         mBind = ActivityNetworkSettingBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
-        InputFilter filter = (source, start, end, dest, dStart, dEnd) -> {
+        EventBus.getDefault().register(this);
+        // 注册广播接收器
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+        registerReceiver(mReceiver, filter);
+        mReceiverTag = true;
+        InputFilter inputFilter = (source, start, end, dest, dStart, dEnd) -> {
             if (!(source + "").matches(FILTER_ASCII)) {
                 return "";
             }
             return null;
         };
-        mBind.etMqttHost.setFilters(new InputFilter[]{new InputFilter.LengthFilter(64), filter});
-        mBind.etMqttClientId.setFilters(new InputFilter[]{new InputFilter.LengthFilter(64), filter});
-        mBind.etMqttSubscribeTopic.setFilters(new InputFilter[]{new InputFilter.LengthFilter(128), filter});
-        mBind.etMqttPublishTopic.setFilters(new InputFilter[]{new InputFilter.LengthFilter(128), filter});
+        mBind.etMqttHost.setFilters(new InputFilter[]{new InputFilter.LengthFilter(64), inputFilter});
+        mBind.etMqttClientId.setFilters(new InputFilter[]{new InputFilter.LengthFilter(64), inputFilter});
+        mBind.etMqttSubscribeTopic.setFilters(new InputFilter[]{new InputFilter.LengthFilter(128), inputFilter});
+        mBind.etMqttPublishTopic.setFilters(new InputFilter[]{new InputFilter.LengthFilter(128), inputFilter});
         createFragment();
         NetworkFragmentAdapter adapter = new NetworkFragmentAdapter(this);
         adapter.setFragmentList(fragments);
@@ -107,7 +122,7 @@ public class NetworkSettingsActivity extends Lw006BaseActivity implements RadioG
         expertFilePath = LoRaLW006MainActivity.PATH_LOGCAT + File.separator + "export" + File.separator + "Settings for Device.xlsx";
         showSyncingProgressDialog();
         mBind.title.postDelayed(() -> {
-            ArrayList<OrderTask> orderTasks = new ArrayList<>();
+            List<OrderTask> orderTasks = new ArrayList<>();
             orderTasks.add(OrderTaskAssembler.getMQTTHost());
             orderTasks.add(OrderTaskAssembler.getMQTTPort());
             orderTasks.add(OrderTaskAssembler.getMQTTClientId());
@@ -145,165 +160,171 @@ public class NetworkSettingsActivity extends Lw006BaseActivity implements RadioG
         dialog.show(getSupportFragmentManager());
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.POSTING, priority = 200)
     public void onConnectStatusEvent(ConnectStatusEvent event) {
         String action = event.getAction();
         if (MokoConstants.ACTION_DISCONNECTED.equals(action)) {
-            dismissSyncProgressDialog();
+            runOnUiThread(() -> {
+                dismissSyncProgressDialog();
+                finish();
+            });
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.POSTING, priority = 200)
     public void onOrderTaskResponseEvent(OrderTaskResponseEvent event) {
+        EventBus.getDefault().cancelEventDelivery(event);
         final String action = event.getAction();
-        if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
-            dismissSyncProgressDialog();
-        }
-        if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
-            OrderTaskResponse response = event.getResponse();
-            OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
-            byte[] value = response.responseValue;
-            if (orderCHAR == OrderCHAR.CHAR_PARAMS) {
-                if (value.length >= 4) {
-                    int header = value[0] & 0xFF;// 0xED
-                    int flag = value[1] & 0xFF;// read or write
-                    int cmd = value[2] & 0xFF;
-                    if (header == 0xEE) {
-                        ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
-                        if (configKeyEnum == null) return;
-                        if (flag == 0x01) {
-                            // write
-                            int result = value[4] & 0xFF;
-                            switch (configKeyEnum) {
-                                case KEY_MQTT_CA:
-                                case KEY_MQTT_CLIENT_CERT:
-                                    if (result != 1) {
-                                        mSavedParamsError = true;
-                                    }
-                                    break;
-                                case KEY_MQTT_CLIENT_KEY:
-                                    if (mSavedParamsError) {
-                                        ToastUtils.showToast(this, "Setup failed！");
-                                    } else {
-                                        ToastUtils.showToast(this, "Setup succeed！");
-                                    }
-                                    break;
+        runOnUiThread(() -> {
+            if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
+                dismissSyncProgressDialog();
+            }
+            if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
+                OrderTaskResponse response = event.getResponse();
+                OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
+                byte[] value = response.responseValue;
+                if (orderCHAR == OrderCHAR.CHAR_PARAMS) {
+                    if (value.length >= 4) {
+                        int header = value[0] & 0xFF;// 0xED
+                        int flag = value[1] & 0xFF;// read or write
+                        int cmd = value[2] & 0xFF;
+                        if (header == 0xEE) {
+                            ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
+                            if (configKeyEnum == null) return;
+                            if (flag == 0x01) {
+                                // write
+                                int result = value[4] & 0xFF;
+                                switch (configKeyEnum) {
+                                    case KEY_MQTT_CA:
+                                    case KEY_MQTT_CLIENT_CERT:
+                                        if (result != 1) {
+                                            mSavedParamsError = true;
+                                        }
+                                        break;
+                                    case KEY_MQTT_CLIENT_KEY:
+                                        if (mSavedParamsError) {
+                                            ToastUtils.showToast(this, "Setup failed！");
+                                        } else {
+                                            ToastUtils.showToast(this, "Setup succeed！");
+                                        }
+                                        break;
+                                }
                             }
                         }
-                    }
-                    if (header == 0xED) {
-                        ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
-                        if (configKeyEnum == null) return;
-                        int length = value[3] & 0xFF;
-                        if (flag == 0x01) {
-                            // write
-                            int result = value[4] & 0xFF;
-                            switch (configKeyEnum) {
-                                case KEY_MQTT_HOST:
-                                case KEY_MQTT_PORT:
-                                case KEY_MQTT_CLIENT_ID:
-                                case KEY_SUBSCRIBE_TOPIC:
-                                case KEY_PUBLISH_TOPIC:
-                                case KEY_MQTT_CLEAN_SESSION:
-                                case KEY_MQTT_QOS:
-                                case KEY_MQTT_KEEP_ALIVE:
-                                case KEY_APN:
-                                case KEY_NETWORK_FORMAT:
-                                case KEY_MQTT_USERNAME:
-                                case KEY_MQTT_PASSWORD:
-                                case KEY_CONNECT_MODE:
-                                case KEY_MQTT_LWT_ENABLE:
-                                case KEY_MQTT_LWT_RETAIN:
-                                case KEY_MQTT_LWT_QOS:
-                                case KEY_MQTT_LWT_TOPIC:
-                                    if (result != 1) {
-                                        mSavedParamsError = true;
-                                    }
-                                    break;
-                                case KEY_MQTT_LWT_PAYLOAD:
-                                    if (result != 1) {
-                                        mSavedParamsError = true;
-                                    }
-                                    if (mSavedParamsError) {
-                                        ToastUtils.showToast(this, "Setup failed！");
-                                    } else {
-                                        ToastUtils.showToast(this, "Setup succeed！");
-                                    }
-                                    break;
+                        if (header == 0xED) {
+                            ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
+                            if (configKeyEnum == null) return;
+                            int length = value[3] & 0xFF;
+                            if (flag == 0x01) {
+                                // write
+                                int result = value[4] & 0xFF;
+                                switch (configKeyEnum) {
+                                    case KEY_MQTT_HOST:
+                                    case KEY_MQTT_PORT:
+                                    case KEY_MQTT_CLIENT_ID:
+                                    case KEY_SUBSCRIBE_TOPIC:
+                                    case KEY_PUBLISH_TOPIC:
+                                    case KEY_MQTT_CLEAN_SESSION:
+                                    case KEY_MQTT_QOS:
+                                    case KEY_MQTT_KEEP_ALIVE:
+                                    case KEY_APN:
+                                    case KEY_NETWORK_FORMAT:
+                                    case KEY_MQTT_USERNAME:
+                                    case KEY_MQTT_PASSWORD:
+                                    case KEY_CONNECT_MODE:
+                                    case KEY_MQTT_LWT_ENABLE:
+                                    case KEY_MQTT_LWT_RETAIN:
+                                    case KEY_MQTT_LWT_QOS:
+                                    case KEY_MQTT_LWT_TOPIC:
+                                        if (result != 1) {
+                                            mSavedParamsError = true;
+                                        }
+                                        break;
+                                    case KEY_MQTT_LWT_PAYLOAD:
+                                        if (result != 1) {
+                                            mSavedParamsError = true;
+                                        }
+                                        if (mSavedParamsError) {
+                                            ToastUtils.showToast(this, "Setup failed！");
+                                        } else {
+                                            ToastUtils.showToast(this, "Setup succeed！");
+                                        }
+                                        break;
+                                }
                             }
-                        }
-                        if (flag == 0x00) {
-                            if (length == 0) return;
-                            // read
-                            switch (configKeyEnum) {
-                                case KEY_MQTT_HOST:
-                                    mBind.etMqttHost.setText(new String(Arrays.copyOfRange(value, 4, value.length)));
-                                    mBind.etMqttHost.setSelection(mBind.etMqttHost.getText().length());
-                                    break;
-                                case KEY_MQTT_PORT:
-                                    mBind.etMqttPort.setText(String.valueOf(MokoUtils.toInt(Arrays.copyOfRange(value, 4, value.length))));
-                                    mBind.etMqttPort.setSelection(mBind.etMqttPort.getText().length());
-                                    break;
-                                case KEY_MQTT_CLIENT_ID:
-                                    String clientId = new String(Arrays.copyOfRange(value, 4, value.length));
-                                    mBind.etMqttClientId.setText(clientId);
-                                    mBind.etMqttClientId.setSelection(mBind.etMqttClientId.getText().length());
-                                    break;
-                                case KEY_SUBSCRIBE_TOPIC:
-                                    mBind.etMqttSubscribeTopic.setText(new String(Arrays.copyOfRange(value, 4, value.length)));
-                                    mBind.etMqttSubscribeTopic.setSelection(mBind.etMqttSubscribeTopic.getText().length());
-                                    break;
-                                case KEY_PUBLISH_TOPIC:
-                                    mBind.etMqttPublishTopic.setText(new String(Arrays.copyOfRange(value, 4, value.length)));
-                                    mBind.etMqttPublishTopic.setSelection(mBind.etMqttPublishTopic.getText().length());
-                                    break;
-                                case KEY_APN:
-                                    mBind.etApn.setText(new String(Arrays.copyOfRange(value, 4, value.length)));
-                                    mBind.etApn.setSelection(mBind.etApn.getText().length());
-                                    break;
-                                case KEY_NETWORK_FORMAT:
-                                    networkFormatSelect = value[4] & 0xff;
-                                    mBind.tvNetworkFormat.setText(netWorkFormatArray[networkFormatSelect]);
-                                    break;
-                                case KEY_MQTT_CLEAN_SESSION:
-                                    generalFragment.setCleanSession((value[4] & 0xff) == 1);
-                                    break;
-                                case KEY_MQTT_QOS:
-                                    generalFragment.setQos(value[4] & 0xff);
-                                    break;
-                                case KEY_MQTT_KEEP_ALIVE:
-                                    generalFragment.setKeepAlive(value[4] & 0xff);
-                                    break;
-                                case KEY_MQTT_USERNAME:
-                                    userFragment.setUserName(new String(Arrays.copyOfRange(value, 4, value.length)));
-                                    break;
-                                case KEY_MQTT_PASSWORD:
-                                    userFragment.setPassword(new String(Arrays.copyOfRange(value, 4, value.length)));
-                                    break;
-                                case KEY_CONNECT_MODE:
-                                    sslFragment.setConnectMode(value[4] & 0xff);
-                                    break;
-                                case KEY_MQTT_LWT_ENABLE:
-                                    lwtFragment.setLwtEnable((value[4] & 0xff) == 1);
-                                    break;
-                                case KEY_MQTT_LWT_RETAIN:
-                                    lwtFragment.setLwtRetain((value[4] & 0xff) == 1);
-                                    break;
-                                case KEY_MQTT_LWT_TOPIC:
-                                    lwtFragment.setTopic(new String(Arrays.copyOfRange(value, 4, value.length)));
-                                    break;
-                                case KEY_MQTT_LWT_PAYLOAD:
-                                    lwtFragment.setPayload(new String(Arrays.copyOfRange(value, 4, value.length)));
-                                    break;
-                                case KEY_MQTT_LWT_QOS:
-                                    lwtFragment.setQos(value[4] & 0xff);
-                                    break;
+                            if (flag == 0x00) {
+                                if (length == 0) return;
+                                // read
+                                switch (configKeyEnum) {
+                                    case KEY_MQTT_HOST:
+                                        mBind.etMqttHost.setText(new String(Arrays.copyOfRange(value, 4, value.length)));
+                                        mBind.etMqttHost.setSelection(mBind.etMqttHost.getText().length());
+                                        break;
+                                    case KEY_MQTT_PORT:
+                                        mBind.etMqttPort.setText(String.valueOf(MokoUtils.toInt(Arrays.copyOfRange(value, 4, value.length))));
+                                        mBind.etMqttPort.setSelection(mBind.etMqttPort.getText().length());
+                                        break;
+                                    case KEY_MQTT_CLIENT_ID:
+                                        String clientId = new String(Arrays.copyOfRange(value, 4, value.length));
+                                        mBind.etMqttClientId.setText(clientId);
+                                        mBind.etMqttClientId.setSelection(mBind.etMqttClientId.getText().length());
+                                        break;
+                                    case KEY_SUBSCRIBE_TOPIC:
+                                        mBind.etMqttSubscribeTopic.setText(new String(Arrays.copyOfRange(value, 4, value.length)));
+                                        mBind.etMqttSubscribeTopic.setSelection(mBind.etMqttSubscribeTopic.getText().length());
+                                        break;
+                                    case KEY_PUBLISH_TOPIC:
+                                        mBind.etMqttPublishTopic.setText(new String(Arrays.copyOfRange(value, 4, value.length)));
+                                        mBind.etMqttPublishTopic.setSelection(mBind.etMqttPublishTopic.getText().length());
+                                        break;
+                                    case KEY_APN:
+                                        mBind.etApn.setText(new String(Arrays.copyOfRange(value, 4, value.length)));
+                                        mBind.etApn.setSelection(mBind.etApn.getText().length());
+                                        break;
+                                    case KEY_NETWORK_FORMAT:
+                                        networkFormatSelect = value[4] & 0xff;
+                                        mBind.tvNetworkFormat.setText(netWorkFormatArray[networkFormatSelect]);
+                                        break;
+                                    case KEY_MQTT_CLEAN_SESSION:
+                                        generalFragment.setCleanSession((value[4] & 0xff) == 1);
+                                        break;
+                                    case KEY_MQTT_QOS:
+                                        generalFragment.setQos(value[4] & 0xff);
+                                        break;
+                                    case KEY_MQTT_KEEP_ALIVE:
+                                        generalFragment.setKeepAlive(value[4] & 0xff);
+                                        break;
+                                    case KEY_MQTT_USERNAME:
+                                        userFragment.setUserName(new String(Arrays.copyOfRange(value, 4, value.length)));
+                                        break;
+                                    case KEY_MQTT_PASSWORD:
+                                        userFragment.setPassword(new String(Arrays.copyOfRange(value, 4, value.length)));
+                                        break;
+                                    case KEY_CONNECT_MODE:
+                                        sslFragment.setConnectMode(value[4] & 0xff);
+                                        break;
+                                    case KEY_MQTT_LWT_ENABLE:
+                                        lwtFragment.setLwtEnable((value[4] & 0xff) == 1);
+                                        break;
+                                    case KEY_MQTT_LWT_RETAIN:
+                                        lwtFragment.setLwtRetain((value[4] & 0xff) == 1);
+                                        break;
+                                    case KEY_MQTT_LWT_TOPIC:
+                                        lwtFragment.setTopic(new String(Arrays.copyOfRange(value, 4, value.length)));
+                                        break;
+                                    case KEY_MQTT_LWT_PAYLOAD:
+                                        lwtFragment.setPayload(new String(Arrays.copyOfRange(value, 4, value.length)));
+                                        break;
+                                    case KEY_MQTT_LWT_QOS:
+                                        lwtFragment.setQos(value[4] & 0xff);
+                                        break;
+                                }
                             }
                         }
                     }
                 }
             }
-        }
+        });
     }
 
     private void createFragment() {
@@ -385,6 +406,17 @@ public class NetworkSettingsActivity extends Lw006BaseActivity implements RadioG
         return !generalFragment.isValid() || !lwtFragment.isValid();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mReceiverTag) {
+            mReceiverTag = false;
+            // 注销广播
+            unregisterReceiver(mReceiver);
+        }
+        EventBus.getDefault().unregister(this);
+    }
+
     private void setMQTTDeviceConfig() {
         try {
             showSyncingProgressDialog();
@@ -431,6 +463,30 @@ public class NetworkSettingsActivity extends Lw006BaseActivity implements RadioG
             ToastUtils.showToast(this, "File is missing");
         }
     }
+
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                String action = intent.getAction();
+                if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+                    int blueState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0);
+                    if (blueState == BluetoothAdapter.STATE_TURNING_OFF) {
+                        dismissSyncProgressDialog();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(NetworkSettingsActivity.this);
+                        builder.setTitle("Dismiss");
+                        builder.setCancelable(false);
+                        builder.setMessage("The current system of bluetooth is not available!");
+                        builder.setPositiveButton("OK", (dialog, which) -> {
+                            NetworkSettingsActivity.this.setResult(RESULT_OK);
+                            finish();
+                        });
+                        builder.show();
+                    }
+                }
+            }
+        }
+    };
 
     public void selectCertificate(View view) {
         if (isWindowLocked()) return;
@@ -607,7 +663,6 @@ public class NetworkSettingsActivity extends Lw006BaseActivity implements RadioG
                     OutputStream outputStream = getContentResolver().openOutputStream(uri);
                     xssfWorkbook.write(outputStream);
                 } catch (Exception e) {
-                    e.printStackTrace();
                     isFileError = true;
                 }
                 runOnUiThread(() -> {
@@ -619,11 +674,9 @@ public class NetworkSettingsActivity extends Lw006BaseActivity implements RadioG
                     }
                     ToastUtils.showToast(NetworkSettingsActivity.this, "Export success!");
                     Utils.sendEmail(NetworkSettingsActivity.this, "", "", "Settings for Device", "Choose Email Client", expertFile);
-
                 });
             }).start();
         } catch (Exception e) {
-            e.printStackTrace();
             ToastUtils.showToast(this, "Export error!");
         }
     }
@@ -752,7 +805,6 @@ public class NetworkSettingsActivity extends Lw006BaseActivity implements RadioG
                                 initData();
                             });
                         } catch (Exception e) {
-                            e.printStackTrace();
                             isFileError = true;
                         }
                     }).start();

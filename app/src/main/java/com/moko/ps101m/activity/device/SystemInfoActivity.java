@@ -1,6 +1,5 @@
 package com.moko.ps101m.activity.device;
 
-
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ActivityNotFoundException;
@@ -15,6 +14,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -52,7 +52,6 @@ import no.nordicsemi.android.dfu.DfuServiceListenerHelper;
 
 public class SystemInfoActivity extends Lw006BaseActivity {
     public static final int REQUEST_CODE_SELECT_FIRMWARE = 0x10;
-
     private Lw006ActivitySystemInfoBinding mBind;
     private boolean mReceiverTag = false;
     private String mDeviceMac;
@@ -105,8 +104,6 @@ public class SystemInfoActivity extends Lw006BaseActivity {
         if (!MokoConstants.ACTION_CURRENT_DATA.equals(action))
             EventBus.getDefault().cancelEventDelivery(event);
         runOnUiThread(() -> {
-            if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
-            }
             if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
                 dismissSyncProgressDialog();
             }
@@ -140,12 +137,8 @@ public class SystemInfoActivity extends Lw006BaseActivity {
                             int header = value[0] & 0xFF;// 0xED
                             int flag = value[1] & 0xFF;// read or write
                             int cmd = value[2] & 0xFF;
-                            if (header != 0xED)
-                                return;
                             ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
-                            if (configKeyEnum == null) {
-                                return;
-                            }
+                            if (header != 0xED || configKeyEnum == null) return;
                             int length = value[3] & 0xFF;
                             if (flag == 0x00) {
                                 // read
@@ -168,13 +161,13 @@ public class SystemInfoActivity extends Lw006BaseActivity {
                                         if (length > 0) {
                                             byte[] macBytes = Arrays.copyOfRange(value, 4, 4 + length);
                                             String mac = MokoUtils.bytesToHexString(macBytes);
-                                            StringBuilder stringBuffer = new StringBuilder(mac);
-                                            stringBuffer.insert(2, ":");
-                                            stringBuffer.insert(5, ":");
-                                            stringBuffer.insert(8, ":");
-                                            stringBuffer.insert(11, ":");
-                                            stringBuffer.insert(14, ":");
-                                            mDeviceMac = stringBuffer.toString().toUpperCase();
+                                            StringBuilder builder = new StringBuilder(mac);
+                                            builder.insert(2, ":");
+                                            builder.insert(5, ":");
+                                            builder.insert(8, ":");
+                                            builder.insert(11, ":");
+                                            builder.insert(14, ":");
+                                            mDeviceMac = builder.toString().toUpperCase();
                                             mBind.tvMacAddress.setText(mDeviceMac);
                                         }
                                         break;
@@ -195,7 +188,6 @@ public class SystemInfoActivity extends Lw006BaseActivity {
     }
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
@@ -255,7 +247,7 @@ public class SystemInfoActivity extends Lw006BaseActivity {
     private ProgressDialog mDFUDialog;
 
     private void showDFUProgressDialog(String tips) {
-        mDFUDialog = new ProgressDialog(SystemInfoActivity.this);
+        mDFUDialog = new ProgressDialog(this);
         mDFUDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         mDFUDialog.setCanceledOnTouchOutside(false);
         mDFUDialog.setCancelable(false);
@@ -282,7 +274,7 @@ public class SystemInfoActivity extends Lw006BaseActivity {
 
     private final DfuProgressListener mDfuProgressListener = new DfuProgressListenerAdapter() {
         @Override
-        public void onDeviceConnecting(String deviceAddress) {
+        public void onDeviceConnecting(@NonNull String deviceAddress) {
             XLog.w("onDeviceConnecting...");
             mDeviceConnectCount++;
             if (mDeviceConnectCount > 3) {
@@ -301,23 +293,23 @@ public class SystemInfoActivity extends Lw006BaseActivity {
         }
 
         @Override
-        public void onDfuProcessStarting(String deviceAddress) {
+        public void onDfuProcessStarting(@NonNull String deviceAddress) {
             isUpgrade = true;
             mDFUDialog.setMessage("DfuProcessStarting...");
         }
 
         @Override
-        public void onEnablingDfuMode(String deviceAddress) {
+        public void onEnablingDfuMode(@NonNull String deviceAddress) {
             mDFUDialog.setMessage("EnablingDfuMode...");
         }
 
         @Override
-        public void onFirmwareValidating(String deviceAddress) {
+        public void onFirmwareValidating(@NonNull String deviceAddress) {
             mDFUDialog.setMessage("FirmwareValidating...");
         }
 
         @Override
-        public void onDfuCompleted(String deviceAddress) {
+        public void onDfuCompleted(@NonNull String deviceAddress) {
             mDeviceConnectCount = 0;
             if (!isFinishing() && mDFUDialog != null && mDFUDialog.isShowing()) {
                 mDFUDialog.dismiss();
@@ -327,18 +319,18 @@ public class SystemInfoActivity extends Lw006BaseActivity {
         }
 
         @Override
-        public void onDfuAborted(String deviceAddress) {
+        public void onDfuAborted(@NonNull String deviceAddress) {
             mDFUDialog.setMessage("DfuAborted...");
         }
 
         @Override
-        public void onProgressChanged(String deviceAddress, int percent, float speed, float avgSpeed, int currentPart, int partsTotal) {
+        public void onProgressChanged(@NonNull String deviceAddress, int percent, float speed, float avgSpeed, int currentPart, int partsTotal) {
             XLog.i("Progress:" + percent + "%");
             mDFUDialog.setMessage("Progress：" + percent + "%");
         }
 
         @Override
-        public void onError(String deviceAddress, int error, int errorType, String message) {
+        public void onError(@NonNull String deviceAddress, int error, int errorType, String message) {
             ToastUtils.showToast(SystemInfoActivity.this, "Opps!DFU Failed. Please try again!");
             XLog.i("Error:" + message);
             dismissDFUProgressDialog();
@@ -349,7 +341,7 @@ public class SystemInfoActivity extends Lw006BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_SELECT_FIRMWARE) {
-            if (resultCode == RESULT_OK) {
+            if (resultCode == RESULT_OK && null != data) {
                 //得到uri，后面就是将uri转化成file的过程。
                 Uri uri = data.getData();
                 String firmwareFilePath = FileUtils.getPath(this, uri);

@@ -2,7 +2,6 @@ package com.moko.ps101m.entity;
 
 public class AdvInfo {
     public String name;
-    public int deviceType;
     public int rssi;
     public String mac;
     public int powerPercent;

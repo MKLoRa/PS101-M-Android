@@ -15,6 +15,10 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -28,6 +32,7 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ps101m.AppConstants;
+import com.moko.ps101m.BuildConfig;
 import com.moko.ps101m.R;
 import com.moko.ps101m.activity.device.LogDataActivity;
 import com.moko.ps101m.adapter.DeviceListAdapter;
@@ -341,14 +346,14 @@ public class LoRaLW006MainActivity extends Lw006BaseActivity implements MokoScan
 
                 }
             });
-//            dialog.show();
-//            Timer timer = new Timer();
-//            timer.schedule(new TimerTask() {
-//                @Override
-//                public void run() {
-//                    runOnUiThread(dialog::showKeyboard);
-//                }
-//            }, 200);
+            dialog.show();
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    runOnUiThread(dialog::showKeyboard);
+                }
+            }, 200);
         }
     }
 
@@ -395,16 +400,20 @@ public class LoRaLW006MainActivity extends Lw006BaseActivity implements MokoScan
             if (!isVerifyEnable) {
                 XLog.i("Success");
                 Intent i = new Intent(LoRaLW006MainActivity.this, DeviceInfoActivity.class);
-                startActivityForResult(i, AppConstants.REQUEST_CODE_DEVICE_INFO);
+                launcher.launch(i);
                 return;
             }
             showLoadingMessageDialog();
             // open password notify and set passwrord
-            List<OrderTask> orderTasks = new ArrayList<>();
-            orderTasks.add(OrderTaskAssembler.setPassword(mPassword));
-            LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+            LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setPassword(mPassword));
         }
     }
+
+    private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == RESULT_OK){
+            if (animation == null) startScan();
+        }
+    });
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onOrderTaskResponseEvent(OrderTaskResponseEvent event) {
@@ -434,7 +443,7 @@ public class LoRaLW006MainActivity extends Lw006BaseActivity implements MokoScan
                             SPUtiles.setStringValue(this, AppConstants.SP_KEY_SAVED_PASSWORD_LW006, mSavedPassword);
                             XLog.i("Success");
                             Intent i = new Intent(this, DeviceInfoActivity.class);
-                            startActivityForResult(i, AppConstants.REQUEST_CODE_DEVICE_INFO);
+                            launcher.launch(i);
                         } else if (0 == result) {
                             isPasswordError = true;
                             ToastUtils.showToast(LoRaLW006MainActivity.this, "Password Error");
@@ -442,16 +451,6 @@ public class LoRaLW006MainActivity extends Lw006BaseActivity implements MokoScan
                         }
                     }
                 }
-            }
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == AppConstants.REQUEST_CODE_DEVICE_INFO) {
-            if (resultCode == RESULT_OK) {
-                if (animation == null) startScan();
             }
         }
     }

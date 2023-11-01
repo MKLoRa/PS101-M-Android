@@ -11,7 +11,6 @@ import android.view.View;
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
-import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.ps101m.activity.Lw006BaseActivity;
@@ -26,9 +25,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class IndicatorSettingsActivity extends Lw006BaseActivity {
     private Lw006ActivityIndicatorSettingsBinding mBind;
@@ -47,9 +44,7 @@ public class IndicatorSettingsActivity extends Lw006BaseActivity {
         registerReceiver(mReceiver, filter);
         mReceiverTag = true;
         showSyncingProgressDialog();
-        List<OrderTask> orderTasks = new ArrayList<>();
-        orderTasks.add(OrderTaskAssembler.getIndicatorStatus());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getIndicatorStatus());
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 200)
@@ -68,8 +63,6 @@ public class IndicatorSettingsActivity extends Lw006BaseActivity {
         if (!MokoConstants.ACTION_CURRENT_DATA.equals(action))
             EventBus.getDefault().cancelEventDelivery(event);
         runOnUiThread(() -> {
-            if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
-            }
             if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
                 dismissSyncProgressDialog();
             }
@@ -100,18 +93,17 @@ public class IndicatorSettingsActivity extends Lw006BaseActivity {
                         if (flag == 0x00) {
                             // read
                             if (configKeyEnum == ParamsKeyEnum.KEY_INDICATOR_STATUS) {
-                                if (length == 2) {
+                                if (length == 3) {
                                     byte[] indicatorBytes = Arrays.copyOfRange(value, 4, 4 + length);
                                     int indicator = MokoUtils.toInt(indicatorBytes);
-                                    mBind.cbDeviceState.setChecked((indicator & 1) == 1);
-                                    mBind.cbLowPower.setChecked((indicator & 2) == 2);
-                                    mBind.cbCharging.setChecked((indicator & 4) == 4);
-                                    mBind.cbFullCharge.setChecked((indicator & 8) == 8);
-                                    mBind.cbBleConnection.setChecked((indicator & 16) == 16);
-                                    mBind.cbNetworkCheck.setChecked((indicator & 32) == 32);
-                                    mBind.cbInfix.setChecked((indicator & 64) == 64);
-                                    mBind.cbFixSuccessful.setChecked((indicator & 128) == 128);
-                                    mBind.cbFailToFix.setChecked((indicator & 256) == 256);
+                                    mBind.cbDeviceState.setChecked((indicator & 0x01) == 1);
+                                    mBind.cbLowPower.setChecked((indicator >> 1 & 0x01) == 1);
+                                    mBind.cbCharging.setChecked((indicator >> 2 & 0x01) == 1);
+                                    mBind.cbFullCharge.setChecked((indicator >> 3 & 0x01) == 1);
+                                    mBind.cbBleConnection.setChecked((indicator >> 4 & 0x01) == 1);
+                                    mBind.cbInfix.setChecked((indicator >> 5 & 0x01) == 1);
+                                    mBind.cbFixSuccessful.setChecked((indicator >> 6 & 0x01) == 1);
+                                    mBind.cbFailToFix.setChecked((indicator >> 7 & 0x01) == 1);
                                 }
                             }
                         }
@@ -166,15 +158,14 @@ public class IndicatorSettingsActivity extends Lw006BaseActivity {
     public void onSave(View view) {
         if (isWindowLocked()) return;
         int indicator = (mBind.cbDeviceState.isChecked() ? 1 : 0)
-                | (mBind.cbLowPower.isChecked() ? 2 : 0)
-                | (mBind.cbCharging.isChecked() ? 4 : 0)
-                | (mBind.cbFullCharge.isChecked() ? 8 : 0)
-                | (mBind.cbBleConnection.isChecked() ? 16 : 0)
-                | (mBind.cbNetworkCheck.isChecked() ? 32 : 0)
-                | (mBind.cbInfix.isChecked() ? 64 : 0)
-                | (mBind.cbFixSuccessful.isChecked() ? 128 : 0)
-                | (mBind.cbFailToFix.isChecked() ? 256 : 0)
-                | 512 | 1024;
+                | (mBind.cbLowPower.isChecked() ? 1 << 1 : 0)
+                | (mBind.cbCharging.isChecked() ? 1 << 2 : 0)
+                | (mBind.cbFullCharge.isChecked() ? 1 << 3 : 0)
+                | (mBind.cbBleConnection.isChecked() ? 1 << 4 : 0)
+                | (mBind.cbInfix.isChecked() ? 1 << 5 : 0)
+                | (mBind.cbFixSuccessful.isChecked() ? 1 << 6 : 0)
+                | (mBind.cbFailToFix.isChecked() ? 1 << 7 : 0)
+                | 1 << 8 | 1 << 9 | 1 << 10 | 1 << 11 | 1 << 12 | 1 << 13 | 1 << 14 | 1 << 15 | 1 << 16;
         showSyncingProgressDialog();
         LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setIndicatorStatus(indicator));
     }
