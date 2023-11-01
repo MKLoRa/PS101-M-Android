@@ -10,13 +10,13 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.moko.ps101m.databinding.Lw006FragmentGeneralBinding;
+import com.moko.ps101m.databinding.Ps101mFragmentGeneralBinding;
 import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 
 public class GeneralFragment extends Fragment {
     private static final String TAG = GeneralFragment.class.getSimpleName();
-    private Lw006FragmentGeneralBinding mBind;
+    private Ps101mFragmentGeneralBinding mBind;
     public GeneralFragment() {
     }
 
@@ -27,7 +27,7 @@ public class GeneralFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
-        mBind = Lw006FragmentGeneralBinding.inflate(inflater, container, false);
+        mBind = Ps101mFragmentGeneralBinding.inflate(inflater, container, false);
         return mBind.getRoot();
     }
 

@@ -12,11 +12,11 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.moko.ps101m.activity.setting.NetworkSettingsActivity;
-import com.moko.ps101m.databinding.Lw006FragmentNetworkBinding;
+import com.moko.ps101m.databinding.Ps101mFragmentNetworkBinding;
 
 public class NetworkFragment extends Fragment {
     private static final String TAG = NetworkFragment.class.getSimpleName();
-    private Lw006FragmentNetworkBinding mBind;
+    private Ps101mFragmentNetworkBinding mBind;
 
     public NetworkFragment() {
     }
@@ -28,7 +28,7 @@ public class NetworkFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
-        mBind = Lw006FragmentNetworkBinding.inflate(inflater, container, false);
+        mBind = Ps101mFragmentNetworkBinding.inflate(inflater, container, false);
         mBind.tvNetworkSetting.setOnClickListener(v-> startActivity(new Intent(requireActivity(), NetworkSettingsActivity.class)));
         return mBind.getRoot();
     }

@@ -386,7 +386,7 @@ public class PS101MainActivity extends PS101BaseActivity implements MokoScanDevi
             if (isPasswordError) {
                 isPasswordError = false;
             } else {
-                ToastUtils.showToast(PS101MainActivity.this, "Connection Failed");
+                ToastUtils.showToast(this, "Connection Failed");
             }
             if (animation == null) startScan();
         }
@@ -394,7 +394,7 @@ public class PS101MainActivity extends PS101BaseActivity implements MokoScanDevi
             dismissLoadingProgressDialog();
             if (!isVerifyEnable) {
                 XLog.i("Success");
-                Intent i = new Intent(PS101MainActivity.this, DeviceInfoActivity.class);
+                Intent i = new Intent(this, DeviceInfoActivity.class);
                 launcher.launch(i);
                 return;
             }
@@ -441,7 +441,7 @@ public class PS101MainActivity extends PS101BaseActivity implements MokoScanDevi
                             launcher.launch(i);
                         } else if (0 == result) {
                             isPasswordError = true;
-                            ToastUtils.showToast(PS101MainActivity.this, "Password Error");
+                            ToastUtils.showToast(this, "Password Error");
                             MokoSupport.getInstance().disConnectBle();
                         }
                     }
@@ -486,9 +486,7 @@ public class PS101MainActivity extends PS101BaseActivity implements MokoScanDevi
         if (getIntent().getExtras() != null) {
             String from = getIntent().getStringExtra(AppConstants.EXTRA_KEY_FROM_ACTIVITY);
             if (LogDataActivity.TAG.equals(from)) {
-                if (animation == null) {
-                    startScan();
-                }
+                if (animation == null) startScan();
             }
         }
     }

@@ -14,7 +14,7 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ps101m.R;
 import com.moko.ps101m.activity.DeviceInfoActivity;
 import com.moko.ps101m.activity.setting.NtpSeverSettingActivity;
-import com.moko.ps101m.databinding.Lw006FragmentDeviceBinding;
+import com.moko.ps101m.databinding.Ps101mFragmentDeviceBinding;
 import com.moko.ps101m.dialog.BottomDialog;
 import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
@@ -25,7 +25,7 @@ import java.util.List;
 
 public class DeviceFragment extends Fragment {
     private static final String TAG = DeviceFragment.class.getSimpleName();
-    private Lw006FragmentDeviceBinding mBind;
+    private Ps101mFragmentDeviceBinding mBind;
     private ArrayList<String> mTimeZones;
     private int mSelectedTimeZone;
     private final String[] mLowPowerPrompts = {"10%", "20%", "30%", "40%", "50%", "60%"};
@@ -49,7 +49,7 @@ public class DeviceFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
-        mBind = Lw006FragmentDeviceBinding.inflate(inflater, container, false);
+        mBind = Ps101mFragmentDeviceBinding.inflate(inflater, container, false);
         activity = (DeviceInfoActivity) getActivity();
         mTimeZones = new ArrayList<>();
         for (int i = -24; i <= 28; i++) {

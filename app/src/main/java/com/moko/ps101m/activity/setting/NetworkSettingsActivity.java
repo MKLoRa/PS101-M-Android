@@ -15,18 +15,21 @@ import android.view.View;
 import android.widget.RadioGroup;
 
 import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.elvishew.xlog.XLog;
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
+import com.moko.ps101m.ExcelHelper;
 import com.moko.ps101m.R;
-import com.moko.ps101m.activity.PS101MainActivity;
 import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.activity.PS101MainActivity;
 import com.moko.ps101m.adapter.NetworkFragmentAdapter;
 import com.moko.ps101m.databinding.ActivityNetworkSettingBinding;
 import com.moko.ps101m.dialog.AlertMessageDialog;
@@ -44,22 +47,17 @@ import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class NetworkSettingsActivity extends PS101BaseActivity implements RadioGroup.OnCheckedChangeListener {
     private ActivityNetworkSettingBinding mBind;
@@ -75,7 +73,6 @@ public class NetworkSettingsActivity extends PS101BaseActivity implements RadioG
     private final String[] netWorkFormatArray = {"NB-IOT", "eMTC", "NB-IOT->eMTC", "eMTC->NB-IOT"};
     private int networkFormatSelect;
     private boolean mReceiverTag;
-    private NetworkSettings networkSettings = new NetworkSettings();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,7 +115,7 @@ public class NetworkSettingsActivity extends PS101BaseActivity implements RadioG
         });
         mBind.vpMqtt.setOffscreenPageLimit(4);
         mBind.rgMqtt.setOnCheckedChangeListener(this);
-        expertFilePath = PS101MainActivity.PATH_LOGCAT + File.separator + "export" + File.separator + "Settings for Device.xlsx";
+        expertFilePath = PS101MainActivity.PATH_LOGCAT + File.separator + "export" + File.separator + "Settings_for_Device.xls";
         showSyncingProgressDialog();
         mBind.title.postDelayed(() -> {
             List<OrderTask> orderTasks = new ArrayList<>();
@@ -414,6 +411,7 @@ public class NetworkSettingsActivity extends PS101BaseActivity implements RadioG
             unregisterReceiver(mReceiver);
         }
         EventBus.getDefault().unregister(this);
+        if (null != thread) thread.shutdown();
     }
 
     private void setMQTTDeviceConfig() {
@@ -507,177 +505,51 @@ public class NetworkSettingsActivity extends PS101BaseActivity implements RadioG
         sslFragment.selectCertFile();
     }
 
+    private final ExecutorService thread = Executors.newFixedThreadPool(1);
+    private ExcelHelper helper;
+
     public void onExportSettings(View view) {
         if (isWindowLocked()) return;
         if (isParaError()) return;
-        String host = mBind.etMqttHost.getText().toString();
-        String port = mBind.etMqttPort.getText().toString();
-        String clientId = mBind.etMqttClientId.getText().toString();
-        String topicSubscribe = mBind.etMqttSubscribeTopic.getText().toString();
-        String topicPublish = mBind.etMqttPublishTopic.getText().toString();
-        boolean cleanSession = generalFragment.isCleanSession();
-        int qos = generalFragment.getQos();
-        int keepAlive = generalFragment.getKeepAlive();
-        String username = userFragment.getUsername();
-        String password = userFragment.getPassword();
-        int connectMode = sslFragment.getConnectMode();
-        boolean lwtEnable = lwtFragment.getLwtEnable();
-        boolean lwtRetain = lwtFragment.getLwtRetain();
-        int lwtQos = lwtFragment.getQos();
-        String lwtTopic = lwtFragment.getTopic();
-        String lwtPayload = lwtFragment.getPayload();
-        String apn = TextUtils.isEmpty(mBind.etApn.getText()) ? "" : mBind.etApn.getText().toString();
+        if (null == helper) helper = new ExcelHelper();
+        NetworkSettings networkBean = new NetworkSettings();
+        networkBean.host = mBind.etMqttHost.getText().toString();
+        networkBean.port = mBind.etMqttPort.getText().toString();
+        networkBean.clientId = mBind.etMqttClientId.getText().toString();
+        networkBean.subscribe = mBind.etMqttSubscribeTopic.getText().toString();
+        networkBean.publish = mBind.etMqttPublishTopic.getText().toString();
+        networkBean.cleanSession = generalFragment.isCleanSession();
+        networkBean.qos = generalFragment.getQos();
+        networkBean.keepAlive = generalFragment.getKeepAlive();
+        networkBean.userName = userFragment.getUsername();
+        networkBean.password = userFragment.getPassword();
+        networkBean.connectMode = sslFragment.getConnectMode();
+        networkBean.lwtEnable = lwtFragment.getLwtEnable();
+        networkBean.lwtRetain = lwtFragment.getLwtRetain();
+        networkBean.lwtQos = lwtFragment.getQos();
+        networkBean.lwtTopic = lwtFragment.getTopic();
+        networkBean.lwtPayload = lwtFragment.getPayload();
+        networkBean.apn = TextUtils.isEmpty(mBind.etApn.getText()) ? "" : mBind.etApn.getText().toString();
+        networkBean.networkFormat = networkFormatSelect;
         showLoadingProgressDialog();
-        final File expertFile = new File(expertFilePath);
-        try {
-            if (!expertFile.getParentFile().exists()) {
-                expertFile.getParentFile().mkdirs();
-            }
-            if (!expertFile.exists()) {
-                expertFile.delete();
-                expertFile.createNewFile();
-            }
-            new Thread(() -> {
-                XSSFWorkbook xssfWorkbook = new XSSFWorkbook();
-                XSSFSheet sheet = xssfWorkbook.createSheet();
-                XSSFRow row0 = sheet.createRow(0);
-                row0.createCell(0).setCellValue("Config_Item");
-                row0.createCell(1).setCellValue("Config_value");
-                row0.createCell(2).setCellValue("Remark");
-
-                XSSFRow row1 = sheet.createRow(1);
-                row1.createCell(0).setCellValue("Host");
-                if (!TextUtils.isEmpty(host))
-                    row1.createCell(1).setCellValue(String.format("value:%s", host));
-                row1.createCell(2).setCellValue("1-64 characters");
-
-                XSSFRow row2 = sheet.createRow(2);
-                row2.createCell(0).setCellValue("Port");
-                if (!TextUtils.isEmpty(port))
-                    row2.createCell(1).setCellValue(String.format("value:%s", port));
-                row2.createCell(2).setCellValue("Range: 1-65535");
-
-                XSSFRow row3 = sheet.createRow(3);
-                row3.createCell(0).setCellValue("Client id");
-                if (!TextUtils.isEmpty(clientId))
-                    row3.createCell(1).setCellValue(String.format("value:%s", clientId));
-                row3.createCell(2).setCellValue("1-64 characters");
-
-                XSSFRow row4 = sheet.createRow(4);
-                row4.createCell(0).setCellValue("Subscribe Topic");
-                if (!TextUtils.isEmpty(topicSubscribe))
-                    row4.createCell(1).setCellValue(String.format("value:%s", topicSubscribe));
-                row4.createCell(2).setCellValue("1-128 characters");
-
-                XSSFRow row5 = sheet.createRow(5);
-                row5.createCell(0).setCellValue("Publish Topic");
-                if (!TextUtils.isEmpty(topicPublish))
-                    row5.createCell(1).setCellValue(String.format("value:%s", topicPublish));
-                row5.createCell(2).setCellValue("1-128 characters");
-
-                XSSFRow row6 = sheet.createRow(6);
-                row6.createCell(0).setCellValue("Clean Session");
-                row6.createCell(1).setCellValue(String.format("value:%s", cleanSession ? "1" : "0"));
-                row6.createCell(2).setCellValue("Range: 0/1 0:NO 1:YES");
-
-                XSSFRow row7 = sheet.createRow(7);
-                row7.createCell(0).setCellValue("Qos");
-                row7.createCell(1).setCellValue(String.format("value:%d", qos));
-                row7.createCell(2).setCellValue("Range: 0/1/2 0:qos0 1:qos1 2:qos2");
-
-                XSSFRow row8 = sheet.createRow(8);
-                row8.createCell(0).setCellValue("Keep Alive");
-                row8.createCell(1).setCellValue(String.format("value:%d", keepAlive));
-                row8.createCell(2).setCellValue("Range: 10-120, unit: second");
-
-                XSSFRow row9 = sheet.createRow(9);
-                row9.createCell(0).setCellValue("MQTT Username");
-                if (!TextUtils.isEmpty(username))
-                    row9.createCell(1).setCellValue(String.format("value:%s", username));
-                row9.createCell(2).setCellValue("0-256 characters");
-
-                XSSFRow row10 = sheet.createRow(10);
-                row10.createCell(0).setCellValue("MQTT Password");
-                if (!TextUtils.isEmpty(password))
-                    row10.createCell(1).setCellValue(String.format("value:%s", password));
-                row10.createCell(2).setCellValue("0-256 characters");
-
-                XSSFRow row11 = sheet.createRow(11);
-                row11.createCell(0).setCellValue("SSL/TLS");
-                XSSFRow row12 = sheet.createRow(12);
-                row12.createCell(0).setCellValue("Certificate type");
-                if (connectMode > 0) {
-                    row11.createCell(1).setCellValue("value:1");
-                    row12.createCell(1).setCellValue(String.format("value:%d", connectMode));
-                } else {
-                    row11.createCell(1).setCellValue(String.format("value:%d", connectMode));
-                    row12.createCell(1).setCellValue("value:1");
-                }
-                row11.createCell(2).setCellValue("Range: 0/1 0:Disable SSL (TCP mode) 1:Enable SSL");
-                row12.createCell(2).setCellValue("Valid when SSL is enabled, range: 1/2/3 1: CA certificate file 2: CA certificate file 3: Self signed certificates");
-
-                XSSFRow row13 = sheet.createRow(13);
-                row13.createCell(0).setCellValue("LWT");
-                row13.createCell(1).setCellValue(lwtEnable ? "value:1" : "value:0");
-                row13.createCell(2).setCellValue("Range: 0/1 0:Disable 1:Enable");
-
-                XSSFRow row14 = sheet.createRow(14);
-                row14.createCell(0).setCellValue("LWT Retain");
-                row14.createCell(1).setCellValue(lwtRetain ? "value:1" : "value:0");
-                row14.createCell(2).setCellValue("Range: 0/1 0:NO 1:YES");
-
-                XSSFRow row15 = sheet.createRow(15);
-                row15.createCell(0).setCellValue("LWT Qos");
-                row15.createCell(1).setCellValue(String.format("value:%d", lwtQos));
-                row15.createCell(2).setCellValue("Range: 0/1/2 0:qos0 1:qos1 2:qos2");
-
-                XSSFRow row16 = sheet.createRow(16);
-                row16.createCell(0).setCellValue("LWT Topic");
-                if (!TextUtils.isEmpty(lwtTopic))
-                    row16.createCell(1).setCellValue(String.format("value:%s", lwtTopic));
-                row16.createCell(2).setCellValue("1-128 characters");
-
-                XSSFRow row17 = sheet.createRow(17);
-                row17.createCell(0).setCellValue("LWT Payload");
-                if (!TextUtils.isEmpty(lwtPayload))
-                    row17.createCell(1).setCellValue(String.format("value:%s", lwtPayload));
-                row17.createCell(2).setCellValue("1-128 characters");
-
-                XSSFRow row18 = sheet.createRow(18);
-                row18.createCell(0).setCellValue("APN");
-                if (!TextUtils.isEmpty(apn)) {
-                    row18.createCell(1).setCellValue(String.format("value:%s", apn));
-                }
-                row18.createCell(2).setCellValue("0-100 Characters");
-
-                XSSFRow row19 = sheet.createRow(19);
-                row19.createCell(0).setCellValue("Network Priority");
-                if (!TextUtils.isEmpty(apn)) {
-                    row19.createCell(1).setCellValue(String.format("value:%s", networkFormatSelect));
-                }
-                row19.createCell(2).setCellValue("Range: 0/1/2/3");
-
-                Uri uri = Uri.fromFile(expertFile);
-                try {
-                    OutputStream outputStream = getContentResolver().openOutputStream(uri);
-                    xssfWorkbook.write(outputStream);
-                } catch (Exception e) {
-                    isFileError = true;
-                }
+        thread.execute(() -> {
+            try {
+                List<Map<String, String>> maps = helper.handleExcelData(networkBean);
+                File file = helper.createExcel(expertFilePath);
+                helper.writeToExcel(maps, file);
                 runOnUiThread(() -> {
                     dismissLoadingProgressDialog();
-                    if (isFileError) {
-                        isFileError = false;
-                        ToastUtils.showToast(NetworkSettingsActivity.this, "Export error!");
-                        return;
-                    }
-                    ToastUtils.showToast(NetworkSettingsActivity.this, "Export success!");
-                    Utils.sendEmail(NetworkSettingsActivity.this, "", "", "Settings for Device", "Choose Email Client", expertFile);
+                    ToastUtils.showToast(this, "Export success!");
+                    Utils.sendEmail(this, "", "", "Settings for Device", "Choose Email Client", file);
                 });
-            }).start();
-        } catch (Exception e) {
-            ToastUtils.showToast(this, "Export error!");
-        }
+            } catch (Exception e) {
+                runOnUiThread(() -> {
+                    XLog.i(e);
+                    dismissLoadingProgressDialog();
+                    ToastUtils.showToast(this, "Export error");
+                });
+            }
+        });
     }
 
     public void onImportSettings(View view) {
@@ -700,121 +572,36 @@ public class NetworkSettingsActivity extends PS101BaseActivity implements RadioG
                 //得到uri，后面就是将uri转化成file的过程。
                 Uri uri = data.getData();
                 String paramFilePath = FileUtils.getPath(this, uri);
-                if (TextUtils.isEmpty(paramFilePath)) {
-                    return;
-                }
-                if (!paramFilePath.endsWith(".xlsx")) {
+                if (TextUtils.isEmpty(paramFilePath)) return;
+                if (!paramFilePath.endsWith(".xls")) {
                     ToastUtils.showToast(this, "Please select the correct file!");
                     return;
                 }
                 final File paramFile = new File(paramFilePath);
+                if (null == helper) helper = new ExcelHelper();
                 if (paramFile.exists()) {
                     showLoadingProgressDialog();
-                    new Thread(() -> {
-                        try {
-                            Workbook workbook = WorkbookFactory.create(paramFile);
-                            Sheet sheet = workbook.getSheetAt(0);
-                            int rows = sheet.getPhysicalNumberOfRows();
-                            int columns = sheet.getRow(0).getPhysicalNumberOfCells();
-                            // 从第二行开始
-                            if (rows < 20 || columns < 3) {
-                                runOnUiThread(() -> {
-                                    dismissLoadingProgressDialog();
-                                    ToastUtils.showToast(NetworkSettingsActivity.this, "Please select the correct file!");
-                                });
-                                return;
-                            }
-                            Cell hostCell = sheet.getRow(1).getCell(1);
-                            if (hostCell != null)
-                                networkSettings.host = hostCell.getStringCellValue().replaceAll("value:", "");
-                            Cell postCell = sheet.getRow(2).getCell(1);
-                            if (postCell != null)
-                                networkSettings.port = postCell.getStringCellValue().replaceAll("value:", "");
-                            Cell clientCell = sheet.getRow(3).getCell(1);
-                            if (clientCell != null)
-                                networkSettings.clientId = clientCell.getStringCellValue().replaceAll("value:", "");
-                            Cell topicSubscribeCell = sheet.getRow(4).getCell(1);
-                            if (topicSubscribeCell != null) {
-                                networkSettings.subscribe = topicSubscribeCell.getStringCellValue().replaceAll("value:", "");
-                            }
-                            Cell topicPublishCell = sheet.getRow(5).getCell(1);
-                            if (topicPublishCell != null) {
-                                networkSettings.publish = topicPublishCell.getStringCellValue().replaceAll("value:", "");
-                            }
-                            Cell cleanSessionCell = sheet.getRow(6).getCell(1);
-                            if (cleanSessionCell != null)
-                                networkSettings.cleanSession = "1".equals(cleanSessionCell.getStringCellValue().replaceAll("value:", ""));
-                            Cell qosCell = sheet.getRow(7).getCell(1);
-                            if (qosCell != null)
-                                networkSettings.qos = Integer.parseInt(qosCell.getStringCellValue().replaceAll("value:", ""));
-                            Cell keepAliveCell = sheet.getRow(8).getCell(1);
-                            if (keepAliveCell != null)
-                                networkSettings.keepAlive = Integer.parseInt(keepAliveCell.getStringCellValue().replaceAll("value:", ""));
-                            Cell usernameCell = sheet.getRow(9).getCell(1);
-                            if (usernameCell != null) {
-                                networkSettings.userName = usernameCell.getStringCellValue().replaceAll("value:", "");
-                            }
-                            Cell passwordCell = sheet.getRow(10).getCell(1);
-                            if (passwordCell != null) {
-                                networkSettings.password = passwordCell.getStringCellValue().replaceAll("value:", "");
-                            }
-                            Cell connectModeCell = sheet.getRow(11).getCell(1);
-                            if (connectModeCell != null) {
-                                // 0/1
-                                networkSettings.connectMode = Integer.parseInt(connectModeCell.getStringCellValue().replaceAll("value:", ""));
-                                if (networkSettings.connectMode > 0) {
-                                    Cell cell = sheet.getRow(12).getCell(1);
-                                    if (cell != null)
-                                        // 1/2/3
-                                        networkSettings.connectMode = Integer.parseInt(cell.getStringCellValue().replaceAll("value:", ""));
-                                }
-                            }
-                            Cell lwtEnableCell = sheet.getRow(13).getCell(1);
-                            if (lwtEnableCell != null)
-                                networkSettings.lwtEnable = "1".equals(lwtEnableCell.getStringCellValue().replaceAll("value:", ""));
-                            Cell lwtRetainCell = sheet.getRow(14).getCell(1);
-                            if (lwtRetainCell != null)
-                                networkSettings.lwtRetain = "1".equals(lwtRetainCell.getStringCellValue().replaceAll("value:", ""));
-                            Cell lwtQosCell = sheet.getRow(15).getCell(1);
-                            if (lwtQosCell != null)
-                                networkSettings.lwtQos = Integer.parseInt(lwtQosCell.getStringCellValue().replaceAll("value:", ""));
-                            Cell topicCell = sheet.getRow(16).getCell(1);
-                            if (topicCell != null) {
-                                networkSettings.lwtTopic = topicCell.getStringCellValue().replaceAll("value:", "");
-                            }
-                            Cell payloadCell = sheet.getRow(17).getCell(1);
-                            if (payloadCell != null) {
-                                networkSettings.lwtPayload = payloadCell.getStringCellValue().replaceAll("value:", "");
-                            }
-                            Cell apnCell = sheet.getRow(18).getCell(1);
-                            if (null != apnCell) {
-                                networkSettings.apn = apnCell.getStringCellValue().replaceAll("value:", "");
-                            }
-                            Cell netCell = sheet.getRow(19).getCell(1);
-                            if (null != netCell) {
-                                networkSettings.networkFormat = Integer.parseInt(netCell.getStringCellValue().replaceAll("value:", ""));
-                            }
-                            runOnUiThread(() -> {
-                                dismissLoadingProgressDialog();
-                                if (isFileError) {
-                                    ToastUtils.showToast(NetworkSettingsActivity.this, "Import failed!");
-                                    return;
-                                }
+                    thread.execute(() -> {
+                        NetworkSettings settings = helper.parseImportFile(paramFile);
+                        runOnUiThread(() -> {
+                            dismissLoadingProgressDialog();
+                            if (null != settings) {
                                 ToastUtils.showToast(NetworkSettingsActivity.this, "Import success!");
-                                initData();
-                            });
-                        } catch (Exception e) {
-                            isFileError = true;
-                        }
-                    }).start();
+                                initData(settings);
+                            } else {
+                                ToastUtils.showToast(NetworkSettingsActivity.this, "Import failed!");
+                            }
+                        });
+                    });
                 } else {
                     ToastUtils.showToast(this, "File is not exists!");
+                    dismissLoadingProgressDialog();
                 }
             }
         }
     }
 
-    private void initData() {
+    private void initData(@NonNull NetworkSettings networkSettings) {
         mBind.etMqttHost.setText(networkSettings.host);
         mBind.etMqttPort.setText(networkSettings.port);
         mBind.etMqttClientId.setText(networkSettings.clientId);
@@ -842,8 +629,8 @@ public class NetworkSettingsActivity extends PS101BaseActivity implements RadioG
         dialog.setConfirm("YES");
         dialog.setCancel("NO");
         dialog.setOnAlertConfirmListener(() -> {
-            networkSettings = new NetworkSettings();
-            initData();
+            NetworkSettings networkSettings = new NetworkSettings();
+            initData(networkSettings);
         });
         dialog.show(getSupportFragmentManager());
     }

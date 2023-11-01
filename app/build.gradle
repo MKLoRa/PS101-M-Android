@@ -101,8 +101,7 @@ dependencies {
     implementation 'cn.carbswang.android:NumberPickerView:1.1.1'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
     implementation "androidx.viewpager2:viewpager2:1.0.0"
-    implementation files('libs/poi-3.12-android-a.jar')
-    implementation files('libs/poi-ooxml-schemas-3.12-20150511-a.jar')
+    implementation files('libs/jxl.jar')
     if (!isLibrary.toBoolean()) {
         implementation project(path: ':mokosupport')
     } else {
