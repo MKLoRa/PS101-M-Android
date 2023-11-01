@@ -9,10 +9,10 @@ import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
-import com.moko.ps101m.activity.Lw006BaseActivity;
+import com.moko.ps101m.activity.PS101BaseActivity;
 import com.moko.ps101m.databinding.ActivityAxisDataReportBinding;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -28,7 +28,7 @@ import java.util.Arrays;
  * @date: 2023/10/27 11:28
  * @des:
  */
-public class ThreeAxisDataReportActivity extends Lw006BaseActivity {
+public class ThreeAxisDataReportActivity extends PS101BaseActivity {
     private ActivityAxisDataReportBinding mBind;
 
     @Override
@@ -39,7 +39,7 @@ public class ThreeAxisDataReportActivity extends Lw006BaseActivity {
 
         EventBus.getDefault().register(this);
         showSyncingProgressDialog();
-        LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getAxisDataReportInterval());
+        MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getAxisDataReportInterval());
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 300)
@@ -103,7 +103,7 @@ public class ThreeAxisDataReportActivity extends Lw006BaseActivity {
         if (isValid()) {
             showSyncingProgressDialog();
             int interval = Integer.parseInt(mBind.etInterval.getText().toString());
-            LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setAxisDataReportInterval(interval));
+            MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setAxisDataReportInterval(interval));
         } else {
             ToastUtils.showToast(this, "Para error!");
         }

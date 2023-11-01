@@ -8,11 +8,11 @@ import android.text.TextWatcher;
 import android.view.inputmethod.InputMethodManager;
 
 import com.moko.ps101m.R;
-import com.moko.ps101m.databinding.Lw006DialogChangePasswordBinding;
+import com.moko.ps101m.databinding.Ps101mDialogChangePwdBinding;
 import com.moko.ps101m.utils.ToastUtils;
 
 
-public class ChangePasswordDialog extends BaseDialog<Lw006DialogChangePasswordBinding> {
+public class ChangePasswordDialog extends BaseDialog<Ps101mDialogChangePwdBinding> {
     private final String FILTER_ASCII = "[ -~]*";
 
     private boolean passwordEnable;
@@ -23,8 +23,8 @@ public class ChangePasswordDialog extends BaseDialog<Lw006DialogChangePasswordBi
     }
 
     @Override
-    protected Lw006DialogChangePasswordBinding getViewBind() {
-        return Lw006DialogChangePasswordBinding.inflate(getLayoutInflater());
+    protected Ps101mDialogChangePwdBinding getViewBind() {
+        return Ps101mDialogChangePwdBinding.inflate(getLayoutInflater());
     }
 
     @Override

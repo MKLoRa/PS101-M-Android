@@ -9,11 +9,11 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ps101m.R;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.databinding.Lw006ActivityFilterTlmBinding;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.databinding.Ps101mActivityFilterTlmBinding;
 import com.moko.ps101m.dialog.BottomDialog;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class FilterTLMActivity extends Lw006BaseActivity {
-    private Lw006ActivityFilterTlmBinding mBind;
+public class FilterTLMActivity extends PS101BaseActivity {
+    private Ps101mActivityFilterTlmBinding mBind;
     private boolean savedParamsError;
     private final String[] mValues = {"Null", "version 0", "version 1"};
     private int mSelected;
@@ -36,14 +36,14 @@ public class FilterTLMActivity extends Lw006BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityFilterTlmBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityFilterTlmBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         showSyncingProgressDialog();
         List<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.getFilterEddystoneTlmEnable());
         orderTasks.add(OrderTaskAssembler.getFilterEddystoneTlmVersion());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 400)
@@ -109,7 +109,7 @@ public class FilterTLMActivity extends Lw006BaseActivity {
                                 case KEY_FILTER_EDDYSTONE_TLM_ENABLE:
                                     if (length > 0) {
                                         mTLMEnable = value[4] == 1;
-                                        mBind.ivTlmEnable.setImageResource(mTLMEnable ? R.drawable.lw006_ic_checked : R.drawable.lw006_ic_unchecked);
+                                        mBind.ivTlmEnable.setImageResource(mTLMEnable ? R.drawable.ic_checked : R.drawable.ps101_ic_unchecked);
                                     }
                                     break;
                             }
@@ -153,7 +153,7 @@ public class FilterTLMActivity extends Lw006BaseActivity {
             List<OrderTask> orderTasks = new ArrayList<>();
             orderTasks.add(OrderTaskAssembler.setFilterEddystoneTlmVersion(mSelected));
             orderTasks.add(OrderTaskAssembler.getFilterEddystoneTlmVersion());
-            LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         });
         dialog.show(getSupportFragmentManager());
     }
@@ -165,6 +165,6 @@ public class FilterTLMActivity extends Lw006BaseActivity {
         List<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.setFilterEddystoneTlmEnable(mTLMEnable ? 1 : 0));
         orderTasks.add(OrderTaskAssembler.getFilterEddystoneTlmEnable());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 }

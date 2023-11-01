@@ -14,11 +14,11 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ps101m.R;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.databinding.ActivityOnOffSettingsBinding;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.databinding.Ps101mActivityOnOffSettingsBinding;
 import com.moko.ps101m.dialog.AlertMessageDialog;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -35,8 +35,8 @@ import java.util.List;
  * @date: 2023/6/12 17:39
  * @des:
  */
-public class OnOffSettingsActivity extends Lw006BaseActivity {
-    private ActivityOnOffSettingsBinding mBind;
+public class OnOffSettingsActivity extends PS101BaseActivity {
+    private Ps101mActivityOnOffSettingsBinding mBind;
     private boolean mReceiverTag;
     private boolean shutdownPayloadOpen;
     private boolean offByButtonOpen;
@@ -45,7 +45,7 @@ public class OnOffSettingsActivity extends Lw006BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = ActivityOnOffSettingsBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityOnOffSettingsBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         // 注册广播接收器
@@ -53,16 +53,16 @@ public class OnOffSettingsActivity extends Lw006BaseActivity {
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(mReceiver, filter);
         mReceiverTag = true;
-        if (!LoRaLW006MokoSupport.getInstance().isBluetoothOpen()) {
+        if (!MokoSupport.getInstance().isBluetoothOpen()) {
             // 蓝牙未打开，开启蓝牙
-            LoRaLW006MokoSupport.getInstance().enableBluetooth();
+            MokoSupport.getInstance().enableBluetooth();
         } else {
             showSyncingProgressDialog();
             List<OrderTask> orderTasks = new ArrayList<>(4);
             orderTasks.add(OrderTaskAssembler.getShutdownPayloadEnable());
             orderTasks.add(OrderTaskAssembler.getOffByButtonEnable());
             orderTasks.add(OrderTaskAssembler.getAutoPowerOn());
-            LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         }
         setListener();
     }
@@ -74,7 +74,7 @@ public class OnOffSettingsActivity extends Lw006BaseActivity {
             List<OrderTask> orderTasks = new ArrayList<>(2);
             orderTasks.add(OrderTaskAssembler.setShutdownInfoReport(shutdownPayloadOpen ? 0 : 1));
             orderTasks.add(OrderTaskAssembler.getShutdownPayloadEnable());
-            LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         });
         mBind.ivOffByButton.setOnClickListener(v -> {
             if (isWindowLocked()) return;
@@ -82,7 +82,7 @@ public class OnOffSettingsActivity extends Lw006BaseActivity {
             List<OrderTask> orderTasks = new ArrayList<>(2);
             orderTasks.add(OrderTaskAssembler.setOffByButton(offByButtonOpen ? 0 : 1));
             orderTasks.add(OrderTaskAssembler.getOffByButtonEnable());
-            LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         });
 
         mBind.ivAutoPowerOn.setOnClickListener(v -> {
@@ -91,7 +91,7 @@ public class OnOffSettingsActivity extends Lw006BaseActivity {
             List<OrderTask> orderTasks = new ArrayList<>(2);
             orderTasks.add(OrderTaskAssembler.setAutoPowerOn(autoPowerOnOpen ? 0 : 1));
             orderTasks.add(OrderTaskAssembler.getAutoPowerOn());
-            LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         });
 
         mBind.ivPowerOff.setOnClickListener(v -> {
@@ -102,7 +102,7 @@ public class OnOffSettingsActivity extends Lw006BaseActivity {
             dialog.setConfirm("OK");
             dialog.setOnAlertConfirmListener(() -> {
                 showSyncingProgressDialog();
-                LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.close());
+                MokoSupport.getInstance().sendOrder(OrderTaskAssembler.close());
             });
             dialog.show(getSupportFragmentManager());
         });
@@ -161,21 +161,21 @@ public class OnOffSettingsActivity extends Lw006BaseActivity {
                                     if (length == 1) {
                                         int enable = value[4] & 0xFF;
                                         shutdownPayloadOpen = enable == 1;
-                                        mBind.ivShutdownPayload.setImageResource(enable == 1 ? R.drawable.lw006_ic_checked : R.drawable.lw006_ic_unchecked);
+                                        mBind.ivShutdownPayload.setImageResource(enable == 1 ? R.drawable.ic_checked : R.drawable.ps101_ic_unchecked);
                                     }
                                     break;
                                 case KEY_OFF_BY_BUTTON:
                                     if (length == 1) {
                                         int enable = value[4] & 0xFF;
                                         offByButtonOpen = enable == 1;
-                                        mBind.ivOffByButton.setImageResource(enable == 1 ? R.drawable.lw006_ic_checked : R.drawable.lw006_ic_unchecked);
+                                        mBind.ivOffByButton.setImageResource(enable == 1 ? R.drawable.ic_checked : R.drawable.ps101_ic_unchecked);
                                     }
                                     break;
                                 case KEY_AUTO_POWER_ON_ENABLE:
                                     if (length == 1) {
                                         int enable = value[4] & 0xFF;
                                         autoPowerOnOpen = enable == 1;
-                                        mBind.ivAutoPowerOn.setImageResource(enable == 1 ? R.drawable.lw006_ic_checked : R.drawable.lw006_ic_unchecked);
+                                        mBind.ivAutoPowerOn.setImageResource(enable == 1 ? R.drawable.ic_checked : R.drawable.ps101_ic_unchecked);
                                     }
                                     break;
                             }

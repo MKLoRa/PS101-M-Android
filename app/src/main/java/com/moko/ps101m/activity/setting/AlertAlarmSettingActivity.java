@@ -13,11 +13,11 @@ import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.databinding.ActivityAlartAlermSettingBinding;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.databinding.Ps101mActivityAlartAlermSettingBinding;
 import com.moko.ps101m.dialog.BottomDialog;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -35,8 +35,8 @@ import java.util.List;
  * @date: 2023/6/8 15:14
  * @des:
  */
-public class AlertAlarmSettingActivity extends Lw006BaseActivity {
-    private ActivityAlartAlermSettingBinding mBind;
+public class AlertAlarmSettingActivity extends PS101BaseActivity {
+    private Ps101mActivityAlartAlermSettingBinding mBind;
     private boolean mReceiverTag;
     private final String[] mValues = {"WIFI", "BLE", "GPS", "WIFI+GPS", "BLE+GPS", "WIFI+BLE", "WIFI+BLE+GPS"};
     private final String[] triggerMode = {"Single Click", "Double Click", "Long Press 1s", "Long Press 2s", "Long Press 3s"};
@@ -47,7 +47,7 @@ public class AlertAlarmSettingActivity extends Lw006BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = ActivityAlartAlermSettingBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityAlartAlermSettingBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         // 注册广播接收器
@@ -60,7 +60,7 @@ public class AlertAlarmSettingActivity extends Lw006BaseActivity {
         orderTasks.add(OrderTaskAssembler.getAlarmAlertTriggerType());
         orderTasks.add(OrderTaskAssembler.getAlarmAlertPosStrategy());
         orderTasks.add(OrderTaskAssembler.getAlarmAlertNotifyEnable());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
 
         mBind.tvTriggerMode.setOnClickListener(v -> {
             if (isWindowLocked()) return;
@@ -176,7 +176,7 @@ public class AlertAlarmSettingActivity extends Lw006BaseActivity {
         orderTasks.add(OrderTaskAssembler.setAlarmAlertTriggerType(mSelectedMode));
         orderTasks.add(OrderTaskAssembler.setAlarmAlertPosStrategy(mSelectedPos));
         orderTasks.add(OrderTaskAssembler.setAlarmAlertNotifyEnable(type));
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {

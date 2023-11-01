@@ -6,20 +6,18 @@ import android.view.View;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
-import com.moko.ble.lib.event.OrderTaskResponseEvent;
-import com.moko.ble.lib.task.OrderTaskResponse;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.databinding.Lw006ActivityAuxiliaryOperationBinding;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.databinding.Ps101mActivityAuxiliaryOperationBinding;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public class AuxiliaryOperationActivity extends Lw006BaseActivity {
+public class AuxiliaryOperationActivity extends PS101BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Lw006ActivityAuxiliaryOperationBinding mBind = Lw006ActivityAuxiliaryOperationBinding.inflate(getLayoutInflater());
+        Ps101mActivityAuxiliaryOperationBinding mBind = Ps101mActivityAuxiliaryOperationBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
     }

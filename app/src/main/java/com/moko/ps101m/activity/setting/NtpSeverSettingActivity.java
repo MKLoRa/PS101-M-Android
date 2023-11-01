@@ -15,10 +15,10 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
-import com.moko.ps101m.activity.Lw006BaseActivity;
+import com.moko.ps101m.activity.PS101BaseActivity;
 import com.moko.ps101m.databinding.ActivityNtpSeverSettingBinding;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -36,7 +36,7 @@ import java.util.List;
  * @date: 2023/10/27 20:07
  * @des:
  */
-public class NtpSeverSettingActivity extends Lw006BaseActivity {
+public class NtpSeverSettingActivity extends PS101BaseActivity {
     private ActivityNtpSeverSettingBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
@@ -57,7 +57,7 @@ public class NtpSeverSettingActivity extends Lw006BaseActivity {
         List<OrderTask> orderTasks = new ArrayList<>(2);
         orderTasks.add(OrderTaskAssembler.getNtpServer());
         orderTasks.add(OrderTaskAssembler.getNtpSyncInterval());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[0]));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[0]));
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 200)
@@ -180,6 +180,6 @@ public class NtpSeverSettingActivity extends Lw006BaseActivity {
         List<OrderTask> orderTasks = new ArrayList<>(2);
         orderTasks.add(OrderTaskAssembler.setNtpServer(ntpServer));
         orderTasks.add(OrderTaskAssembler.setNtpSyncInterval(interval));
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[0]));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[0]));
     }
 }

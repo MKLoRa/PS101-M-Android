@@ -10,18 +10,18 @@ import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
 
 import com.moko.ps101m.R;
-import com.moko.ps101m.databinding.Lw006DialogLoadingMessageBinding;
+import com.moko.ps101m.databinding.DialogLoadingMessageBinding;
 import com.moko.ps101m.view.ProgressDrawable;
 
-public class LoadingMessageDialog extends MokoBaseDialog<Lw006DialogLoadingMessageBinding> {
+public class LoadingMessageDialog extends MokoBaseDialog<DialogLoadingMessageBinding> {
     //    private static final int DIALOG_DISMISS_DELAY_TIME = 15000;
     public static final String TAG = LoadingMessageDialog.class.getSimpleName();
     private String message;
     private int messageId = -1;
 
     @Override
-    protected Lw006DialogLoadingMessageBinding getViewBind(LayoutInflater inflater, ViewGroup container) {
-        return Lw006DialogLoadingMessageBinding.inflate(inflater, container, false);
+    protected DialogLoadingMessageBinding getViewBind(LayoutInflater inflater, ViewGroup container) {
+        return DialogLoadingMessageBinding.inflate(inflater, container, false);
     }
 
     @Override

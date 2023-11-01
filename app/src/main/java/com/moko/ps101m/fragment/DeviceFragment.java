@@ -16,7 +16,7 @@ import com.moko.ps101m.activity.DeviceInfoActivity;
 import com.moko.ps101m.activity.setting.NtpSeverSettingActivity;
 import com.moko.ps101m.databinding.Lw006FragmentDeviceBinding;
 import com.moko.ps101m.dialog.BottomDialog;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 
 import java.util.ArrayList;
@@ -83,7 +83,7 @@ public class DeviceFragment extends Fragment {
                 List<OrderTask> orderTasks = new ArrayList<>(2);
                 orderTasks.add(OrderTaskAssembler.setDataFormat(value));
                 orderTasks.add(OrderTaskAssembler.getDataFormat());
-                LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[0]));
+                MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[0]));
             });
             dialog.show(activity.getSupportFragmentManager());
         });
@@ -113,14 +113,14 @@ public class DeviceFragment extends Fragment {
             ArrayList<OrderTask> orderTasks = new ArrayList<>();
             orderTasks.add(OrderTaskAssembler.setTimeZone(value - 24));
             orderTasks.add(OrderTaskAssembler.getTimeZone());
-            LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         });
         dialog.show(activity.getSupportFragmentManager());
     }
 
     public void setLowPowerPayload(int enable) {
         mLowPowerPayloadEnable = enable == 1;
-        mBind.ivLowPowerPayload.setImageResource(mLowPowerPayloadEnable ? R.drawable.lw006_ic_checked : R.drawable.lw006_ic_unchecked);
+        mBind.ivLowPowerPayload.setImageResource(mLowPowerPayloadEnable ? R.drawable.ic_checked : R.drawable.ps101_ic_unchecked);
     }
 
     public void setLowPower(int lowPower) {
@@ -153,7 +153,7 @@ public class DeviceFragment extends Fragment {
         ArrayList<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.setLowPowerReportEnable(mLowPowerPayloadEnable ? 1 : 0));
         orderTasks.add(OrderTaskAssembler.getLowPowerPayloadEnable());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     public void showLowPowerDialog() {
@@ -167,7 +167,7 @@ public class DeviceFragment extends Fragment {
             ArrayList<OrderTask> orderTasks = new ArrayList<>();
             orderTasks.add(OrderTaskAssembler.setLowPowerPercent(value));
             orderTasks.add(OrderTaskAssembler.getLowPowerPercent());
-            LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         });
         dialog.show(activity.getSupportFragmentManager());
     }
@@ -182,7 +182,7 @@ public class DeviceFragment extends Fragment {
             ArrayList<OrderTask> orderTasks = new ArrayList<>();
             orderTasks.add(OrderTaskAssembler.setBuzzerSound(value));
             orderTasks.add(OrderTaskAssembler.getBuzzerSoundChoose());
-            LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         });
         dialog.show(activity.getSupportFragmentManager());
     }
@@ -207,7 +207,7 @@ public class DeviceFragment extends Fragment {
             }
             orderTasks.add(OrderTaskAssembler.setVibrationIntensity(vibrationVal));
             orderTasks.add(OrderTaskAssembler.getVibrationIntensity());
-            LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         });
         dialog.show(activity.getSupportFragmentManager());
     }

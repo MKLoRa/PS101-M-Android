@@ -10,9 +10,9 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
-import com.moko.ps101m.databinding.Lw006ActivityPosGpsL76cBinding;
+import com.moko.ps101m.databinding.Ps101mActivityPosGpsBinding;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -25,21 +25,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class PosGpsL76CFixActivity extends Lw006BaseActivity {
-    private Lw006ActivityPosGpsL76cBinding mBind;
+public class PosGpsL76CFixActivity extends PS101BaseActivity {
+    private Ps101mActivityPosGpsBinding mBind;
     private boolean savedParamsError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityPosGpsL76cBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityPosGpsBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         showSyncingProgressDialog();
         List<OrderTask> orderTasks = new ArrayList<>(2);
         orderTasks.add(OrderTaskAssembler.getGPSPosTimeoutL76());
         orderTasks.add(OrderTaskAssembler.getGPSPDOPLimitL76());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 200)
@@ -151,7 +151,7 @@ public class PosGpsL76CFixActivity extends Lw006BaseActivity {
         List<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.setGPSPosTimeoutL76C(posTimeout));
         orderTasks.add(OrderTaskAssembler.setGPSPDOPLimitL76C(limit));
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     @Override

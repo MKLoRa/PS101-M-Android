@@ -10,7 +10,7 @@ import com.moko.ps101m.entity.AdvInfo;
 
 public class DeviceListAdapter extends BaseQuickAdapter<AdvInfo, BaseViewHolder> {
     public DeviceListAdapter() {
-        super(R.layout.lw006_list_item_device);
+        super(R.layout.ps101m_list_item_device);
     }
 
     @Override

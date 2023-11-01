@@ -8,10 +8,10 @@ import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.databinding.Lw006ActivitySelftestBinding;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.databinding.Ps101mActivitySelftestBinding;
 import com.moko.ps101m.dialog.AlertMessageDialog;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -23,13 +23,13 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SelfTestActivity extends Lw006BaseActivity {
-    private Lw006ActivitySelftestBinding mBind;
+public class SelfTestActivity extends PS101BaseActivity {
+    private Ps101mActivitySelftestBinding mBind;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivitySelftestBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivitySelftestBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         showSyncingProgressDialog();
@@ -37,7 +37,7 @@ public class SelfTestActivity extends Lw006BaseActivity {
         orderTasks.add(OrderTaskAssembler.getSelfTestStatus());
         orderTasks.add(OrderTaskAssembler.getPCBAStatus());
         orderTasks.add(OrderTaskAssembler.getMotorState());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 300)
@@ -134,7 +134,7 @@ public class SelfTestActivity extends Lw006BaseActivity {
             List<OrderTask> orderTasks = new ArrayList<>();
             orderTasks.add(OrderTaskAssembler.resetMotorState());
             orderTasks.add(OrderTaskAssembler.getMotorState());
-            LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         });
         dialog.show(getSupportFragmentManager());
     }

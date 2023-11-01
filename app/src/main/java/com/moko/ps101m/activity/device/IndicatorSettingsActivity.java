@@ -13,10 +13,10 @@ import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.databinding.Lw006ActivityIndicatorSettingsBinding;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.databinding.Ps101mActivityIndicatorSettingsBinding;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -27,14 +27,14 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.Arrays;
 
-public class IndicatorSettingsActivity extends Lw006BaseActivity {
-    private Lw006ActivityIndicatorSettingsBinding mBind;
+public class IndicatorSettingsActivity extends PS101BaseActivity {
+    private Ps101mActivityIndicatorSettingsBinding mBind;
     private boolean mReceiverTag = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityIndicatorSettingsBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityIndicatorSettingsBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
 
         EventBus.getDefault().register(this);
@@ -44,7 +44,7 @@ public class IndicatorSettingsActivity extends Lw006BaseActivity {
         registerReceiver(mReceiver, filter);
         mReceiverTag = true;
         showSyncingProgressDialog();
-        LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getIndicatorStatus());
+        MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getIndicatorStatus());
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 200)
@@ -167,6 +167,6 @@ public class IndicatorSettingsActivity extends Lw006BaseActivity {
                 | (mBind.cbFailToFix.isChecked() ? 1 << 7 : 0)
                 | 1 << 8 | 1 << 9 | 1 << 10 | 1 << 11 | 1 << 12 | 1 << 13 | 1 << 14 | 1 << 15 | 1 << 16;
         showSyncingProgressDialog();
-        LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setIndicatorStatus(indicator));
+        MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setIndicatorStatus(indicator));
     }
 }

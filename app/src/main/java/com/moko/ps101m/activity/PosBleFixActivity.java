@@ -20,10 +20,10 @@ import com.moko.ps101m.R;
 import com.moko.ps101m.activity.filter.FilterAdvNameActivity;
 import com.moko.ps101m.activity.filter.FilterMacAddressActivity;
 import com.moko.ps101m.activity.filter.FilterRawDataSwitchActivity;
-import com.moko.ps101m.databinding.Lw006ActivityPosBleBinding;
+import com.moko.ps101m.databinding.Ps101mActivityPosBleBinding;
 import com.moko.ps101m.dialog.BottomDialog;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -37,8 +37,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-public class PosBleFixActivity extends Lw006BaseActivity implements SeekBar.OnSeekBarChangeListener {
-    private Lw006ActivityPosBleBinding mBind;
+public class PosBleFixActivity extends PS101BaseActivity implements SeekBar.OnSeekBarChangeListener {
+    private Ps101mActivityPosBleBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
     private final String[] mRelationshipValues = {"Null", "Only MAC", "Only ADV Name", "Only Raw Data", "ADV Name&Raw Data", "MAC&ADV Name&Raw Data", "ADV Name | Raw Data"};
@@ -51,7 +51,7 @@ public class PosBleFixActivity extends Lw006BaseActivity implements SeekBar.OnSe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityPosBleBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityPosBleBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         mBind.sbRssiFilter.setOnSeekBarChangeListener(this);
@@ -72,7 +72,7 @@ public class PosBleFixActivity extends Lw006BaseActivity implements SeekBar.OnSe
         orderTasks.add(OrderTaskAssembler.getFilterBleScanPhy());
         orderTasks.add(OrderTaskAssembler.getFilterRSSI());
         orderTasks.add(OrderTaskAssembler.getFilterRelationship());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 200)
@@ -222,7 +222,7 @@ public class PosBleFixActivity extends Lw006BaseActivity implements SeekBar.OnSe
         orderTasks.add(OrderTaskAssembler.setFilterRSSI(mBind.sbRssiFilter.getProgress() - 127));
         orderTasks.add(OrderTaskAssembler.setFilterBleScanPhy(mScanningTypeSelected));
         orderTasks.add(OrderTaskAssembler.setFilterRelationship(mRelationshipSelected));
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {

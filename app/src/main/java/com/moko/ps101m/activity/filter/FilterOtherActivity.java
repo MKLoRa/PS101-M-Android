@@ -14,11 +14,11 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.ps101m.R;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.databinding.Lw006ActivityFilterOtherBinding;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.databinding.Ps101mActivityFilterOtherBinding;
 import com.moko.ps101m.dialog.BottomDialog;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -31,8 +31,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class FilterOtherActivity extends Lw006BaseActivity {
-    private Lw006ActivityFilterOtherBinding mBind;
+public class FilterOtherActivity extends PS101BaseActivity {
+    private Ps101mActivityFilterOtherBinding mBind;
     private boolean savedParamsError;
     private ArrayList<String> filterOther = new ArrayList<>();
     private ArrayList<String> mValues;
@@ -41,7 +41,7 @@ public class FilterOtherActivity extends Lw006BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityFilterOtherBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityFilterOtherBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         showSyncingProgressDialog();
@@ -49,7 +49,7 @@ public class FilterOtherActivity extends Lw006BaseActivity {
         orderTasks.add(OrderTaskAssembler.getFilterOtherEnable());
         orderTasks.add(OrderTaskAssembler.getFilterOtherRelationship());
         orderTasks.add(OrderTaskAssembler.getFilterOtherRules());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 400)
@@ -143,7 +143,7 @@ public class FilterOtherActivity extends Lw006BaseActivity {
                                         }
                                         for (int i = 0, l = filterOther.size(); i < l; i++) {
                                             String other = filterOther.get(i);
-                                            View v = LayoutInflater.from(this).inflate(R.layout.lw006_item_other_filter, mBind.llFilterCondition, false);
+                                            View v = LayoutInflater.from(this).inflate(R.layout.ps101m_item_other_filter, mBind.llFilterCondition, false);
                                             TextView tvCondition = v.findViewById(R.id.tv_condition);
                                             EditText etDataType = v.findViewById(R.id.et_data_type);
                                             EditText etMin = v.findViewById(R.id.et_min);
@@ -265,7 +265,7 @@ public class FilterOtherActivity extends Lw006BaseActivity {
         }
         orderTasks.add(OrderTaskAssembler.setFilterOtherRelationship(relationship));
         orderTasks.add(OrderTaskAssembler.setFilterOtherEnable(mBind.cbOther.isChecked() ? 1 : 0));
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     public void onAdd(View view) {
@@ -275,7 +275,7 @@ public class FilterOtherActivity extends Lw006BaseActivity {
             ToastUtils.showToast(this, "You can set up to 3 filters!");
             return;
         }
-        View v = LayoutInflater.from(this).inflate(R.layout.lw006_item_other_filter, mBind.llFilterCondition, false);
+        View v = LayoutInflater.from(this).inflate(R.layout.ps101m_item_other_filter, mBind.llFilterCondition, false);
         TextView tvCondition = v.findViewById(R.id.tv_condition);
         if (count == 0) {
             tvCondition.setText("Condition A");

@@ -12,11 +12,11 @@ import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTaskResponse;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.databinding.Lw006ActivityStandbyModeBinding;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.databinding.Ps101mActivityStandbyModeBinding;
 import com.moko.ps101m.dialog.BottomDialog;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -33,8 +33,8 @@ import java.util.Arrays;
  * @date: 2023/6/7 19:54
  * @des:
  */
-public class StandbyModeActivity extends Lw006BaseActivity {
-    private Lw006ActivityStandbyModeBinding mBind;
+public class StandbyModeActivity extends PS101BaseActivity {
+    private Ps101mActivityStandbyModeBinding mBind;
     private boolean mReceiverTag = false;
     private int mSelected;
     private final String[] mValues = {"WIFI", "BLE", "GPS", "WIFI+GPS", "BLE+GPS", "WIFI+BLE", "WIFI+BLE+GPS"};
@@ -42,7 +42,7 @@ public class StandbyModeActivity extends Lw006BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityStandbyModeBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityStandbyModeBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         // 注册广播接收器
@@ -51,7 +51,7 @@ public class StandbyModeActivity extends Lw006BaseActivity {
         registerReceiver(mReceiver, filter);
         mReceiverTag = true;
         showSyncingProgressDialog();
-        LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getStandbyPosStrategy());
+        MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getStandbyPosStrategy());
         mBind.tvStandbyPosStrategy.setOnClickListener(v -> {
             if (isWindowLocked()) return;
             BottomDialog dialog = new BottomDialog();
@@ -125,7 +125,7 @@ public class StandbyModeActivity extends Lw006BaseActivity {
     public void onSave(View view) {
         if (isWindowLocked()) return;
         showSyncingProgressDialog();
-        LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setStandbyPosStrategy(mSelected));
+        MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setStandbyPosStrategy(mSelected));
     }
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {

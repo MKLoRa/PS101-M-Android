@@ -26,12 +26,12 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.ps101m.AppConstants;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.databinding.Lw006ActivitySystemInfoBinding;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.databinding.Ps101mActivitySystemInfoBinding;
 import com.moko.ps101m.service.DfuService;
 import com.moko.ps101m.utils.FileUtils;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -50,9 +50,9 @@ import no.nordicsemi.android.dfu.DfuProgressListenerAdapter;
 import no.nordicsemi.android.dfu.DfuServiceInitiator;
 import no.nordicsemi.android.dfu.DfuServiceListenerHelper;
 
-public class SystemInfoActivity extends Lw006BaseActivity {
+public class SystemInfoActivity extends PS101BaseActivity {
     public static final int REQUEST_CODE_SELECT_FIRMWARE = 0x10;
-    private Lw006ActivitySystemInfoBinding mBind;
+    private Ps101mActivitySystemInfoBinding mBind;
     private boolean mReceiverTag = false;
     private String mDeviceMac;
     private String mDeviceName;
@@ -60,7 +60,7 @@ public class SystemInfoActivity extends Lw006BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivitySystemInfoBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivitySystemInfoBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         // 注册广播接收器
@@ -78,7 +78,7 @@ public class SystemInfoActivity extends Lw006BaseActivity {
         orderTasks.add(OrderTaskAssembler.getFirmwareVersion());
         orderTasks.add(OrderTaskAssembler.getHardwareVersion());
         orderTasks.add(OrderTaskAssembler.getManufacturer());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         DfuServiceListenerHelper.registerProgressListener(this, mDfuProgressListener);
     }
 

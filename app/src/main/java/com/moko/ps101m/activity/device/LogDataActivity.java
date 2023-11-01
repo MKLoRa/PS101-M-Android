@@ -15,14 +15,14 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ps101m.AppConstants;
 import com.moko.ps101m.R;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.activity.LoRaLW006MainActivity;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.activity.PS101MainActivity;
 import com.moko.ps101m.adapter.LogDataListAdapter;
-import com.moko.ps101m.databinding.Lw006ActivityLogDataBinding;
+import com.moko.ps101m.databinding.Ps101mActivityLogDataBinding;
 import com.moko.ps101m.dialog.AlertMessageDialog;
 import com.moko.ps101m.entity.LogData;
 import com.moko.ps101m.utils.Utils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.entity.OrderCHAR;
 
 import org.greenrobot.eventbus.EventBus;
@@ -39,9 +39,9 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Objects;
 
-public class LogDataActivity extends Lw006BaseActivity implements BaseQuickAdapter.OnItemClickListener {
+public class LogDataActivity extends PS101BaseActivity implements BaseQuickAdapter.OnItemClickListener {
     public static String TAG = LogDataActivity.class.getSimpleName();
-    private Lw006ActivityLogDataBinding mBind;
+    private Ps101mActivityLogDataBinding mBind;
     private StringBuilder storeString;
     private ArrayList<LogData> LogDatas;
     private boolean isSync;
@@ -56,10 +56,10 @@ public class LogDataActivity extends Lw006BaseActivity implements BaseQuickAdapt
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityLogDataBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityLogDataBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         String mDeviceMac = getIntent().getStringExtra(AppConstants.EXTRA_KEY_DEVICE_MAC).replaceAll(":", "");
-        logDirPath = LoRaLW006MainActivity.PATH_LOGCAT + File.separator + mDeviceMac;
+        logDirPath = PS101MainActivity.PATH_LOGCAT + File.separator + mDeviceMac;
         LogDatas = new ArrayList<>();
         adapter = new LogDataListAdapter();
         adapter.openLoadAnimation();
@@ -150,13 +150,13 @@ public class LogDataActivity extends Lw006BaseActivity implements BaseQuickAdapt
             storeString = new StringBuilder();
             mBind.tvSyncSwitch.setText("Stop");
             isSync = true;
-            animation = AnimationUtils.loadAnimation(this, R.anim.lw006_rotate_refresh);
+            animation = AnimationUtils.loadAnimation(this, R.anim.rotate_refresh);
             mBind.ivSync.startAnimation(animation);
-            LoRaLW006MokoSupport.getInstance().enableLogNotify();
+            MokoSupport.getInstance().enableLogNotify();
             Calendar calendar = Calendar.getInstance();
             syncTime = Utils.calendar2strDate(calendar, "yyyy-MM-dd HH-mm-ss");
         } else {
-            LoRaLW006MokoSupport.getInstance().disableLogNotify();
+            MokoSupport.getInstance().disableLogNotify();
             stopSync();
         }
     }
@@ -232,11 +232,11 @@ public class LogDataActivity extends Lw006BaseActivity implements BaseQuickAdapt
 
     private void backHome() {
         if (isSync) {
-            LoRaLW006MokoSupport.getInstance().disableLogNotify();
+            MokoSupport.getInstance().disableLogNotify();
             stopSync();
         } else {
             if (isDisconnected) {
-                Intent intent = new Intent(this, LoRaLW006MainActivity.class);
+                Intent intent = new Intent(this, PS101MainActivity.class);
                 intent.putExtra(AppConstants.EXTRA_KEY_FROM_ACTIVITY, TAG);
                 startActivity(intent);
                 return;
@@ -259,7 +259,7 @@ public class LogDataActivity extends Lw006BaseActivity implements BaseQuickAdapt
             dialog.setCancelGone();
             dialog.setOnAlertConfirmListener(() -> {
                 if (isDisconnected) {
-                    Intent intent = new Intent(this, LoRaLW006MainActivity.class);
+                    Intent intent = new Intent(this, PS101MainActivity.class);
                     intent.putExtra(AppConstants.EXTRA_KEY_FROM_ACTIVITY, TAG);
                     startActivity(intent);
                     return;

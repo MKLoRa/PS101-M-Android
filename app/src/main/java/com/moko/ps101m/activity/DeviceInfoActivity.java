@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -33,7 +32,7 @@ import com.moko.ps101m.activity.setting.AuxiliaryOperationActivity;
 import com.moko.ps101m.activity.setting.AxisSettingActivity;
 import com.moko.ps101m.activity.setting.BleSettingsActivity;
 import com.moko.ps101m.activity.setting.DeviceModeActivity;
-import com.moko.ps101m.databinding.Lw006ActivityDeviceInfoBinding;
+import com.moko.ps101m.databinding.Ps101mActivityDeviceInfoBinding;
 import com.moko.ps101m.dialog.AlertMessageDialog;
 import com.moko.ps101m.dialog.ChangePasswordDialog;
 import com.moko.ps101m.fragment.DeviceFragment;
@@ -41,7 +40,7 @@ import com.moko.ps101m.fragment.GeneralFragment;
 import com.moko.ps101m.fragment.NetworkFragment;
 import com.moko.ps101m.fragment.PositionFragment;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -56,8 +55,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.OnCheckedChangeListener {
-    private Lw006ActivityDeviceInfoBinding mBind;
+public class DeviceInfoActivity extends PS101BaseActivity implements RadioGroup.OnCheckedChangeListener {
+    private Ps101mActivityDeviceInfoBinding mBind;
     private FragmentManager fragmentManager;
     private NetworkFragment networkFragment;
     private PositionFragment posFragment;
@@ -70,7 +69,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityDeviceInfoBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityDeviceInfoBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         fragmentManager = getSupportFragmentManager();
         initFragment();
@@ -82,8 +81,8 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(mReceiver, filter);
         mReceiverTag = true;
-        if (!LoRaLW006MokoSupport.getInstance().isBluetoothOpen()) {
-            LoRaLW006MokoSupport.getInstance().enableBluetooth();
+        if (!MokoSupport.getInstance().isBluetoothOpen()) {
+            MokoSupport.getInstance().enableBluetooth();
         } else {
             showSyncingProgressDialog();
             mBind.frameContainer.postDelayed(() -> {
@@ -94,7 +93,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
                 orderTasks.add(OrderTaskAssembler.getNetworkStatus());
                 orderTasks.add(OrderTaskAssembler.getMqttConnectionStatus());
                 orderTasks.add(OrderTaskAssembler.getNetworkReconnectInterval());
-                LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+                MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
             }, 300);
         }
     }
@@ -124,11 +123,11 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
         final String action = event.getAction();
         runOnUiThread(() -> {
             if (MokoConstants.ACTION_DISCONNECTED.equals(action)) {
-                if (LoRaLW006MokoSupport.getInstance().exportDatas != null) {
-                    LoRaLW006MokoSupport.getInstance().exportDatas.clear();
-                    LoRaLW006MokoSupport.getInstance().storeString = null;
-                    LoRaLW006MokoSupport.getInstance().startTime = 0;
-                    LoRaLW006MokoSupport.getInstance().sum = 0;
+                if (MokoSupport.getInstance().exportDatas != null) {
+                    MokoSupport.getInstance().exportDatas.clear();
+                    MokoSupport.getInstance().storeString = null;
+                    MokoSupport.getInstance().startTime = 0;
+                    MokoSupport.getInstance().sum = 0;
                 }
                 showDisconnectDialog();
             }
@@ -299,7 +298,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
         } else if (disConnectType == 1) {
             showAlertDialog(null, "The device is disconnected!", "OK");
         } else {
-            if (LoRaLW006MokoSupport.getInstance().isBluetoothOpen()) {
+            if (MokoSupport.getInstance().isBluetoothOpen()) {
                 showAlertDialog("Dismiss", "The device disconnected!", "Exit");
             }
         }
@@ -350,7 +349,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
         if (mBind.radioBtnNetwork.isChecked()) {
             if (networkFragment.isValid()) {
                 showSyncingProgressDialog();
-                LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setNetworkReconnectInterval(networkFragment.getReconnectInterval()));
+                MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setNetworkReconnectInterval(networkFragment.getReconnectInterval()));
             } else {
                 ToastUtils.showToast(this, "Para error!");
             }
@@ -365,7 +364,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
     }
 
     private void back() {
-        LoRaLW006MokoSupport.getInstance().disConnectBle();
+        MokoSupport.getInstance().disConnectBle();
     }
 
     @Override
@@ -404,7 +403,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
         orderTasks.add(OrderTaskAssembler.getLowPowerPayloadEnable());
         orderTasks.add(OrderTaskAssembler.getBuzzerSoundChoose());
         orderTasks.add(OrderTaskAssembler.getVibrationIntensity());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     private void showGeneralAndGetData() {
@@ -417,7 +416,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
                 .hide(deviceFragment)
                 .commit();
         showSyncingProgressDialog();
-        LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getHeartBeatInterval());
+        MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getHeartBeatInterval());
     }
 
     private void showPosAndGetData() {
@@ -445,7 +444,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
         orderTasks.add(OrderTaskAssembler.getNetworkStatus());
         orderTasks.add(OrderTaskAssembler.getMqttConnectionStatus());
         orderTasks.add(OrderTaskAssembler.getNetworkReconnectInterval());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     public void onChangePassword(View view) {
@@ -453,7 +452,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
         final ChangePasswordDialog dialog = new ChangePasswordDialog(this);
         dialog.setOnPasswordClicked(password -> {
             showSyncingProgressDialog();
-            LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.changePassword(password));
+            MokoSupport.getInstance().sendOrder(OrderTaskAssembler.changePassword(password));
         });
         dialog.show();
         Timer timer = new Timer();
@@ -564,8 +563,8 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
             if (null == result.getData()) return;
             String mac = result.getData().getStringExtra(AppConstants.EXTRA_KEY_DEVICE_MAC);
             mBind.frameContainer.postDelayed(() -> {
-                if (LoRaLW006MokoSupport.getInstance().isConnDevice(mac)) {
-                    LoRaLW006MokoSupport.getInstance().disConnectBle();
+                if (MokoSupport.getInstance().isConnDevice(mac)) {
+                    MokoSupport.getInstance().disConnectBle();
                     return;
                 }
                 showDisconnectDialog();
@@ -581,7 +580,7 @@ public class DeviceInfoActivity extends Lw006BaseActivity implements RadioGroup.
         dialog.setConfirm("OK");
         dialog.setOnAlertConfirmListener(() -> {
             showSyncingProgressDialog();
-            LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.restore());
+            MokoSupport.getInstance().sendOrder(OrderTaskAssembler.restore());
         });
         dialog.show(getSupportFragmentManager());
     }

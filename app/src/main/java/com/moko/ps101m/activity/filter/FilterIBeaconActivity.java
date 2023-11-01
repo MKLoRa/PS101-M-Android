@@ -10,10 +10,10 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.databinding.Lw006ActivityFilterIbeaconBinding;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.databinding.Ps101mActivityFilterIbeaconBinding;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -26,14 +26,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class FilterIBeaconActivity extends Lw006BaseActivity {
-    private Lw006ActivityFilterIbeaconBinding mBind;
+public class FilterIBeaconActivity extends PS101BaseActivity {
+    private Ps101mActivityFilterIbeaconBinding mBind;
     private boolean savedParamsError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityFilterIbeaconBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityFilterIbeaconBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
 
@@ -43,7 +43,7 @@ public class FilterIBeaconActivity extends Lw006BaseActivity {
         orderTasks.add(OrderTaskAssembler.getFilterIBeaconUUID());
         orderTasks.add(OrderTaskAssembler.getFilterIBeaconMajorRange());
         orderTasks.add(OrderTaskAssembler.getFilterIBeaconMinorRange());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 400)
@@ -224,7 +224,7 @@ public class FilterIBeaconActivity extends Lw006BaseActivity {
         orderTasks.add(OrderTaskAssembler.setFilterIBeaconMajorRange(majorMin, majorMax));
         orderTasks.add(OrderTaskAssembler.setFilterIBeaconMinorRange(minorMin, minorMax));
         orderTasks.add(OrderTaskAssembler.setFilterIBeaconEnable(mBind.cbIbeacon.isChecked() ? 1 : 0));
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     @Override

@@ -11,11 +11,11 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.databinding.Lw006ActivityFilterMkpirBinding;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.databinding.Ps101mActivityFilterMkpirBinding;
 import com.moko.ps101m.dialog.BottomDialog;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -33,8 +33,8 @@ import java.util.List;
  * @date: 2023/6/7 10:43
  * @des:
  */
-public class FilterMkPirActivity extends Lw006BaseActivity {
-    private Lw006ActivityFilterMkpirBinding mBind;
+public class FilterMkPirActivity extends PS101BaseActivity {
+    private Ps101mActivityFilterMkpirBinding mBind;
     private final String[] detectionStatusArray = {"No motion detected", "Motion detected", "All"};
     private final String[] sensorSensitivityArray = {"Low", "Medium", "High", "All"};
     private final String[] doorStatusArray = {"Close", "Open", "All"};
@@ -53,7 +53,7 @@ public class FilterMkPirActivity extends Lw006BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityFilterMkpirBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityFilterMkpirBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         showSyncingProgressDialog();
@@ -65,7 +65,7 @@ public class FilterMkPirActivity extends Lw006BaseActivity {
         orderTasks.add(OrderTaskAssembler.getMkPirDelayResStatus());
         orderTasks.add(OrderTaskAssembler.getMkPirMajor());
         orderTasks.add(OrderTaskAssembler.getMkPirMinor());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         setListener();
     }
 
@@ -255,7 +255,7 @@ public class FilterMkPirActivity extends Lw006BaseActivity {
         orderTasks.add(OrderTaskAssembler.setFilterMkPirDelayResStatus(delayResStatusIndex));
         orderTasks.add(OrderTaskAssembler.setFilterMkPirMajorRange(majorMin, majorMax));
         orderTasks.add(OrderTaskAssembler.setFilterMkPirMinorRange(minorMin, minorMax));
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     private void showBottomDialog(ArrayList<String> mValues, int mSelected, TextView textView, int type) {

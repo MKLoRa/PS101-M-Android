@@ -15,11 +15,11 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.databinding.Lw006ActivityMotionModeBinding;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.databinding.Ps101mActivityMotionModeBinding;
 import com.moko.ps101m.dialog.BottomDialog;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -32,8 +32,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MotionModeActivity extends Lw006BaseActivity {
-    private Lw006ActivityMotionModeBinding mBind;
+public class MotionModeActivity extends PS101BaseActivity {
+    private Ps101mActivityMotionModeBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
     private final String[] mValues = {"WIFI", "BLE", "GPS", "WIFI+GPS", "BLE+GPS", "WIFI+BLE", "WIFI+BLE+GPS"};
@@ -45,7 +45,7 @@ public class MotionModeActivity extends Lw006BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityMotionModeBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityMotionModeBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         // 注册广播接收器
@@ -65,7 +65,7 @@ public class MotionModeActivity extends Lw006BaseActivity {
         orderTasks.add(OrderTaskAssembler.getMotionEndPosStrategy());
         orderTasks.add(OrderTaskAssembler.getMotionStationaryPosStrategy());
         orderTasks.add(OrderTaskAssembler.getMotionStationaryReportInterval());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 300)
@@ -308,7 +308,7 @@ public class MotionModeActivity extends Lw006BaseActivity {
                 | (mBind.cbFixOnEnd.isChecked() ? 32 : 0)
                 | (mBind.cbFixOnStationaryState.isChecked() ? 64 : 0);
         orderTasks.add(OrderTaskAssembler.setMotionModeEvent(motionMode));
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     public void selectPosStrategyStart(View view) {

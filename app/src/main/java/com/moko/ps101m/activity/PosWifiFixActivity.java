@@ -17,10 +17,10 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ps101m.R;
-import com.moko.ps101m.databinding.Lw006ActivityPosWifiBinding;
+import com.moko.ps101m.databinding.Ps101mActivityPosWifiBinding;
 import com.moko.ps101m.dialog.BottomDialog;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -34,8 +34,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-public class PosWifiFixActivity extends Lw006BaseActivity implements SeekBar.OnSeekBarChangeListener {
-    private Lw006ActivityPosWifiBinding mBind;
+public class PosWifiFixActivity extends PS101BaseActivity implements SeekBar.OnSeekBarChangeListener {
+    private Ps101mActivityPosWifiBinding mBind;
     private boolean mReceiverTag = false;
     private final String[] posMechanism = {"RSSI Priority", "Time Priority"};
     private int posMechanismIndex;
@@ -45,7 +45,7 @@ public class PosWifiFixActivity extends Lw006BaseActivity implements SeekBar.OnS
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityPosWifiBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityPosWifiBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         // 注册广播接收器
@@ -63,7 +63,7 @@ public class PosWifiFixActivity extends Lw006BaseActivity implements SeekBar.OnS
         orderTasks.add(OrderTaskAssembler.getWifiPosBSSIDNumber());
         orderTasks.add(OrderTaskAssembler.getWifiPosMechanism());
         orderTasks.add(OrderTaskAssembler.getWifiRssiFilter());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         mBind.tvWifiFixMechanism.setOnClickListener(v -> {
             if (isWindowLocked()) return;
             BottomDialog dialog = new BottomDialog();
@@ -207,7 +207,7 @@ public class PosWifiFixActivity extends Lw006BaseActivity implements SeekBar.OnS
         orderTasks.add(OrderTaskAssembler.setWifiPosBSSIDNumber(number));
         orderTasks.add(OrderTaskAssembler.setWifiPosMechanism(posMechanismIndex));
         orderTasks.add(OrderTaskAssembler.setWifiRssiFilter(mBind.sbRssiFilter.getProgress() - 127));
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {

@@ -10,9 +10,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.moko.ps101m.activity.DeviceInfoActivity;
 import com.moko.ps101m.databinding.Lw006FragmentGeneralBinding;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 
 public class GeneralFragment extends Fragment {
@@ -47,6 +46,6 @@ public class GeneralFragment extends Fragment {
     public void saveParams() {
         final String intervalStr = mBind.etHeartbeatInterval.getText().toString();
         final int interval = Integer.parseInt(intervalStr);
-        LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setHeartBeatInterval(interval));
+        MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setHeartBeatInterval(interval));
     }
 }

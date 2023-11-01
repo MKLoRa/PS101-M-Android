@@ -12,11 +12,11 @@ import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTaskResponse;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.databinding.Lw006ActivityDeviceModeBinding;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.databinding.Ps101mActivityDeviceModeBinding;
 import com.moko.ps101m.dialog.BottomDialog;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -28,8 +28,8 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class DeviceModeActivity extends Lw006BaseActivity {
-    private Lw006ActivityDeviceModeBinding mBind;
+public class DeviceModeActivity extends PS101BaseActivity {
+    private Ps101mActivityDeviceModeBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
     private final String[] mValues = {"Standby Mode", "Timing Mode", "Periodic Mode", "Motion Mode"};
@@ -38,7 +38,7 @@ public class DeviceModeActivity extends Lw006BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityDeviceModeBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityDeviceModeBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         // 注册广播接收器
@@ -47,7 +47,7 @@ public class DeviceModeActivity extends Lw006BaseActivity {
         registerReceiver(mReceiver, filter);
         mReceiverTag = true;
         showSyncingProgressDialog();
-        LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getDeviceMode());
+        MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getDeviceMode());
         mBind.tvStandbyMode.setOnClickListener(v -> {
             if (isWindowLocked()) return;
             startActivity(new Intent(this, StandbyModeActivity.class));
@@ -156,7 +156,7 @@ public class DeviceModeActivity extends Lw006BaseActivity {
             mBind.tvDeviceMode.setText(mValues[value]);
             savedParamsError = false;
             showSyncingProgressDialog();
-            LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setDeviceMode(value));
+            MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setDeviceMode(value));
         });
         dialog.show(getSupportFragmentManager());
     }

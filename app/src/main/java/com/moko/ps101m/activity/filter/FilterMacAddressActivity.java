@@ -14,10 +14,10 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.ps101m.R;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.databinding.Lw006ActivityFilterMacAddressBinding;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.databinding.Ps101mActivityFilterMacBinding;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -30,15 +30,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class FilterMacAddressActivity extends Lw006BaseActivity {
-    private Lw006ActivityFilterMacAddressBinding mBind;
+public class FilterMacAddressActivity extends PS101BaseActivity {
+    private Ps101mActivityFilterMacBinding mBind;
     private boolean savedParamsError;
     private ArrayList<String> filterMacAddress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityFilterMacAddressBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityFilterMacBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         filterMacAddress = new ArrayList<>();
@@ -47,7 +47,7 @@ public class FilterMacAddressActivity extends Lw006BaseActivity {
         orderTasks.add(OrderTaskAssembler.getFilterMacPrecise());
         orderTasks.add(OrderTaskAssembler.getFilterMacReverse());
         orderTasks.add(OrderTaskAssembler.getFilterMacRules());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 300)
@@ -136,7 +136,7 @@ public class FilterMacAddressActivity extends Lw006BaseActivity {
                                         }
                                         for (int i = 0, l = filterMacAddress.size(); i < l; i++) {
                                             String macAddress = filterMacAddress.get(i);
-                                            View v = LayoutInflater.from(FilterMacAddressActivity.this).inflate(R.layout.lw006_item_mac_address_filter, mBind.llMacAddress, false);
+                                            View v = LayoutInflater.from(FilterMacAddressActivity.this).inflate(R.layout.ps101m_item_mac_filter, mBind.llMacAddress, false);
                                             TextView title = v.findViewById(R.id.tv_mac_address_title);
                                             EditText etMacAddress = v.findViewById(R.id.et_mac_address);
                                             title.setText(String.format("MAC %d", i + 1));
@@ -171,7 +171,7 @@ public class FilterMacAddressActivity extends Lw006BaseActivity {
             ToastUtils.showToast(this, "You can set up to 10 filters!");
             return;
         }
-        View v = LayoutInflater.from(this).inflate(R.layout.lw006_item_mac_address_filter, mBind.llMacAddress, false);
+        View v = LayoutInflater.from(this).inflate(R.layout.ps101m_item_mac_filter, mBind.llMacAddress, false);
         TextView title = v.findViewById(R.id.tv_mac_address_title);
         title.setText(String.format("MAC %d", count + 1));
         mBind.llMacAddress.addView(v);
@@ -196,7 +196,7 @@ public class FilterMacAddressActivity extends Lw006BaseActivity {
         orderTasks.add(OrderTaskAssembler.setFilterMacPrecise(mBind.cbPreciseMatch.isChecked() ? 1 : 0));
         orderTasks.add(OrderTaskAssembler.setFilterMacReverse(mBind.cbReverseFilter.isChecked() ? 1 : 0));
         orderTasks.add(OrderTaskAssembler.setFilterMacRules(filterMacAddress));
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     private boolean isValid() {

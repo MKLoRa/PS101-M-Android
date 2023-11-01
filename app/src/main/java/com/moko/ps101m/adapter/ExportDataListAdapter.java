@@ -7,7 +7,7 @@ import com.moko.support.ps101m.entity.ExportData;
 
 public class ExportDataListAdapter extends BaseQuickAdapter<ExportData, BaseViewHolder> {
     public ExportDataListAdapter() {
-        super(R.layout.lw006_item_export_data);
+        super(R.layout.ps101m_item_export_data);
     }
 
     @Override

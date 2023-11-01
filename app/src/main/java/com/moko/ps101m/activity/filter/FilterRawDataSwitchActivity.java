@@ -13,10 +13,10 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ps101m.R;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.databinding.Lw006ActivityFilterRawDataSwitchBinding;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.databinding.Ps101mActivityFilterRawDataBinding;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -28,8 +28,8 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FilterRawDataSwitchActivity extends Lw006BaseActivity {
-    private Lw006ActivityFilterRawDataSwitchBinding mBind;
+public class FilterRawDataSwitchActivity extends PS101BaseActivity {
+    private Ps101mActivityFilterRawDataBinding mBind;
     private boolean savedParamsError;
     private boolean isBXPDeviceOpen;
     private boolean isBXPAccOpen;
@@ -38,11 +38,11 @@ public class FilterRawDataSwitchActivity extends Lw006BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityFilterRawDataSwitchBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityFilterRawDataBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         showSyncingProgressDialog();
-        LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getFilterRawData());
+        MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getFilterRawData());
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 300)
@@ -107,9 +107,9 @@ public class FilterRawDataSwitchActivity extends Lw006BaseActivity {
                                     mBind.tvFilterByUrl.setText(value[6] == 1 ? "ON" : "OFF");
                                     mBind.tvFilterByTlm.setText(value[7] == 1 ? "ON" : "OFF");
                                     mBind.tvFilterByBxpIbeacon.setText(value[8] == 1 ? "ON" : "OFF");
-                                    mBind.ivFilterByBxpDevice.setImageResource(value[9] == 1 ? R.drawable.lw006_ic_checked : R.drawable.lw006_ic_unchecked);
-                                    mBind.ivFilterByBxpAcc.setImageResource(value[10] == 1 ? R.drawable.lw006_ic_checked : R.drawable.lw006_ic_unchecked);
-                                    mBind.ivFilterByBxpTh.setImageResource(value[11] == 1 ? R.drawable.lw006_ic_checked : R.drawable.lw006_ic_unchecked);
+                                    mBind.ivFilterByBxpDevice.setImageResource(value[9] == 1 ? R.drawable.ic_checked : R.drawable.ps101_ic_unchecked);
+                                    mBind.ivFilterByBxpAcc.setImageResource(value[10] == 1 ? R.drawable.ic_checked : R.drawable.ps101_ic_unchecked);
+                                    mBind.ivFilterByBxpTh.setImageResource(value[11] == 1 ? R.drawable.ic_checked : R.drawable.ps101_ic_unchecked);
                                     mBind.tvFilterByBxpButton.setText(value[12] == 1 ? "ON" : "OFF");
                                     mBind.tvFilterByBxpTag.setText(value[13] == 1 ? "ON" : "OFF");
                                     mBind.tvFilterByMkPir.setText(value[14] == 1 ? "ON" : "OFF");
@@ -174,7 +174,7 @@ public class FilterRawDataSwitchActivity extends Lw006BaseActivity {
         List<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.setFilterBXPDeviceEnable(isBXPDeviceOpen ? 1 : 0));
         orderTasks.add(OrderTaskAssembler.getFilterRawData());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     public void onFilterByBXPAcc(View view) {
@@ -185,7 +185,7 @@ public class FilterRawDataSwitchActivity extends Lw006BaseActivity {
         List<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.setFilterBXPAccEnable(isBXPAccOpen ? 1 : 0));
         orderTasks.add(OrderTaskAssembler.getFilterRawData());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     public void onFilterByBXPTH(View view) {
@@ -196,7 +196,7 @@ public class FilterRawDataSwitchActivity extends Lw006BaseActivity {
         List<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.setFilterBXPTHEnable(isBXPTHOpen ? 1 : 0));
         orderTasks.add(OrderTaskAssembler.getFilterRawData());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     public void onFilterByBXPButton(View view) {
@@ -225,6 +225,6 @@ public class FilterRawDataSwitchActivity extends Lw006BaseActivity {
 
     private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         showSyncingProgressDialog();
-        mBind.tvFilterByMkPir.postDelayed(() -> LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getFilterRawData()), 200);
+        mBind.tvFilterByMkPir.postDelayed(() -> MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getFilterRawData()), 200);
     });
 }

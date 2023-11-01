@@ -25,9 +25,8 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.ps101m.R;
-import com.moko.ps101m.activity.DeviceInfoActivity;
-import com.moko.ps101m.activity.LoRaLW006MainActivity;
-import com.moko.ps101m.activity.Lw006BaseActivity;
+import com.moko.ps101m.activity.PS101MainActivity;
+import com.moko.ps101m.activity.PS101BaseActivity;
 import com.moko.ps101m.adapter.NetworkFragmentAdapter;
 import com.moko.ps101m.databinding.ActivityNetworkSettingBinding;
 import com.moko.ps101m.dialog.AlertMessageDialog;
@@ -40,7 +39,7 @@ import com.moko.ps101m.fragment.UserDeviceFragment;
 import com.moko.ps101m.utils.FileUtils;
 import com.moko.ps101m.utils.ToastUtils;
 import com.moko.ps101m.utils.Utils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -62,7 +61,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class NetworkSettingsActivity extends Lw006BaseActivity implements RadioGroup.OnCheckedChangeListener {
+public class NetworkSettingsActivity extends PS101BaseActivity implements RadioGroup.OnCheckedChangeListener {
     private ActivityNetworkSettingBinding mBind;
     private final String FILTER_ASCII = "[ -~]*";
     private GeneralDeviceFragment generalFragment;
@@ -119,7 +118,7 @@ public class NetworkSettingsActivity extends Lw006BaseActivity implements RadioG
         });
         mBind.vpMqtt.setOffscreenPageLimit(4);
         mBind.rgMqtt.setOnCheckedChangeListener(this);
-        expertFilePath = LoRaLW006MainActivity.PATH_LOGCAT + File.separator + "export" + File.separator + "Settings for Device.xlsx";
+        expertFilePath = PS101MainActivity.PATH_LOGCAT + File.separator + "export" + File.separator + "Settings for Device.xlsx";
         showSyncingProgressDialog();
         mBind.title.postDelayed(() -> {
             List<OrderTask> orderTasks = new ArrayList<>();
@@ -141,7 +140,7 @@ public class NetworkSettingsActivity extends Lw006BaseActivity implements RadioG
             orderTasks.add(OrderTaskAssembler.getMQTTLwtQos());
             orderTasks.add(OrderTaskAssembler.getMQTTLwtTopic());
             orderTasks.add(OrderTaskAssembler.getMQTTLwtPayload());
-            LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         }, 500);
         mBind.tvNetworkFormat.setOnClickListener(v -> onNetworkFormatClick());
     }
@@ -458,7 +457,7 @@ public class NetworkSettingsActivity extends Lw006BaseActivity implements RadioG
             orderTasks.add(OrderTaskAssembler.setMQTTLwtQos(lwtFragment.getQos()));
             orderTasks.add(OrderTaskAssembler.setMQTTLwtTopic(lwtFragment.getTopic()));
             orderTasks.add(OrderTaskAssembler.setMQTTLwtPayload(lwtFragment.getPayload()));
-            LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         } catch (Exception e) {
             ToastUtils.showToast(this, "File is missing");
         }

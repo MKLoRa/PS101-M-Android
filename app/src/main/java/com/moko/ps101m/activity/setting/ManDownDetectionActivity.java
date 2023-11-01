@@ -15,11 +15,11 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.databinding.Lw006ActivityManDownDetectionBinding;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.databinding.Ps101mActivityManDownDetectionBinding;
 import com.moko.ps101m.dialog.BottomDialog;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -32,8 +32,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ManDownDetectionActivity extends Lw006BaseActivity {
-    private Lw006ActivityManDownDetectionBinding mBind;
+public class ManDownDetectionActivity extends PS101BaseActivity {
+    private Ps101mActivityManDownDetectionBinding mBind;
     private boolean mReceiverTag = false;
     private final String[] mValues = {"WIFI", "BLE", "GPS", "WIFI+GPS", "BLE+GPS", "WIFI+BLE", "WIFI+BLE+GPS"};
     private int mSelected;
@@ -44,7 +44,7 @@ public class ManDownDetectionActivity extends Lw006BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityManDownDetectionBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityManDownDetectionBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         // 注册广播接收器
@@ -58,7 +58,7 @@ public class ManDownDetectionActivity extends Lw006BaseActivity {
         orderTasks.add(OrderTaskAssembler.getManDownDetectionTimeout());
         orderTasks.add(OrderTaskAssembler.getManDownPosStrategy());
         orderTasks.add(OrderTaskAssembler.getManDownReportInterval());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
 
         mBind.tvPosStrategy.setOnClickListener(v -> {
             if (isWindowLocked()) return;
@@ -231,6 +231,6 @@ public class ManDownDetectionActivity extends Lw006BaseActivity {
         orderTasks.add(OrderTaskAssembler.setManDownDetectionTimeout(timeout));
         orderTasks.add(OrderTaskAssembler.setManDownPosStrategy(mSelected));
         orderTasks.add(OrderTaskAssembler.setManDownReportInterval(interval));
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 }

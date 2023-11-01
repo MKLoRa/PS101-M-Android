@@ -5,7 +5,6 @@ import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.SeekBar;
-import android.widget.TextView;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -13,12 +12,12 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ps101m.R;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.databinding.Lw006ActivityBleSettingsBinding;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.databinding.Ps101mActivityBleSettingsBinding;
 import com.moko.ps101m.dialog.ChangePasswordDialog;
 import com.moko.ps101m.entity.TxPowerEnum;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -33,9 +32,9 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class BleSettingsActivity extends Lw006BaseActivity implements SeekBar.OnSeekBarChangeListener {
+public class BleSettingsActivity extends PS101BaseActivity implements SeekBar.OnSeekBarChangeListener {
     private final String FILTER_ASCII = "[ -~]*";
-    private Lw006ActivityBleSettingsBinding mBind;
+    private Ps101mActivityBleSettingsBinding mBind;
     private boolean savedParamsError;
     private boolean mPasswordVerifyEnable;
     private boolean mPasswordVerifyDisable;
@@ -43,7 +42,7 @@ public class BleSettingsActivity extends Lw006BaseActivity implements SeekBar.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityBleSettingsBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityBleSettingsBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         InputFilter inputFilter = (source, start, end, dest, dstart, dend) -> {
@@ -61,7 +60,7 @@ public class BleSettingsActivity extends Lw006BaseActivity implements SeekBar.On
         orderTasks.add(OrderTaskAssembler.getAdvTxPower());
         orderTasks.add(OrderTaskAssembler.getAdvTimeout());
         orderTasks.add(OrderTaskAssembler.getPasswordVerifyEnable());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 200)
@@ -142,7 +141,7 @@ public class BleSettingsActivity extends Lw006BaseActivity implements SeekBar.On
                                         int enable = value[4] & 0xFF;
                                         mPasswordVerifyEnable = enable == 1;
                                         mPasswordVerifyDisable = enable == 0;
-                                        mBind.ivLoginMode.setImageResource(mPasswordVerifyEnable ? R.drawable.lw006_ic_checked : R.drawable.lw006_ic_unchecked);
+                                        mBind.ivLoginMode.setImageResource(mPasswordVerifyEnable ? R.drawable.ic_checked : R.drawable.ps101_ic_unchecked);
                                         mBind.tvChangePassword.setVisibility(mPasswordVerifyEnable ? View.VISIBLE : View.GONE);
                                     }
                                     break;
@@ -217,7 +216,7 @@ public class BleSettingsActivity extends Lw006BaseActivity implements SeekBar.On
             orderTasks.add(OrderTaskAssembler.setAdvTxPower(txPowerEnum.getTxPower()));
         }
         orderTasks.add(OrderTaskAssembler.setPasswordVerifyEnable(mPasswordVerifyEnable ? 1 : 0));
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     public void onChangePassword(View view) {
@@ -226,7 +225,7 @@ public class BleSettingsActivity extends Lw006BaseActivity implements SeekBar.On
         final ChangePasswordDialog dialog = new ChangePasswordDialog(this);
         dialog.setOnPasswordClicked(password -> {
             showSyncingProgressDialog();
-            LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.changePassword(password));
+            MokoSupport.getInstance().sendOrder(OrderTaskAssembler.changePassword(password));
         });
         dialog.show();
         Timer timer = new Timer();
@@ -241,7 +240,7 @@ public class BleSettingsActivity extends Lw006BaseActivity implements SeekBar.On
     public void onChangeLoginMode(View view) {
         if (isWindowLocked()) return;
         mPasswordVerifyEnable = !mPasswordVerifyEnable;
-        mBind.ivLoginMode.setImageResource(mPasswordVerifyEnable ? R.drawable.lw006_ic_checked : R.drawable.lw006_ic_unchecked);
+        mBind.ivLoginMode.setImageResource(mPasswordVerifyEnable ? R.drawable.ic_checked : R.drawable.ps101_ic_unchecked);
         mBind.tvChangePassword.setVisibility(mPasswordVerifyEnable ? View.VISIBLE : View.GONE);
     }
 

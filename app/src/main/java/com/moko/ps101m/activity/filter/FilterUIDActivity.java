@@ -10,10 +10,10 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.databinding.Lw006ActivityFilterUidBinding;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.databinding.Ps101mActivityFilterUidBinding;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -26,14 +26,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class FilterUIDActivity extends Lw006BaseActivity {
-    private Lw006ActivityFilterUidBinding mBind;
+public class FilterUIDActivity extends PS101BaseActivity {
+    private Ps101mActivityFilterUidBinding mBind;
     private boolean savedParamsError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityFilterUidBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityFilterUidBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
 
@@ -42,7 +42,7 @@ public class FilterUIDActivity extends Lw006BaseActivity {
         orderTasks.add(OrderTaskAssembler.getFilterEddystoneUidEnable());
         orderTasks.add(OrderTaskAssembler.getFilterEddystoneUidNamespace());
         orderTasks.add(OrderTaskAssembler.getFilterEddystoneUidInstance());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 400)
@@ -164,7 +164,7 @@ public class FilterUIDActivity extends Lw006BaseActivity {
         orderTasks.add(OrderTaskAssembler.setFilterEddystoneUIDNamespace(namespace));
         orderTasks.add(OrderTaskAssembler.setFilterEddystoneUIDInstance(instanceId));
         orderTasks.add(OrderTaskAssembler.setFilterEddystoneUIDEnable(mBind.cbUid.isChecked() ? 1 : 0));
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     @Override

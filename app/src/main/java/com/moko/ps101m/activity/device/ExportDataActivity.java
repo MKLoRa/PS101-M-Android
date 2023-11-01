@@ -22,14 +22,14 @@ import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.ps101m.AppConstants;
 import com.moko.ps101m.R;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.activity.LoRaLW006MainActivity;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.activity.PS101MainActivity;
 import com.moko.ps101m.adapter.ExportDataListAdapter;
-import com.moko.ps101m.databinding.Lw006ActivityExportDataBinding;
+import com.moko.ps101m.databinding.Ps101mActivityExportDataBinding;
 import com.moko.ps101m.dialog.AlertMessageDialog;
 import com.moko.ps101m.utils.ToastUtils;
 import com.moko.ps101m.utils.Utils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.ExportData;
 import com.moko.support.ps101m.entity.OrderCHAR;
@@ -46,10 +46,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 
-public class ExportDataActivity extends Lw006BaseActivity {
+public class ExportDataActivity extends PS101BaseActivity {
     private static final String TRACKED_FILE = "tracked.txt";
     private static String PATH_LOGCAT;
-    private Lw006ActivityExportDataBinding mBind;
+    private Ps101mActivityExportDataBinding mBind;
     private boolean mReceiverTag = false;
     private StringBuilder storeString;
     private ArrayList<ExportData> exportDatas;
@@ -64,12 +64,12 @@ public class ExportDataActivity extends Lw006BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityExportDataBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityExportDataBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
-        exportDatas = LoRaLW006MokoSupport.getInstance().exportDatas;
-        storeString = LoRaLW006MokoSupport.getInstance().storeString;
-        mStartTime = LoRaLW006MokoSupport.getInstance().startTime;
-        mSum = LoRaLW006MokoSupport.getInstance().sum;
+        exportDatas = MokoSupport.getInstance().exportDatas;
+        storeString = MokoSupport.getInstance().storeString;
+        mStartTime = MokoSupport.getInstance().startTime;
+        mSum = MokoSupport.getInstance().sum;
         if (exportDatas != null && exportDatas.size() > 0 && storeString != null) {
             mIsStart = true;
             if (mStartTime > 0) {
@@ -92,16 +92,16 @@ public class ExportDataActivity extends Lw006BaseActivity {
         adapter.replaceData(exportDatas);
         mBind.rvExportData.setLayoutManager(new LinearLayoutManager(this));
         mBind.rvExportData.setAdapter(adapter);
-        PATH_LOGCAT = LoRaLW006MainActivity.PATH_LOGCAT + File.separator + TRACKED_FILE;
+        PATH_LOGCAT = PS101MainActivity.PATH_LOGCAT + File.separator + TRACKED_FILE;
         EventBus.getDefault().register(this);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(mReceiver, filter);
         mReceiverTag = true;
-        if (!LoRaLW006MokoSupport.getInstance().isBluetoothOpen()) {
+        if (!MokoSupport.getInstance().isBluetoothOpen()) {
             // 蓝牙未打开，开启蓝牙
-            LoRaLW006MokoSupport.getInstance().enableBluetooth();
+            MokoSupport.getInstance().enableBluetooth();
         }
     }
 
@@ -169,7 +169,7 @@ public class ExportDataActivity extends Lw006BaseActivity {
                             byte[] sumBytes = Arrays.copyOfRange(value, 5, length);
                             int sum = MokoUtils.toInt(sumBytes);
                             mBind.tvSum.setText(String.format("Sum:%d", sum));
-                            LoRaLW006MokoSupport.getInstance().sum = sum;
+                            MokoSupport.getInstance().sum = sum;
                         }
 
                         if (mIsBack && !mIsSync) {
@@ -177,9 +177,9 @@ public class ExportDataActivity extends Lw006BaseActivity {
                                 mHandler.removeMessages(0);
                                 mHandler.postDelayed(() -> {
                                     dismissSyncProgressDialog();
-                                    LoRaLW006MokoSupport.getInstance().exportDatas = exportDatas;
-                                    LoRaLW006MokoSupport.getInstance().storeString = storeString;
-                                    LoRaLW006MokoSupport.getInstance().startTime = mStartTime;
+                                    MokoSupport.getInstance().exportDatas = exportDatas;
+                                    MokoSupport.getInstance().storeString = storeString;
+                                    MokoSupport.getInstance().startTime = mStartTime;
                                     finish();
                                 }, 2000);
                             }
@@ -234,9 +234,9 @@ public class ExportDataActivity extends Lw006BaseActivity {
                                         if (mIsBack) {
                                             mHandler.postDelayed(() -> {
                                                 dismissSyncProgressDialog();
-                                                LoRaLW006MokoSupport.getInstance().exportDatas = exportDatas;
-                                                LoRaLW006MokoSupport.getInstance().storeString = storeString;
-                                                LoRaLW006MokoSupport.getInstance().startTime = mStartTime;
+                                                MokoSupport.getInstance().exportDatas = exportDatas;
+                                                MokoSupport.getInstance().storeString = storeString;
+                                                MokoSupport.getInstance().startTime = mStartTime;
                                                 finish();
                                             }, 2000);
                                         }
@@ -244,7 +244,7 @@ public class ExportDataActivity extends Lw006BaseActivity {
                                             mIsSync = true;
                                             mBind.tvEmpty.setEnabled(false);
                                             mBind.tvExport.setEnabled(false);
-                                            Animation animation = AnimationUtils.loadAnimation(this, R.anim.lw006_rotate_refresh);
+                                            Animation animation = AnimationUtils.loadAnimation(this, R.anim.rotate_refresh);
                                             mBind.ivSync.startAnimation(animation);
                                             mBind.tvSync.setText("Stop");
                                         } else {
@@ -268,7 +268,7 @@ public class ExportDataActivity extends Lw006BaseActivity {
                                         mBind.tvStart.setEnabled(false);
                                         mBind.tvEmpty.setEnabled(false);
                                         mBind.tvExport.setEnabled(false);
-                                        Animation animation = AnimationUtils.loadAnimation(this, R.anim.lw006_rotate_refresh);
+                                        Animation animation = AnimationUtils.loadAnimation(this, R.anim.rotate_refresh);
                                         mBind.ivSync.startAnimation(animation);
                                         mBind.tvSync.setText("Stop");
                                     }
@@ -312,12 +312,12 @@ public class ExportDataActivity extends Lw006BaseActivity {
         if (mIsSync) {
             mIsBack = true;
             showSyncingProgressDialog();
-            LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setSyncEnable(0));
+            MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setSyncEnable(0));
             return;
         }
-        LoRaLW006MokoSupport.getInstance().exportDatas = exportDatas;
-        LoRaLW006MokoSupport.getInstance().storeString = storeString;
-        LoRaLW006MokoSupport.getInstance().startTime = mStartTime;
+        MokoSupport.getInstance().exportDatas = exportDatas;
+        MokoSupport.getInstance().storeString = storeString;
+        MokoSupport.getInstance().startTime = mStartTime;
         finish();
     }
 
@@ -342,11 +342,11 @@ public class ExportDataActivity extends Lw006BaseActivity {
             ToastUtils.showToast(this, "Opps！Save failed. Please check the input characters and try again.");
             return;
         }
-        if (LoRaLW006MokoSupport.getInstance().exportDatas != null) {
-            LoRaLW006MokoSupport.getInstance().exportDatas.clear();
-            LoRaLW006MokoSupport.getInstance().storeString = null;
-            LoRaLW006MokoSupport.getInstance().startTime = 0;
-            LoRaLW006MokoSupport.getInstance().sum = 0;
+        if (MokoSupport.getInstance().exportDatas != null) {
+            MokoSupport.getInstance().exportDatas.clear();
+            MokoSupport.getInstance().storeString = null;
+            MokoSupport.getInstance().startTime = 0;
+            MokoSupport.getInstance().sum = 0;
         }
         mStartTime = time;
         storeString = new StringBuilder();
@@ -356,7 +356,7 @@ public class ExportDataActivity extends Lw006BaseActivity {
         mBind.tvSum.setText("Sum:N/A");
         mBind.tvCount.setText("Count:0");
         showSyncingProgressDialog();
-        LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.readStorageData(time));
+        MokoSupport.getInstance().sendOrder(OrderTaskAssembler.readStorageData(time));
     }
 
     public void onSync(View view) {
@@ -364,9 +364,9 @@ public class ExportDataActivity extends Lw006BaseActivity {
         if (isWindowLocked()) return;
         showSyncingProgressDialog();
         if (!mIsSync) {
-            LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setSyncEnable(1));
+            MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setSyncEnable(1));
         } else {
-            LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setSyncEnable(0));
+            MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setSyncEnable(0));
         }
     }
 
@@ -377,7 +377,7 @@ public class ExportDataActivity extends Lw006BaseActivity {
         dialog.setMessage("Are you sure to empty the saved tracked datas?");
         dialog.setOnAlertConfirmListener(() -> {
             showSyncingProgressDialog();
-            LoRaLW006MokoSupport.getInstance().sendOrder(OrderTaskAssembler.clearStorageData());
+            MokoSupport.getInstance().sendOrder(OrderTaskAssembler.clearStorageData());
         });
         dialog.show(getSupportFragmentManager());
     }

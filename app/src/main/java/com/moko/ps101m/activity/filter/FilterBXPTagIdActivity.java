@@ -14,10 +14,10 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.ps101m.R;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.databinding.Lw006ActivityFilterBxpTagIdBinding;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.databinding.Ps101mActivityFilterBxpTagIdBinding;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -31,15 +31,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-public class FilterBXPTagIdActivity extends Lw006BaseActivity {
-    private Lw006ActivityFilterBxpTagIdBinding mBind;
+public class FilterBXPTagIdActivity extends PS101BaseActivity {
+    private Ps101mActivityFilterBxpTagIdBinding mBind;
     private boolean savedParamsError;
     private ArrayList<String> filterTagId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityFilterBxpTagIdBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityFilterBxpTagIdBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         filterTagId = new ArrayList<>();
@@ -49,7 +49,7 @@ public class FilterBXPTagIdActivity extends Lw006BaseActivity {
         orderTasks.add(OrderTaskAssembler.getFilterBXPTagPrecise());
         orderTasks.add(OrderTaskAssembler.getFilterBXPTagReverse());
         orderTasks.add(OrderTaskAssembler.getFilterBXPTagRules());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 400)
@@ -142,7 +142,7 @@ public class FilterBXPTagIdActivity extends Lw006BaseActivity {
                                         }
                                         for (int i = 0, l = filterTagId.size(); i < l; i++) {
                                             String macAddress = filterTagId.get(i);
-                                            View v = LayoutInflater.from(FilterBXPTagIdActivity.this).inflate(R.layout.lw006_item_tag_id_filter, mBind.llTagId, false);
+                                            View v = LayoutInflater.from(FilterBXPTagIdActivity.this).inflate(R.layout.ps101m_item_tag_id_filter, mBind.llTagId, false);
                                             TextView title = v.findViewById(R.id.tv_tag_id_title);
                                             EditText etMacAddress = v.findViewById(R.id.et_tag_id);
                                             title.setText(String.format(Locale.getDefault(), "Tag ID %d", i + 1));
@@ -177,7 +177,7 @@ public class FilterBXPTagIdActivity extends Lw006BaseActivity {
             ToastUtils.showToast(this, "You can set up to 10 filters!");
             return;
         }
-        View v = LayoutInflater.from(this).inflate(R.layout.lw006_item_tag_id_filter, mBind.llTagId, false);
+        View v = LayoutInflater.from(this).inflate(R.layout.ps101m_item_tag_id_filter, mBind.llTagId, false);
         TextView title = v.findViewById(R.id.tv_tag_id_title);
         title.setText(String.format(Locale.getDefault(), "Tag ID %d", count + 1));
         mBind.llTagId.addView(v);
@@ -203,7 +203,7 @@ public class FilterBXPTagIdActivity extends Lw006BaseActivity {
         orderTasks.add(OrderTaskAssembler.setFilterBXPTagPrecise(mBind.cbPreciseMatch.isChecked() ? 1 : 0));
         orderTasks.add(OrderTaskAssembler.setFilterBXPTagReverse(mBind.cbReverseFilter.isChecked() ? 1 : 0));
         orderTasks.add(OrderTaskAssembler.setFilterBXPTagRules(filterTagId));
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     private boolean isValid() {

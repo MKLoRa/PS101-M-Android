@@ -7,7 +7,7 @@ import androidx.annotation.Nullable;
 
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.utils.MokoUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
 
@@ -1890,6 +1890,6 @@ public class ParamsWriteTask extends OrderTask {
                 data[i + 6] = dataBytes[dataOrigin];
             }
         }
-        LoRaLW006MokoSupport.getInstance().sendDirectOrder(this);
+        MokoSupport.getInstance().sendDirectOrder(this);
     }
 }

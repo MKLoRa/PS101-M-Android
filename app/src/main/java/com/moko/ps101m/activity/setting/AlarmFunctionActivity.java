@@ -14,11 +14,11 @@ import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
-import com.moko.ps101m.activity.Lw006BaseActivity;
-import com.moko.ps101m.databinding.Lw006ActivityAlarmFunctionBinding;
+import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.databinding.Ps101mActivityAlarmFunctionBinding;
 import com.moko.ps101m.dialog.BottomDialog;
 import com.moko.ps101m.utils.ToastUtils;
-import com.moko.support.ps101m.LoRaLW006MokoSupport;
+import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
@@ -36,8 +36,8 @@ import java.util.List;
  * @date: 2023/6/8 10:43
  * @des:
  */
-public class AlarmFunctionActivity extends Lw006BaseActivity {
-    private Lw006ActivityAlarmFunctionBinding mBind;
+public class AlarmFunctionActivity extends PS101BaseActivity {
+    private Ps101mActivityAlarmFunctionBinding mBind;
     private boolean mReceiverTag;
     private final String[] mValues = {"NO", "Alert", "SOS"};
     private int mSelected;
@@ -46,7 +46,7 @@ public class AlarmFunctionActivity extends Lw006BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Lw006ActivityAlarmFunctionBinding.inflate(getLayoutInflater());
+        mBind = Ps101mActivityAlarmFunctionBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         // 注册广播接收器
@@ -58,7 +58,7 @@ public class AlarmFunctionActivity extends Lw006BaseActivity {
         List<OrderTask> orderTasks = new ArrayList<>(4);
         orderTasks.add(OrderTaskAssembler.getAlarmType());
         orderTasks.add(OrderTaskAssembler.getAlarmExitTime());
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
 
         mBind.tvAlarmType.setOnClickListener(v -> {
             if (isWindowLocked()) return;
@@ -162,7 +162,7 @@ public class AlarmFunctionActivity extends Lw006BaseActivity {
         List<OrderTask> orderTasks = new ArrayList<>(2);
         orderTasks.add(OrderTaskAssembler.setAlarmType(mSelected));
         orderTasks.add(OrderTaskAssembler.setAlarmExitTime(time));
-        LoRaLW006MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     private boolean isValid() {
