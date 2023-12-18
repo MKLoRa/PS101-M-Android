@@ -19,7 +19,7 @@
         android:textSize="15sp"
         android:textStyle="bold" />
 
-    <View style="@style/lw006_divider_line" />
+    <View style="@style/divider_line" />
 
     <TextView
         android:id="@+id/tv_ble_fix"
@@ -33,7 +33,7 @@
         android:textSize="15sp"
         android:textStyle="bold" />
 
-    <View style="@style/lw006_divider_line" />
+    <View style="@style/divider_line" />
 
     <TextView
         android:id="@+id/tv_gps_fix"
@@ -47,5 +47,5 @@
         android:textSize="15sp"
         android:textStyle="bold" />
 
-    <View style="@style/lw006_divider_line" />
+    <View style="@style/divider_line" />
 </LinearLayout>

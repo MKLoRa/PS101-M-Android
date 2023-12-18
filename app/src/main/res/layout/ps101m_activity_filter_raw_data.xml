@@ -73,7 +73,7 @@
                     android:textStyle="bold" />
             </RelativeLayout>
 
-            <View style="@style/lw006_divider_line" />
+            <View style="@style/divider_line" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -108,7 +108,7 @@
                     android:textStyle="bold" />
             </RelativeLayout>
 
-            <View style="@style/lw006_divider_line" />
+            <View style="@style/divider_line" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -143,7 +143,7 @@
                     android:textStyle="bold" />
             </RelativeLayout>
 
-            <View style="@style/lw006_divider_line" />
+            <View style="@style/divider_line" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -178,7 +178,7 @@
                     android:textStyle="bold" />
             </RelativeLayout>
 
-            <View style="@style/lw006_divider_line" />
+            <View style="@style/divider_line" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -213,7 +213,7 @@
                     android:textStyle="bold" />
             </RelativeLayout>
 
-            <View style="@style/lw006_divider_line" />
+            <View style="@style/divider_line" />
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -241,7 +241,7 @@
                     android:src="@drawable/ps101_ic_unchecked" />
             </RelativeLayout>
 
-            <View style="@style/lw006_divider_line" />
+            <View style="@style/divider_line" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -270,7 +270,7 @@
                     android:src="@drawable/ps101_ic_unchecked" />
             </RelativeLayout>
 
-            <View style="@style/lw006_divider_line" />
+            <View style="@style/divider_line" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -299,7 +299,7 @@
                     android:src="@drawable/ps101_ic_unchecked" />
             </RelativeLayout>
 
-            <View style="@style/lw006_divider_line" />
+            <View style="@style/divider_line" />
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -333,7 +333,7 @@
                     android:textStyle="bold" />
             </RelativeLayout>
 
-            <View style="@style/lw006_divider_line" />
+            <View style="@style/divider_line" />
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -367,7 +367,7 @@
                     android:textStyle="bold" />
             </RelativeLayout>
 
-            <View style="@style/lw006_divider_line" />
+            <View style="@style/divider_line" />
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -401,7 +401,7 @@
                     android:textStyle="bold" />
             </RelativeLayout>
 
-            <View style="@style/lw006_divider_line" />
+            <View style="@style/divider_line" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -436,7 +436,7 @@
                     android:textStyle="bold" />
             </RelativeLayout>
 
-            <View style="@style/lw006_divider_line" />
+            <View style="@style/divider_line" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

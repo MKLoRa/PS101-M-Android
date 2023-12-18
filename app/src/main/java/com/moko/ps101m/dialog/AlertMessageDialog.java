@@ -80,7 +80,7 @@ public class AlertMessageDialog extends MokoBaseDialog<DialogAlertBinding> {
 
     @Override
     public int getDialogStyle() {
-        return R.style.LW006CenterDialog;
+        return R.style.CenterDialog;
     }
 
     @Override

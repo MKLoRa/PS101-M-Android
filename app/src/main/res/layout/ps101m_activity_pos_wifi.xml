@@ -97,7 +97,7 @@
 
         <View
             android:id="@+id/line1"
-            style="@style/lw006_divider_line"
+            style="@style/divider_line"
             android:layout_width="0dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -134,7 +134,7 @@
 
         <View
             android:id="@+id/line2"
-            style="@style/lw006_divider_line"
+            style="@style/divider_line"
             android:layout_width="0dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -167,7 +167,7 @@
 
         <View
             android:id="@+id/line3"
-            style="@style/lw006_divider_line"
+            style="@style/divider_line"
             android:layout_width="0dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -203,7 +203,7 @@
 
             <SeekBar
                 android:id="@+id/sb_rssi_filter"
-                style="@style/LW006CustomSeekbarStyle"
+                style="@style/CustomSeekbarStyle"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_marginTop="20dp"
