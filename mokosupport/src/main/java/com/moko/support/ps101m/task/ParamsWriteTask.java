@@ -14,6 +14,7 @@ import com.moko.support.ps101m.entity.ParamsKeyEnum;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -207,20 +208,14 @@ public class ParamsWriteTask extends OrderTask {
 
     public void setMQTTUsername(@Nullable String userName) {
         if (!TextUtils.isEmpty(userName)) {
-            byte[] bytes = userName.getBytes();
-            int length = bytes.length;
-            data = new byte[length + 4];
-            data[0] = (byte) 0xED;
-            data[1] = (byte) 0x01;
-            data[2] = (byte) ParamsKeyEnum.KEY_MQTT_USERNAME.getParamsKey();
-            data[3] = (byte) length;
-            System.arraycopy(bytes, 0, data, 4, bytes.length);
-            response.responseValue = data;
+            setLongChar(ParamsKeyEnum.KEY_MQTT_USERNAME, userName);
         } else {
             response.responseValue = data = new byte[]{
-                    (byte) 0xED,
+                    (byte) 0xEE,
                     (byte) 0x01,
                     (byte) ParamsKeyEnum.KEY_MQTT_USERNAME.getParamsKey(),
+                    (byte) 0x00,
+                    (byte) 0x00,
                     (byte) 0x00
             };
         }
@@ -228,20 +223,14 @@ public class ParamsWriteTask extends OrderTask {
 
     public void setMQTTPassword(@Nullable String password) {
         if (!TextUtils.isEmpty(password)) {
-            byte[] bytes = password.getBytes();
-            int length = bytes.length;
-            data = new byte[length + 4];
-            data[0] = (byte) 0xED;
-            data[1] = (byte) 0x01;
-            data[2] = (byte) ParamsKeyEnum.KEY_MQTT_PASSWORD.getParamsKey();
-            data[3] = (byte) length;
-            System.arraycopy(bytes, 0, data, 4, bytes.length);
-            response.responseValue = data;
+            setLongChar(ParamsKeyEnum.KEY_MQTT_PASSWORD, password);
         } else {
             response.responseValue = data = new byte[]{
-                    (byte) 0xED,
+                    (byte) 0xEE,
                     (byte) 0x01,
                     (byte) ParamsKeyEnum.KEY_MQTT_PASSWORD.getParamsKey(),
+                    (byte) 0x00,
+                    (byte) 0x00,
                     (byte) 0x00
             };
         }
@@ -1838,29 +1827,116 @@ public class ParamsWriteTask extends OrderTask {
         }
     }
 
+    public void setLongChar(ParamsKeyEnum key, String character) {
+        dataBytes = character.getBytes();
+        dataLength = dataBytes.length;
+        if (dataLength != 0) {
+            if (dataLength % DATA_LENGTH_MAX > 0) {
+                packetCount = dataLength / DATA_LENGTH_MAX + 1;
+            } else {
+                packetCount = dataLength / DATA_LENGTH_MAX;
+            }
+        } else {
+            packetCount = 1;
+        }
+        remainPack = packetCount - 1;
+        packetIndex = 0;
+        delayTime = DEFAULT_DELAY_TIME + 500 * packetCount;
+        if (packetCount > 1) {
+            data = new byte[DATA_LENGTH_MAX + 6];
+            data[0] = (byte) 0xEE;
+            data[1] = (byte) 0x01;
+            data[2] = (byte) key.getParamsKey();
+            data[3] = (byte) packetCount;
+            data[4] = (byte) packetIndex;
+            data[5] = (byte) DATA_LENGTH_MAX;
+            for (int i = 0; i < DATA_LENGTH_MAX; i++, dataOrigin++) {
+                data[i + 6] = dataBytes[dataOrigin];
+            }
+        } else {
+            data = new byte[dataLength + 6];
+            data[0] = (byte) 0xEE;
+            data[1] = (byte) 0x01;
+            data[2] = (byte) key.getParamsKey();
+            data[3] = (byte) 0x01;
+            data[4] = (byte) packetIndex;
+            data[5] = (byte) dataLength;
+            for (int i = 0; i < dataLength; i++) {
+                data[i + 6] = dataBytes[i];
+            }
+        }
+    }
+
     private int packetCount;
     private int packetIndex;
     private int remainPack;
     private int dataLength;
     private int dataOrigin;
     private byte[] dataBytes;
-    private static final int DATA_LENGTH_MAX = 176;
+    private String dataBytesStr = "";
+    private static final int DATA_LENGTH_MAX = 238;
 
     @Override
     public boolean parseValue(byte[] value) {
         final int header = value[0] & 0xFF;
-        if (header == 0xED)
-            return true;
-        final int cmd = value[2] & 0xFF;
-        final int result = value[4] & 0xFF;
-        if (result == 1) {
-            remainPack--;
-            packetIndex++;
-            if (remainPack >= 0) {
-                assembleRemainData(cmd);
-                return false;
+        final int flag = value[1] & 0xFF;
+        if (header == 0xED) return true;
+        if (flag == 0x01) {
+            final int cmd = value[2] & 0xFF;
+            final int result = value[4] & 0xFF;
+            if (result == 1) {
+                remainPack--;
+                packetIndex++;
+                if (remainPack >= 0) {
+                    assembleRemainData(cmd);
+                    return false;
+                }
+                return true;
             }
-            return true;
+        } else {
+            final int cmd = value[2] & 0xFF;
+            final int packetCount = value[3] & 0xFF;
+            final int indexPack = value[4] & 0xFF;
+            final int length = value[5] & 0xFF;
+            if (indexPack < (packetCount - 1)) {
+                byte[] remainBytes = Arrays.copyOfRange(value, 6, 6 + length);
+                dataBytesStr += MokoUtils.bytesToHexString(remainBytes);
+            } else {
+                if (length == 0) {
+                    data = new byte[5];
+                    data[0] = (byte) 0xEE;
+                    data[1] = (byte) 0x00;
+                    data[2] = (byte) cmd;
+                    data[3] = 0;
+                    data[4] = 0;
+                    response.responseValue = data;
+                    orderStatus = ORDER_STATUS_SUCCESS;
+                    MokoSupport.getInstance().pollTask();
+                    MokoSupport.getInstance().executeTask();
+                    MokoSupport.getInstance().orderResult(response);
+                    return false;
+                }
+                byte[] remainBytes = Arrays.copyOfRange(value, 6, 6 + length);
+                dataBytesStr += MokoUtils.bytesToHexString(remainBytes);
+                dataBytes = MokoUtils.hex2bytes(dataBytesStr);
+                dataLength = dataBytes.length;
+                byte[] dataLengthBytes = MokoUtils.toByteArray(dataLength, 2);
+                data = new byte[dataLength + 5];
+                data[0] = (byte) 0xEE;
+                data[1] = (byte) 0x00;
+                data[2] = (byte) cmd;
+                data[3] = dataLengthBytes[0];
+                data[4] = dataLengthBytes[1];
+                for (int i = 0; i < dataLength; i++) {
+                    data[i + 5] = dataBytes[i];
+                }
+                response.responseValue = data;
+                orderStatus = ORDER_STATUS_SUCCESS;
+                MokoSupport.getInstance().pollTask();
+                MokoSupport.getInstance().executeTask();
+                MokoSupport.getInstance().orderResult(response);
+                dataBytesStr = "";
+            }
         }
         return false;
     }

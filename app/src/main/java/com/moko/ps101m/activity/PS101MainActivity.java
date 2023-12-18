@@ -30,15 +30,15 @@ import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ps101m.AppConstants;
 import com.moko.ps101m.BuildConfig;
 import com.moko.ps101m.R;
-import com.moko.ps101m.activity.device.LogDataActivity;
-import com.moko.ps101m.adapter.DeviceListAdapter;
+import com.moko.ps101m.activity.device.PS101LogDataActivity;
+import com.moko.ps101m.adapter.PS101DeviceListAdapter;
 import com.moko.ps101m.databinding.Ps101mActivityMainBinding;
 import com.moko.ps101m.dialog.AlertMessageDialog;
 import com.moko.ps101m.dialog.LoadingMessageDialog;
 import com.moko.ps101m.dialog.PasswordDialog;
 import com.moko.ps101m.dialog.ScanFilterDialog;
 import com.moko.ps101m.entity.AdvInfo;
-import com.moko.ps101m.utils.AdvInfoAnalysisImpl;
+import com.moko.ps101m.utils.PS101AdvInfoAnalysisImpl;
 import com.moko.ps101m.utils.SPUtiles;
 import com.moko.ps101m.utils.ToastUtils;
 import com.moko.support.ps101m.MokoBleScanner;
@@ -65,7 +65,7 @@ public class PS101MainActivity extends PS101BaseActivity implements MokoScanDevi
     private boolean mReceiverTag = false;
     private ConcurrentHashMap<String, AdvInfo> beaconInfoHashMap;
     private ArrayList<AdvInfo> beaconInfos;
-    private DeviceListAdapter adapter;
+    private PS101DeviceListAdapter adapter;
     private Animation animation = null;
     private MokoBleScanner mokoBleScanner;
     public Handler mHandler;
@@ -74,7 +74,7 @@ public class PS101MainActivity extends PS101BaseActivity implements MokoScanDevi
     public static String PATH_LOGCAT;
     private String mPassword;
     private String mSavedPassword;
-    private AdvInfoAnalysisImpl beaconInfoParseable;
+    private PS101AdvInfoAnalysisImpl beaconInfoParseable;
     public String filterName;
     public int filterRssi = -127;
 
@@ -99,7 +99,7 @@ public class PS101MainActivity extends PS101BaseActivity implements MokoScanDevi
         mSavedPassword = SPUtiles.getStringValue(this, AppConstants.SP_KEY_SAVED_PASSWORD_LW006, "");
         beaconInfoHashMap = new ConcurrentHashMap<>();
         beaconInfos = new ArrayList<>();
-        adapter = new DeviceListAdapter();
+        adapter = new PS101DeviceListAdapter();
         adapter.replaceData(beaconInfos);
         adapter.setOnItemChildClickListener(this);
         adapter.openLoadAnimation();
@@ -129,7 +129,7 @@ public class PS101MainActivity extends PS101BaseActivity implements MokoScanDevi
         }
         animation = AnimationUtils.loadAnimation(this, R.anim.rotate_refresh);
         mBind.ivRefresh.startAnimation(animation);
-        beaconInfoParseable = new AdvInfoAnalysisImpl();
+        beaconInfoParseable = new PS101AdvInfoAnalysisImpl();
         mokoBleScanner.startScanDevice(this);
         mHandler.postDelayed(() -> mokoBleScanner.stopScanDevice(), 1000 * 60);
     }
@@ -394,7 +394,7 @@ public class PS101MainActivity extends PS101BaseActivity implements MokoScanDevi
             dismissLoadingProgressDialog();
             if (!isVerifyEnable) {
                 XLog.i("Success");
-                Intent i = new Intent(this, DeviceInfoActivity.class);
+                Intent i = new Intent(this, PS101DeviceInfoActivity.class);
                 launcher.launch(i);
                 return;
             }
@@ -437,7 +437,7 @@ public class PS101MainActivity extends PS101BaseActivity implements MokoScanDevi
                             mSavedPassword = mPassword;
                             SPUtiles.setStringValue(this, AppConstants.SP_KEY_SAVED_PASSWORD_LW006, mSavedPassword);
                             XLog.i("Success");
-                            Intent i = new Intent(this, DeviceInfoActivity.class);
+                            Intent i = new Intent(this, PS101DeviceInfoActivity.class);
                             launcher.launch(i);
                         } else if (0 == result) {
                             isPasswordError = true;
@@ -485,7 +485,7 @@ public class PS101MainActivity extends PS101BaseActivity implements MokoScanDevi
         setIntent(intent);
         if (getIntent().getExtras() != null) {
             String from = getIntent().getStringExtra(AppConstants.EXTRA_KEY_FROM_ACTIVITY);
-            if (LogDataActivity.TAG.equals(from)) {
+            if (PS101LogDataActivity.TAG.equals(from)) {
                 if (animation == null) startScan();
             }
         }

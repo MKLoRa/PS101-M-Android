@@ -114,6 +114,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
+            tools:itemCount="3"
             app:layout_constraintTop_toBottomOf="@id/iv_time_point_add"
             tools:listitem="@layout/ps101m_item_time_point" />
     </androidx.constraintlayout.widget.ConstraintLayout>

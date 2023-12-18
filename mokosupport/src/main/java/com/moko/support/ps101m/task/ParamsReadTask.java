@@ -20,6 +20,15 @@ public class ParamsReadTask extends OrderTask {
         createGetConfigData(key.getParamsKey());
     }
 
+    public void getLongData(ParamsKeyEnum key) {
+        response.responseValue = data = new byte[]{
+                (byte) 0xEE,
+                (byte) 0x00,
+                (byte) key.getParamsKey(),
+                (byte) 0x00
+        };
+    }
+
     private void createGetConfigData(int configKey) {
         response.responseValue = data = new byte[]{
                 (byte) 0xED,

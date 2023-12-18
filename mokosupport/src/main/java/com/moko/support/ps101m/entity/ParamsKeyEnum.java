@@ -133,14 +133,14 @@ public enum ParamsKeyEnum implements Serializable {
     KEY_FILTER_NAME_RULES(0x58),
     // 过滤设备类型开关
     KEY_FILTER_RAW_DATA(0x59),
+    KEY_FILTER_IBEACON_ENABLE(0x5A),
+    // iBeacon类型Major范围
+    KEY_FILTER_IBEACON_MAJOR_RANGE(0x5B),
+    // iBeacon类型Minor范围
+    KEY_FILTER_IBEACON_MINOR_RANGE(0x5C),
+    // iBeacon类型UUID
+    KEY_FILTER_IBEACON_UUID(0x5D),
     // BXP-iBeacon类型过滤开关
-    KEY_FILTER_BXP_IBEACON_ENABLE(0x5A),
-    // BXP-iBeacon类型Major范围
-    KEY_FILTER_BXP_IBEACON_MAJOR_RANGE(0x5B),
-    // BXP-iBeacon类型Minor范围
-    KEY_FILTER_BXP_IBEACON_MINOR_RANGE(0x5C),
-    // BXP-iBeacon类型UUID
-    KEY_FILTER_BXP_IBEACON_UUID(0x5D),
     // eddystone-UID类型过滤开关
     KEY_FILTER_EDDYSTONE_UID_ENABLE(0x5E),
     // eddystone-UID类型Namespace
@@ -155,14 +155,13 @@ public enum ParamsKeyEnum implements Serializable {
     KEY_FILTER_EDDYSTONE_TLM_ENABLE(0x63),
     // eddystone- TLM类型TLMVersion
     KEY_FILTER_EDDYSTONE_TLM_VERSION(0x64),
-    // iBeacon类型过滤开关
-    KEY_FILTER_IBEACON_ENABLE(0x65),
-    // iBeacon类型Major范围
-    KEY_FILTER_IBEACON_MAJOR_RANGE(0x66),
-    // iBeacon类型Minor范围
-    KEY_FILTER_IBEACON_MINOR_RANGE(0x67),
-    // iBeacon类型UUID
-    KEY_FILTER_IBEACON_UUID(0x68),
+    KEY_FILTER_BXP_IBEACON_ENABLE(0x65),
+    // BXP-iBeacon类型Major范围
+    KEY_FILTER_BXP_IBEACON_MAJOR_RANGE(0x66),
+    // BXP-iBeacon类型Minor范围
+    KEY_FILTER_BXP_IBEACON_MINOR_RANGE(0x67),
+    // BXP-iBeacon类型UUID
+    KEY_FILTER_BXP_IBEACON_UUID(0x68),
     // BXP-Device类型过滤开关
     KEY_FILTER_BXP_DEVICE(0x69),
     // BeaconX Pro-ACC设备过滤开关

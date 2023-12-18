@@ -17,7 +17,7 @@ import androidx.fragment.app.Fragment;
 
 import com.moko.ps101m.activity.PS101BaseActivity;
 import com.moko.ps101m.databinding.FragmentSslDeviceBinding;
-import com.moko.ps101m.dialog.BottomDialog;
+import com.moko.ps101m.dialog.PS101BottomDialog;
 import com.moko.ps101m.utils.FileUtils;
 import com.moko.ps101m.utils.ToastUtils;
 
@@ -106,7 +106,7 @@ public class SSLDeviceFragment extends Fragment {
     }
 
     public void selectCertificate() {
-        BottomDialog dialog = new BottomDialog();
+        PS101BottomDialog dialog = new PS101BottomDialog();
         dialog.setDatas(new ArrayList<>(Arrays.asList(values)), selected);
         dialog.setListener(value -> {
             selected = value;

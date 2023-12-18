@@ -103,7 +103,6 @@
             android:layout_height="50dp"
             android:drawableRight="@drawable/ps101_ic_arrow_right"
             android:gravity="center_vertical"
-            android:onClick="onAlarmFunction"
             android:text="3-Axis Data Report"
             android:textColor="@color/black_333333"
             android:textSize="15sp"

@@ -3,6 +3,7 @@ package com.moko.ps101m;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.elvishew.xlog.XLog;
 import com.moko.ps101m.entity.ExcelBean;
@@ -138,7 +139,7 @@ public class ExcelHelper {
         return data;
     }
 
-    public NetworkSettings parseImportFile(@NonNull File file) {
+    public @Nullable NetworkSettings parseImportFile(@NonNull File file) {
         try {
             Workbook workbook = Workbook.getWorkbook(file);
             Sheet sheet = workbook.getSheet(0);

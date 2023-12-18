@@ -783,13 +783,13 @@ public class OrderTaskAssembler {
 
     public static OrderTask getMQTTUsername() {
         ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_MQTT_USERNAME);
+        task.getLongData(ParamsKeyEnum.KEY_MQTT_USERNAME);
         return task;
     }
 
     public static OrderTask getMQTTPassword() {
         ParamsReadTask task = new ParamsReadTask();
-        task.setData(ParamsKeyEnum.KEY_MQTT_PASSWORD);
+        task.getLongData(ParamsKeyEnum.KEY_MQTT_PASSWORD);
         return task;
     }
 

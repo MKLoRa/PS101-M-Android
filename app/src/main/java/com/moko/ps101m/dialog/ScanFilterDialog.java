@@ -4,15 +4,16 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.widget.SeekBar;
 
-import com.moko.ps101m.databinding.Ps101mDialogScanFilterBinding;
+import com.moko.ps101m.databinding.DialogScanFilterBinding;
 
-public class ScanFilterDialog extends BaseDialog<Ps101mDialogScanFilterBinding> {
+
+public class ScanFilterDialog extends BaseDialog<DialogScanFilterBinding> {
     private int filterRssi;
     private String filterName;
 
     @Override
-    protected Ps101mDialogScanFilterBinding getViewBind() {
-        return Ps101mDialogScanFilterBinding.inflate(getLayoutInflater());
+    protected DialogScanFilterBinding getViewBind() {
+        return DialogScanFilterBinding.inflate(getLayoutInflater());
     }
 
     public ScanFilterDialog(Context context) {
