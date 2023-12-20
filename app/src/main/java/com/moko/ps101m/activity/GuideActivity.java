@@ -21,11 +21,11 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.content.ContextCompat;
 
-public class GuideActivity extends PS101BaseActivity {
+public class GuideActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.ps101m_activity_guide);
+        setContentView(R.layout.activity_guide);
         if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
             finish();
             return;
@@ -75,7 +75,7 @@ public class GuideActivity extends PS101BaseActivity {
 
     private void gotoMain() {
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            startActivity(new Intent(this, PS101MainActivity.class));
+            startActivity(new Intent(this, MainActivity.class));
             finish();
         }, 1000);
     }

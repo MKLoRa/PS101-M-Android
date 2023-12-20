@@ -9,7 +9,7 @@ import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
-import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.activity.BaseActivity;
 import com.moko.ps101m.databinding.ActivityAxisDataReportBinding;
 import com.moko.ps101m.utils.ToastUtils;
 import com.moko.support.ps101m.MokoSupport;
@@ -28,7 +28,7 @@ import java.util.Arrays;
  * @date: 2023/10/27 11:28
  * @des:
  */
-public class ThreeAxisDataReportActivity extends PS101BaseActivity {
+public class ThreeAxisDataReportActivity extends BaseActivity {
     private ActivityAxisDataReportBinding mBind;
 
     @Override

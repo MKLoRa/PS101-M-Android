@@ -15,9 +15,9 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.activity.BaseActivity;
 import com.moko.ps101m.databinding.FragmentSslDeviceBinding;
-import com.moko.ps101m.dialog.PS101BottomDialog;
+import com.moko.ps101m.dialog.BottomDialog;
 import com.moko.ps101m.utils.FileUtils;
 import com.moko.ps101m.utils.ToastUtils;
 
@@ -28,7 +28,7 @@ import java.util.Arrays;
 public class SSLDeviceFragment extends Fragment {
     private static final String TAG = SSLDeviceFragment.class.getSimpleName();
     private FragmentSslDeviceBinding mBind;
-    private PS101BaseActivity activity;
+    private BaseActivity activity;
     private int mConnectMode;
     private final String[] values = {"CA signed server certificate", "CA certificate", "Self signed certificates"};
     private int selected;
@@ -50,7 +50,7 @@ public class SSLDeviceFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
         mBind = FragmentSslDeviceBinding.inflate(inflater, container, false);
-        activity = (PS101BaseActivity) getActivity();
+        activity = (BaseActivity) getActivity();
         mBind.clCertificate.setVisibility(mConnectMode > 0 ? View.VISIBLE : View.GONE);
         mBind.cbSsl.setChecked(mConnectMode > 0);
         mBind.cbSsl.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -106,7 +106,7 @@ public class SSLDeviceFragment extends Fragment {
     }
 
     public void selectCertificate() {
-        PS101BottomDialog dialog = new PS101BottomDialog();
+        BottomDialog dialog = new BottomDialog();
         dialog.setDatas(new ArrayList<>(Arrays.asList(values)), selected);
         dialog.setListener(value -> {
             selected = value;

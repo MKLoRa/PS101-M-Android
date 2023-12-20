@@ -15,7 +15,7 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
-import com.moko.ps101m.activity.PS101BaseActivity;
+import com.moko.ps101m.activity.BaseActivity;
 import com.moko.ps101m.databinding.ActivityNtpSeverSettingBinding;
 import com.moko.ps101m.utils.ToastUtils;
 import com.moko.support.ps101m.MokoSupport;
@@ -36,7 +36,7 @@ import java.util.List;
  * @date: 2023/10/27 20:07
  * @des:
  */
-public class NtpSeverSettingActivity extends PS101BaseActivity {
+public class NtpSeverSettingActivity extends BaseActivity {
     private ActivityNtpSeverSettingBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;

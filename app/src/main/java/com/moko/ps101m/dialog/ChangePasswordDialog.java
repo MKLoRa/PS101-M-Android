@@ -3,16 +3,15 @@ package com.moko.ps101m.dialog;
 import android.content.Context;
 import android.text.Editable;
 import android.text.InputFilter;
-import android.text.Spanned;
 import android.text.TextWatcher;
 import android.view.inputmethod.InputMethodManager;
 
 import com.moko.ps101m.R;
-import com.moko.ps101m.databinding.Ps101mDialogChangePwdBinding;
+import com.moko.ps101m.databinding.DialogChangePwdBinding;
 import com.moko.ps101m.utils.ToastUtils;
 
 
-public class ChangePasswordDialog extends BaseDialog<Ps101mDialogChangePwdBinding> {
+public class ChangePasswordDialog extends BaseDialog<DialogChangePwdBinding> {
     private final String FILTER_ASCII = "[ -~]*";
 
     private boolean passwordEnable;
@@ -23,8 +22,8 @@ public class ChangePasswordDialog extends BaseDialog<Ps101mDialogChangePwdBindin
     }
 
     @Override
-    protected Ps101mDialogChangePwdBinding getViewBind() {
-        return Ps101mDialogChangePwdBinding.inflate(getLayoutInflater());
+    protected DialogChangePwdBinding getViewBind() {
+        return DialogChangePwdBinding.inflate(getLayoutInflater());
     }
 
     @Override

@@ -7,16 +7,16 @@ import android.view.View;
 
 import com.moko.ps101m.BuildConfig;
 import com.moko.ps101m.R;
-import com.moko.ps101m.databinding.Ps101mActivityAboutBinding;
+import com.moko.ps101m.databinding.ActivityAboutBinding;
 import com.moko.ps101m.utils.Utils;
 
-public class AboutActivity extends PS101BaseActivity {
-    private Ps101mActivityAboutBinding mBind;
+public class AboutActivity extends BaseActivity {
+    private ActivityAboutBinding mBind;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = Ps101mActivityAboutBinding.inflate(getLayoutInflater());
+        mBind = ActivityAboutBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         if (!BuildConfig.IS_LIBRARY) {
             mBind.appVersion.setText(String.format("APP Version:V%s", Utils.getVersionInfo(this)));
