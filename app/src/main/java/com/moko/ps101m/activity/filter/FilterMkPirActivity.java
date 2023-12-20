@@ -13,7 +13,6 @@ import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.ps101m.activity.BaseActivity;
 import com.moko.ps101m.databinding.ActivityFilterMkpirBinding;
-import com.moko.ps101m.databinding.Ps101mActivityFilterMkpirBinding;
 import com.moko.ps101m.dialog.BottomDialog;
 import com.moko.ps101m.utils.ToastUtils;
 import com.moko.support.ps101m.MokoSupport;
