@@ -67,15 +67,12 @@ public class FilterUrlActivity extends BaseActivity {
         if (!MokoConstants.ACTION_CURRENT_DATA.equals(action))
             EventBus.getDefault().cancelEventDelivery(event);
         runOnUiThread(() -> {
-            if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
-            }
             if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
                 dismissSyncProgressDialog();
             }
             if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
                 OrderTaskResponse response = event.getResponse();
                 OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
-                int responseType = response.responseType;
                 byte[] value = response.responseValue;
                 if (orderCHAR == OrderCHAR.CHAR_PARAMS) {
                     if (value.length >= 4) {
@@ -100,7 +97,7 @@ public class FilterUrlActivity extends BaseActivity {
                                         savedParamsError = true;
                                     }
                                     if (savedParamsError) {
-                                        ToastUtils.showToast(FilterUrlActivity.this, "Opps！Save failed. Please check the input characters and try again.");
+                                        ToastUtils.showToast(this, "Opps！Save failed. Please check the input characters and try again.");
                                     } else {
                                         ToastUtils.showToast(this, "Save Successfully！");
                                     }
