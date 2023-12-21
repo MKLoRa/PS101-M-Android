@@ -1,6 +1,6 @@
 if (!isLibrary.toBoolean()) {
-    include ':app'
+    include ':ps101'
     include ':mokosupport'
 } else {
-    include ':app'
+    include ':ps101'
 }

@@ -23,7 +23,7 @@ import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.ps101m.AppConstants;
 import com.moko.ps101m.R;
 import com.moko.ps101m.activity.BaseActivity;
-import com.moko.ps101m.activity.MainActivity;
+import com.moko.ps101m.activity.Ps101MainActivity;
 import com.moko.ps101m.adapter.ExportDataListAdapter;
 import com.moko.ps101m.databinding.ActivityExportDataBinding;
 import com.moko.ps101m.dialog.AlertMessageDialog;
@@ -92,7 +92,7 @@ public class ExportDataActivity extends BaseActivity {
         adapter.replaceData(exportDatas);
         mBind.rvExportData.setLayoutManager(new LinearLayoutManager(this));
         mBind.rvExportData.setAdapter(adapter);
-        PATH_LOGCAT = MainActivity.PATH_LOGCAT + File.separator + TRACKED_FILE;
+        PATH_LOGCAT = Ps101MainActivity.PATH_LOGCAT + File.separator + TRACKED_FILE;
         EventBus.getDefault().register(this);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();

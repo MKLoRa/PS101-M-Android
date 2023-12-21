@@ -75,7 +75,7 @@ public class GuideActivity extends BaseActivity {
 
     private void gotoMain() {
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(this, Ps101MainActivity.class));
             finish();
         }, 1000);
     }

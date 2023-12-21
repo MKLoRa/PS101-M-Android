@@ -1,35 +1,23 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.moko.ps101m">
-    <!-- SDCard中创建与删除文件权限 -->
-    <uses-permission
-        android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
-        tools:ignore="ProtectedPermissions" />
-    <!-- 向SDCard写入数据权限 -->
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28" />
-    <uses-permission
-        android:name="android.permission.BLUETOOTH"
-        android:maxSdkVersion="30" />
-    <uses-permission
-        android:name="android.permission.BLUETOOTH_ADMIN"
-        android:maxSdkVersion="30" />
 
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-    <!--12新权限 -->
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
-
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <!-- 按时required为true时，则应用只能在支持BLE的Android设备上安装运行；required为false时，Android设备均可正常安装运行 -->
-    <uses-feature
-        android:name="android.hardware.bluetooth_le"
-        android:required="true" />
-    <application android:allowBackup="true">
+    <application
+        android:name="com.moko.ps101m.BaseApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/LaunchActivityTheme">
         <activity
-            android:name="com.moko.ps101m.activity.MainActivity"
+            android:name="com.moko.ps101m.activity.GuideActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.moko.ps101m.activity.Ps101MainActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
@@ -163,42 +151,42 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
 
-        <activity
-            android:name=".activity.filter.FilterMkPirActivity"
+        <activity android:name="com.moko.ps101m.activity.filter.FilterMkPirActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustPan"/>
 
-        <activity
-            android:name=".activity.setting.StandbyModeActivity"
-            android:screenOrientation="portrait" />
+        <activity android:name="com.moko.ps101m.activity.setting.StandbyModeActivity"
+            android:screenOrientation="portrait"/>
 
-        <activity
-            android:name=".activity.setting.AlarmFunctionActivity"
-            android:screenOrientation="portrait" />
+        <activity android:name="com.moko.ps101m.activity.setting.AlarmFunctionActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name="com.moko.ps101m.activity.setting.AlertAlarmSettingActivity"
+            android:screenOrientation="portrait"/>
 
-        <activity
-            android:name=".activity.setting.AlertAlarmSettingActivity"
-            android:screenOrientation="portrait" />
+        <activity android:name="com.moko.ps101m.activity.setting.AlarmSosSettingActivity"
+            android:screenOrientation="portrait"/>
 
-        <activity
-            android:name=".activity.setting.AlarmSosSettingActivity"
-            android:screenOrientation="portrait" />
+        <activity android:name="com.moko.ps101m.activity.device.OnOffSettingsActivity"
+            android:screenOrientation="portrait"/>
 
-        <activity
-            android:name=".activity.device.OnOffSettingsActivity"
-            android:screenOrientation="portrait" />
+        <activity android:name=".activity.setting.NetworkSettingsActivity"
+            android:screenOrientation="portrait"/>
 
-        <activity
-            android:name=".activity.setting.NetworkSettingsActivity"
-            android:screenOrientation="portrait" />
+        <activity android:name=".activity.setting.ThreeAxisDataReportActivity"
+            android:screenOrientation="portrait"/>
 
-        <activity
-            android:name=".activity.setting.ThreeAxisDataReportActivity"
-            android:screenOrientation="portrait" />
+        <activity android:name=".activity.setting.NtpSeverSettingActivity"
+            android:screenOrientation="portrait"/>
 
-        <activity
-            android:name=".activity.setting.NtpSeverSettingActivity"
-            android:screenOrientation="portrait" />
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.moko.ps101m.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
         <service android:name="com.moko.ps101m.service.DfuService" />
     </application>

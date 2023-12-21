@@ -32,7 +32,7 @@ import com.moko.ps101m.BuildConfig;
 import com.moko.ps101m.R;
 import com.moko.ps101m.activity.device.LogDataActivity;
 import com.moko.ps101m.adapter.DeviceListAdapter;
-import com.moko.ps101m.databinding.ActivityMainBinding;
+import com.moko.ps101m.databinding.Ps101ActivityMainBinding;
 import com.moko.ps101m.dialog.AlertMessageDialog;
 import com.moko.ps101m.dialog.LoadingMessageDialog;
 import com.moko.ps101m.dialog.PasswordDialog;
@@ -60,8 +60,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class MainActivity extends BaseActivity implements MokoScanDeviceCallback, BaseQuickAdapter.OnItemChildClickListener {
-    private ActivityMainBinding mBind;
+public class Ps101MainActivity extends BaseActivity implements MokoScanDeviceCallback, BaseQuickAdapter.OnItemChildClickListener {
+    private Ps101ActivityMainBinding mBind;
     private boolean mReceiverTag = false;
     private ConcurrentHashMap<String, AdvInfo> beaconInfoHashMap;
     private ArrayList<AdvInfo> beaconInfos;
@@ -81,7 +81,7 @@ public class MainActivity extends BaseActivity implements MokoScanDeviceCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = ActivityMainBinding.inflate(getLayoutInflater());
+        mBind = Ps101ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         // 初始化Xlog
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
@@ -236,7 +236,7 @@ public class MainActivity extends BaseActivity implements MokoScanDeviceCallback
         } else {
             AlertMessageDialog dialog = new AlertMessageDialog();
             dialog.setMessage(R.string.main_exit_tips);
-            dialog.setOnAlertConfirmListener(MainActivity.this::finish);
+            dialog.setOnAlertConfirmListener(Ps101MainActivity.this::finish);
             dialog.show(getSupportFragmentManager());
         }
     }
@@ -256,8 +256,8 @@ public class MainActivity extends BaseActivity implements MokoScanDeviceCallback
         scanFilterDialog.setFilterName(filterName);
         scanFilterDialog.setFilterRssi(filterRssi);
         scanFilterDialog.setOnScanFilterListener((filterName, filterRssi) -> {
-            MainActivity.this.filterName = filterName;
-            MainActivity.this.filterRssi = filterRssi;
+            Ps101MainActivity.this.filterName = filterName;
+            Ps101MainActivity.this.filterRssi = filterRssi;
             if (!TextUtils.isEmpty(filterName) || filterRssi != -127) {
                 mBind.rlFilter.setVisibility(View.VISIBLE);
                 mBind.rlEditFilter.setVisibility(View.GONE);

@@ -16,7 +16,7 @@ import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ps101m.AppConstants;
 import com.moko.ps101m.R;
 import com.moko.ps101m.activity.BaseActivity;
-import com.moko.ps101m.activity.MainActivity;
+import com.moko.ps101m.activity.Ps101MainActivity;
 import com.moko.ps101m.adapter.LogDataListAdapter;
 import com.moko.ps101m.databinding.ActivityLogDataBinding;
 import com.moko.ps101m.dialog.AlertMessageDialog;
@@ -59,7 +59,7 @@ public class LogDataActivity extends BaseActivity implements BaseQuickAdapter.On
         mBind = ActivityLogDataBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         String mDeviceMac = getIntent().getStringExtra(AppConstants.EXTRA_KEY_DEVICE_MAC).replaceAll(":", "");
-        logDirPath = MainActivity.PATH_LOGCAT + File.separator + mDeviceMac;
+        logDirPath = Ps101MainActivity.PATH_LOGCAT + File.separator + mDeviceMac;
         LogDatas = new ArrayList<>();
         adapter = new LogDataListAdapter();
         adapter.openLoadAnimation();
@@ -236,7 +236,7 @@ public class LogDataActivity extends BaseActivity implements BaseQuickAdapter.On
             stopSync();
         } else {
             if (isDisconnected) {
-                Intent intent = new Intent(this, MainActivity.class);
+                Intent intent = new Intent(this, Ps101MainActivity.class);
                 intent.putExtra(AppConstants.EXTRA_KEY_FROM_ACTIVITY, TAG);
                 startActivity(intent);
                 return;
@@ -259,7 +259,7 @@ public class LogDataActivity extends BaseActivity implements BaseQuickAdapter.On
             dialog.setCancelGone();
             dialog.setOnAlertConfirmListener(() -> {
                 if (isDisconnected) {
-                    Intent intent = new Intent(this, MainActivity.class);
+                    Intent intent = new Intent(this, Ps101MainActivity.class);
                     intent.putExtra(AppConstants.EXTRA_KEY_FROM_ACTIVITY, TAG);
                     startActivity(intent);
                     return;
