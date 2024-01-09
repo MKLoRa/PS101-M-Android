@@ -243,7 +243,7 @@ public class Ps101MainActivity extends BaseActivity implements MokoScanDeviceCal
 
     public void onAbout(View view) {
         if (isWindowLocked()) return;
-        startActivity(new Intent(this, AboutActivity.class));
+        startActivity(new Intent(this, Ps101AboutActivity.class));
     }
 
     public void onFilter(View view) {

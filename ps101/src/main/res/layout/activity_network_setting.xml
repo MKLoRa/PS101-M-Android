@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="MQTT settings"
+            android:text="Network Settings"
             android:textColor="@color/white_ffffff"
             android:textSize="17sp" />
 
@@ -325,7 +325,7 @@
                     android:layout_marginRight="12dp"
                     android:background="@drawable/shape_radius_edit_bg"
                     android:hint="0-100 Characters"
-                    android:maxLength="128"
+                    android:maxLength="100"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
                     android:singleLine="true"

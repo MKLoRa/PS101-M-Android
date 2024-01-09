@@ -6,8 +6,6 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
-import androidx.recyclerview.widget.LinearLayoutManager;
-
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -43,7 +41,7 @@ public class LogDataActivity extends BaseActivity implements BaseQuickAdapter.On
     public static String TAG = LogDataActivity.class.getSimpleName();
     private ActivityLogDataBinding mBind;
     private StringBuilder storeString;
-    private ArrayList<LogData> LogDatas;
+    private ArrayList<LogData> LogData = new ArrayList<>();
     private boolean isSync;
     private LogDataListAdapter adapter;
     private String logDirPath;
@@ -60,12 +58,10 @@ public class LogDataActivity extends BaseActivity implements BaseQuickAdapter.On
         setContentView(mBind.getRoot());
         String mDeviceMac = getIntent().getStringExtra(AppConstants.EXTRA_KEY_DEVICE_MAC).replaceAll(":", "");
         logDirPath = Ps101MainActivity.PATH_LOGCAT + File.separator + mDeviceMac;
-        LogDatas = new ArrayList<>();
         adapter = new LogDataListAdapter();
         adapter.openLoadAnimation();
-        adapter.replaceData(LogDatas);
+        adapter.replaceData(LogData);
         adapter.setOnItemClickListener(this);
-        mBind.rvExportData.setLayoutManager(new LinearLayoutManager(this));
         mBind.rvExportData.setAdapter(adapter);
         EventBus.getDefault().register(this);
         File file = new File(logDirPath);
@@ -92,9 +88,9 @@ public class LogDataActivity extends BaseActivity implements BaseQuickAdapter.On
                 LogData data = new LogData();
                 data.filePath = logFile.getAbsolutePath();
                 data.name = logFile.getName().replaceAll(".txt", "");
-                LogDatas.add(data);
+                LogData.add(data);
             }
-            adapter.replaceData(LogDatas);
+            adapter.replaceData(LogData);
         }
         // 点击无效间隔改为1秒
         voidDuration = 1000;
@@ -133,10 +129,9 @@ public class LogDataActivity extends BaseActivity implements BaseQuickAdapter.On
         });
     }
 
-
     public void onSyncSwitch(View view) {
         if (isWindowLocked()) return;
-        int size = LogDatas.size();
+        int size = LogData.size();
         if (size >= 10) {
             AlertMessageDialog dialog = new AlertMessageDialog();
             dialog.setTitle("Tips");
@@ -183,7 +178,7 @@ public class LogDataActivity extends BaseActivity implements BaseQuickAdapter.On
         dialog.setTitle("Warning!");
         dialog.setMessage("Are you sure to empty the saved debugger log?");
         dialog.setOnAlertConfirmListener(() -> {
-            Iterator<LogData> iterator = LogDatas.iterator();
+            Iterator<LogData> iterator = LogData.iterator();
             while (iterator.hasNext()) {
                 LogData LogData = iterator.next();
                 if (!LogData.isSelected)
@@ -201,7 +196,7 @@ public class LogDataActivity extends BaseActivity implements BaseQuickAdapter.On
                 mBind.tvEmpty.setEnabled(false);
                 mBind.tvExport.setEnabled(false);
             }
-            adapter.replaceData(LogDatas);
+            adapter.replaceData(LogData);
         });
         dialog.show(getSupportFragmentManager());
     }
@@ -209,7 +204,7 @@ public class LogDataActivity extends BaseActivity implements BaseQuickAdapter.On
     public void onExport(View view) {
         if (isWindowLocked()) return;
         ArrayList<File> selectedFiles = new ArrayList<>();
-        for (LogData LogData : LogDatas) {
+        for (LogData LogData : LogData) {
             if (LogData.isSelected) {
                 selectedFiles.add(new File(LogData.filePath));
             }
@@ -278,8 +273,8 @@ public class LogDataActivity extends BaseActivity implements BaseQuickAdapter.On
         LogData LogData = new LogData();
         LogData.name = syncTime;
         LogData.filePath = logFilePath;
-        LogDatas.add(LogData);
-        adapter.replaceData(LogDatas);
+        this.LogData.add(LogData);
+        adapter.replaceData(this.LogData);
         if (isBack)
             finish();
     }

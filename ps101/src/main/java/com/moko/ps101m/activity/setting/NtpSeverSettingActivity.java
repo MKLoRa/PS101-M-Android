@@ -170,6 +170,7 @@ public class NtpSeverSettingActivity extends BaseActivity {
 
     public void onSave(View view) {
         if (isWindowLocked()) return;
+        savedParamsError = false;
         if (TextUtils.isEmpty(mBind.etInterval.getText())) {
             ToastUtils.showToast(this, "Para error!");
             return;

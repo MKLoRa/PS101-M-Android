@@ -64,8 +64,6 @@ public class FilterBXPIBeaconActivity extends BaseActivity {
         if (!MokoConstants.ACTION_CURRENT_DATA.equals(action))
             EventBus.getDefault().cancelEventDelivery(event);
         runOnUiThread(() -> {
-            if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
-            }
             if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
                 dismissSyncProgressDialog();
             }
@@ -119,20 +117,24 @@ public class FilterBXPIBeaconActivity extends BaseActivity {
                                     if (length == 4) {
                                         int majorMin = MokoUtils.toInt(Arrays.copyOfRange(value, 4, 6));
                                         int majorMax = MokoUtils.toInt(Arrays.copyOfRange(value, 6, 8));
-                                        mBind.etIbeaconMajorMin.setText(String.valueOf(majorMin));
-                                        mBind.etIbeaconMajorMax.setText(String.valueOf(majorMax));
-                                        mBind.etIbeaconMajorMin.setSelection(mBind.etIbeaconMajorMin.getText().length());
-                                        mBind.etIbeaconMajorMax.setSelection(mBind.etIbeaconMajorMax.getText().length());
+                                        if (majorMin != 0 || majorMax != 65535) {
+                                            mBind.etIbeaconMajorMin.setText(String.valueOf(majorMin));
+                                            mBind.etIbeaconMajorMax.setText(String.valueOf(majorMax));
+                                            mBind.etIbeaconMajorMin.setSelection(mBind.etIbeaconMajorMin.getText().length());
+                                            mBind.etIbeaconMajorMax.setSelection(mBind.etIbeaconMajorMax.getText().length());
+                                        }
                                     }
                                     break;
                                 case KEY_FILTER_BXP_IBEACON_MINOR_RANGE:
                                     if (length == 4) {
                                         int minorMin = MokoUtils.toInt(Arrays.copyOfRange(value, 4, 6));
                                         int minorMax = MokoUtils.toInt(Arrays.copyOfRange(value, 6, 8));
-                                        mBind.etIbeaconMinorMin.setText(String.valueOf(minorMin));
-                                        mBind.etIbeaconMinorMax.setText(String.valueOf(minorMax));
-                                        mBind.etIbeaconMinorMin.setSelection(mBind.etIbeaconMinorMin.getText().length());
-                                        mBind.etIbeaconMinorMax.setSelection(mBind.etIbeaconMinorMax.getText().length());
+                                        if (minorMin != 0 || minorMax != 65535) {
+                                            mBind.etIbeaconMinorMin.setText(String.valueOf(minorMin));
+                                            mBind.etIbeaconMinorMax.setText(String.valueOf(minorMax));
+                                            mBind.etIbeaconMinorMin.setSelection(mBind.etIbeaconMinorMin.getText().length());
+                                            mBind.etIbeaconMinorMax.setSelection(mBind.etIbeaconMinorMax.getText().length());
+                                        }
                                     }
                                     break;
                                 case KEY_FILTER_BXP_IBEACON_ENABLE:

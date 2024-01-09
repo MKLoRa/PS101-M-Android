@@ -192,10 +192,12 @@ public class FilterMkPirActivity extends BaseActivity {
                                     if (length == 4) {
                                         int majorMin = MokoUtils.toInt(Arrays.copyOfRange(value, 4, 6));
                                         int majorMax = MokoUtils.toInt(Arrays.copyOfRange(value, 6, 8));
-                                        mBind.etMajorMin.setText(String.valueOf(majorMin));
-                                        mBind.etMajorMax.setText(String.valueOf(majorMax));
-                                        mBind.etMajorMin.setSelection(mBind.etMajorMin.getText().length());
-                                        mBind.etMajorMax.setSelection(mBind.etMajorMax.getText().length());
+                                        if (majorMin != 0 || majorMax != 65535) {
+                                            mBind.etMajorMin.setText(String.valueOf(majorMin));
+                                            mBind.etMajorMax.setText(String.valueOf(majorMax));
+                                            mBind.etMajorMin.setSelection(mBind.etMajorMin.getText().length());
+                                            mBind.etMajorMax.setSelection(mBind.etMajorMax.getText().length());
+                                        }
                                     }
                                     break;
 
@@ -203,10 +205,12 @@ public class FilterMkPirActivity extends BaseActivity {
                                     if (length == 4) {
                                         int minorMin = MokoUtils.toInt(Arrays.copyOfRange(value, 4, 6));
                                         int minorMax = MokoUtils.toInt(Arrays.copyOfRange(value, 6, 8));
-                                        mBind.etMinorMin.setText(String.valueOf(minorMin));
-                                        mBind.etMinorMax.setText(String.valueOf(minorMax));
-                                        mBind.etMinorMin.setSelection(mBind.etMinorMin.getText().length());
-                                        mBind.etMinorMax.setSelection(mBind.etMinorMax.getText().length());
+                                        if (minorMin != 0 || minorMax != 65535) {
+                                            mBind.etMinorMin.setText(String.valueOf(minorMin));
+                                            mBind.etMinorMax.setText(String.valueOf(minorMax));
+                                            mBind.etMinorMin.setSelection(mBind.etMinorMin.getText().length());
+                                            mBind.etMinorMax.setSelection(mBind.etMinorMax.getText().length());
+                                        }
                                     }
                                     break;
                             }

@@ -21,6 +21,7 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class MokoSupport extends MokoBleLib {
@@ -151,7 +152,7 @@ public class MokoSupport extends MokoBleLib {
         return true;
     }
 
-    public ArrayList<ExportData> exportDatas;
+    public List<ExportData> exportDatas;
     public StringBuilder storeString;
     public int startTime;
     public int sum;

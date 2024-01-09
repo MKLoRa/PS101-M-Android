@@ -99,8 +99,7 @@ public class StandbyModeActivity extends BaseActivity {
                         if (flag == 0x01) {
                             // write
                             if (configKeyEnum == ParamsKeyEnum.KEY_STANDBY_MODE_POS_STRATEGY) {
-                                int result = value[4] & 0xFF;
-                                if (result == 1) {
+                                if ((value[4] & 0xFF) == 1) {
                                     ToastUtils.showToast(this, "Save Successfully！");
                                 } else {
                                     ToastUtils.showToast(this, "Opps！Save failed. Please check the input characters and try again.");

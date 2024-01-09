@@ -187,7 +187,7 @@
 
                 <TextView
                     android:id="@+id/tvScanType"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0px"
                     android:layout_height="50dp"
                     android:gravity="center_vertical"
                     android:text="Scanning Type/PHY"
@@ -195,6 +195,7 @@
                     android:textSize="15sp"
                     android:textStyle="bold"
                     app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@+id/tv_scanning_type"
                     app:layout_constraintTop_toBottomOf="@+id/line3" />
 
                 <TextView

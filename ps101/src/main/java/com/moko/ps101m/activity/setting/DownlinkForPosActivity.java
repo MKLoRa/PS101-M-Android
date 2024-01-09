@@ -31,7 +31,6 @@ import java.util.Arrays;
 public class DownlinkForPosActivity extends BaseActivity {
     private ActivityDownlinkForPosBinding mBind;
     private boolean mReceiverTag = false;
-    private boolean savedParamsError;
     private final String[] mValues = {"WIFI", "BLE", "GPS", "WIFI+GPS", "BLE+GPS", "WIFI+BLE", "WIFI+BLE+GPS"};
     private int mSelected;
 
@@ -66,8 +65,6 @@ public class DownlinkForPosActivity extends BaseActivity {
         if (!MokoConstants.ACTION_CURRENT_DATA.equals(action))
             EventBus.getDefault().cancelEventDelivery(event);
         runOnUiThread(() -> {
-            if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
-            }
             if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
                 dismissSyncProgressDialog();
             }
@@ -89,9 +86,6 @@ public class DownlinkForPosActivity extends BaseActivity {
                             int result = value[4] & 0xFF;
                             if (configKeyEnum == ParamsKeyEnum.KEY_DOWN_LINK_POS_STRATEGY) {
                                 if (result != 1) {
-                                    savedParamsError = true;
-                                }
-                                if (savedParamsError) {
                                     ToastUtils.showToast(DownlinkForPosActivity.this, "Opps！Save failed. Please check the input characters and try again.");
                                 } else {
                                     ToastUtils.showToast(this, "Save Successfully！");
@@ -152,7 +146,6 @@ public class DownlinkForPosActivity extends BaseActivity {
         dialog.setListener(value -> {
             mSelected = value;
             mBind.tvDownlinkPosStrategy.setText(mValues[value]);
-            savedParamsError = false;
             showSyncingProgressDialog();
             MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setDownLinkPosStrategy(mSelected));
         });

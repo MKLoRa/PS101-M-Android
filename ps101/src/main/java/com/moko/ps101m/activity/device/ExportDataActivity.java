@@ -45,6 +45,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ExportDataActivity extends BaseActivity {
     private static final String TRACKED_FILE = "tracked.txt";
@@ -52,7 +54,7 @@ public class ExportDataActivity extends BaseActivity {
     private ActivityExportDataBinding mBind;
     private boolean mReceiverTag = false;
     private StringBuilder storeString;
-    private ArrayList<ExportData> exportDatas;
+    private List<ExportData> exportData;
     private boolean mIsSync;
     private ExportDataListAdapter adapter;
     private boolean mIsBack;
@@ -66,11 +68,11 @@ public class ExportDataActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         mBind = ActivityExportDataBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
-        exportDatas = MokoSupport.getInstance().exportDatas;
+        exportData = MokoSupport.getInstance().exportDatas;
         storeString = MokoSupport.getInstance().storeString;
         mStartTime = MokoSupport.getInstance().startTime;
         mSum = MokoSupport.getInstance().sum;
-        if (exportDatas != null && exportDatas.size() > 0 && storeString != null) {
+        if (exportData != null && exportData.size() > 0 && storeString != null) {
             mIsStart = true;
             if (mStartTime > 0) {
                 mBind.etTime.setText(String.valueOf(mStartTime));
@@ -79,18 +81,17 @@ public class ExportDataActivity extends BaseActivity {
             if (mSum > 0) {
                 mBind.tvSum.setText(String.format("Sum:%d", mSum));
             }
-            mBind.tvCount.setText(String.format("Count:%d", exportDatas.size()));
+            mBind.tvCount.setText(String.format("Count:%d", exportData.size()));
             mBind.tvExport.setEnabled(true);
             mBind.tvEmpty.setEnabled(true);
         } else {
-            exportDatas = new ArrayList<>();
+            exportData = new LinkedList<>();
             storeString = new StringBuilder();
         }
         mHandler = new Handler();
         adapter = new ExportDataListAdapter();
         adapter.openLoadAnimation();
-        adapter.replaceData(exportDatas);
-        mBind.rvExportData.setLayoutManager(new LinearLayoutManager(this));
+        adapter.replaceData(exportData);
         mBind.rvExportData.setAdapter(adapter);
         PATH_LOGCAT = Ps101MainActivity.PATH_LOGCAT + File.separator + TRACKED_FILE;
         EventBus.getDefault().register(this);
@@ -149,11 +150,11 @@ public class ExportDataActivity extends BaseActivity {
                                 exportData.time = time;
                                 exportData.rawData = rawData;
                                 if (mStartTime == 65535) {
-                                    exportDatas.add(0, exportData);
+                                    this.exportData.add(0, exportData);
                                 } else {
-                                    exportDatas.add(exportData);
+                                    this.exportData.add(exportData);
                                 }
-                                mBind.tvCount.setText(String.format("Count:%d", exportDatas.size()));
+                                mBind.tvCount.setText(String.format("Count:%d", this.exportData.size()));
 
                                 storeString.append(String.format("Time:%s", time));
                                 storeString.append("\n");
@@ -164,7 +165,7 @@ public class ExportDataActivity extends BaseActivity {
                                 storeString.append("\n");
                                 index += dataLength;
                             }
-                            adapter.replaceData(exportDatas);
+                            adapter.replaceData(exportData);
                         } else {
                             byte[] sumBytes = Arrays.copyOfRange(value, 5, length);
                             int sum = MokoUtils.toInt(sumBytes);
@@ -177,7 +178,7 @@ public class ExportDataActivity extends BaseActivity {
                                 mHandler.removeMessages(0);
                                 mHandler.postDelayed(() -> {
                                     dismissSyncProgressDialog();
-                                    MokoSupport.getInstance().exportDatas = exportDatas;
+                                    MokoSupport.getInstance().exportDatas = exportData;
                                     MokoSupport.getInstance().storeString = storeString;
                                     MokoSupport.getInstance().startTime = mStartTime;
                                     finish();
@@ -219,8 +220,8 @@ public class ExportDataActivity extends BaseActivity {
                                     } else {
                                         storeString = new StringBuilder();
                                         writeTrackedFile("");
-                                        exportDatas.clear();
-                                        adapter.replaceData(exportDatas);
+                                        exportData.clear();
+                                        adapter.replaceData(exportData);
                                         mBind.tvExport.setEnabled(false);
                                         mBind.tvSum.setText("Sum:0");
                                         mBind.tvCount.setText("Count:0");
@@ -234,7 +235,7 @@ public class ExportDataActivity extends BaseActivity {
                                         if (mIsBack) {
                                             mHandler.postDelayed(() -> {
                                                 dismissSyncProgressDialog();
-                                                MokoSupport.getInstance().exportDatas = exportDatas;
+                                                MokoSupport.getInstance().exportDatas = exportData;
                                                 MokoSupport.getInstance().storeString = storeString;
                                                 MokoSupport.getInstance().startTime = mStartTime;
                                                 finish();
@@ -250,7 +251,7 @@ public class ExportDataActivity extends BaseActivity {
                                         } else {
                                             mIsSync = false;
                                             mBind.tvStart.setEnabled(true);
-                                            if (exportDatas != null && exportDatas.size() > 0 && storeString != null) {
+                                            if (exportData != null && exportData.size() > 0 && storeString != null) {
                                                 mBind.tvEmpty.setEnabled(true);
                                                 mBind.tvExport.setEnabled(true);
                                             }
@@ -315,7 +316,7 @@ public class ExportDataActivity extends BaseActivity {
             MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setSyncEnable(0));
             return;
         }
-        MokoSupport.getInstance().exportDatas = exportDatas;
+        MokoSupport.getInstance().exportDatas = exportData;
         MokoSupport.getInstance().storeString = storeString;
         MokoSupport.getInstance().startTime = mStartTime;
         finish();
@@ -351,8 +352,8 @@ public class ExportDataActivity extends BaseActivity {
         mStartTime = time;
         storeString = new StringBuilder();
         writeTrackedFile("");
-        exportDatas.clear();
-        adapter.replaceData(exportDatas);
+        exportData.clear();
+        adapter.replaceData(exportData);
         mBind.tvSum.setText("Sum:N/A");
         mBind.tvCount.setText("Count:0");
         showSyncingProgressDialog();

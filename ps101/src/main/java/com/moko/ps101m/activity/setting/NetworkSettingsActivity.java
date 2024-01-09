@@ -93,6 +93,7 @@ public class NetworkSettingsActivity extends BaseActivity implements RadioGroup.
         mBind.etMqttClientId.setFilters(new InputFilter[]{new InputFilter.LengthFilter(64), inputFilter});
         mBind.etMqttSubscribeTopic.setFilters(new InputFilter[]{new InputFilter.LengthFilter(128), inputFilter});
         mBind.etMqttPublishTopic.setFilters(new InputFilter[]{new InputFilter.LengthFilter(128), inputFilter});
+        mBind.etApn.setFilters(new InputFilter[]{new InputFilter.LengthFilter(100), inputFilter});
         createFragment();
         NetworkFragmentAdapter adapter = new NetworkFragmentAdapter(this);
         adapter.setFragmentList(fragments);
@@ -437,6 +438,7 @@ public class NetworkSettingsActivity extends BaseActivity implements RadioGroup.
     private void setMQTTDeviceConfig() {
         try {
             showSyncingProgressDialog();
+            mSavedParamsError = false;
             ArrayList<OrderTask> orderTasks = new ArrayList<>(16);
             orderTasks.add(OrderTaskAssembler.setMQTTHost(mBind.etMqttHost.getText().toString().trim()));
             orderTasks.add(OrderTaskAssembler.setMQTTPort(Integer.parseInt(mBind.etMqttPort.getText().toString().trim())));

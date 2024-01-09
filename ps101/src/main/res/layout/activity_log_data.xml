@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/grey_f2f2f2"
     android:orientation="vertical">
 
@@ -92,6 +93,7 @@
             android:layout_below="@id/tv_sync_switch"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:background="@color/white_ffffff"
             tools:listitem="@layout/item_log_data" />
 

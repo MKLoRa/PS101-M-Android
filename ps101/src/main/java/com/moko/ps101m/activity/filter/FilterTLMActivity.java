@@ -28,7 +28,6 @@ import java.util.List;
 
 public class FilterTLMActivity extends BaseActivity {
     private ActivityFilterTlmBinding mBind;
-    private boolean savedParamsError;
     private final String[] mValues = {"Null", "version 0", "version 1"};
     private int mSelected;
     private boolean mTLMEnable;
@@ -85,9 +84,6 @@ public class FilterTLMActivity extends BaseActivity {
                                 case KEY_FILTER_EDDYSTONE_TLM_VERSION:
                                 case KEY_FILTER_EDDYSTONE_TLM_ENABLE:
                                     if (result != 1) {
-                                        savedParamsError = true;
-                                    }
-                                    if (savedParamsError) {
                                         ToastUtils.showToast(FilterTLMActivity.this, "Opps！Save failed. Please check the input characters and try again.");
                                     } else {
                                         ToastUtils.showToast(this, "Save Successfully！");

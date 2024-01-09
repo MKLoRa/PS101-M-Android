@@ -31,7 +31,6 @@ import java.util.Arrays;
 public class DeviceModeActivity extends BaseActivity {
     private ActivityDeviceModeBinding mBind;
     private boolean mReceiverTag = false;
-    private boolean savedParamsError;
     private final String[] mValues = {"Standby Mode", "Timing Mode", "Periodic Mode", "Motion Mode"};
     private int mSelected;
 
@@ -91,9 +90,6 @@ public class DeviceModeActivity extends BaseActivity {
                             int result = value[4] & 0xFF;
                             if (configKeyEnum == ParamsKeyEnum.KEY_DEVICE_MODE) {
                                 if (result != 1) {
-                                    savedParamsError = true;
-                                }
-                                if (savedParamsError) {
                                     ToastUtils.showToast(this, "Opps！Save failed. Please check the input characters and try again.");
                                 } else {
                                     ToastUtils.showToast(this, "Save Successfully！");
@@ -154,7 +150,6 @@ public class DeviceModeActivity extends BaseActivity {
         dialog.setListener(value -> {
             mSelected = value;
             mBind.tvDeviceMode.setText(mValues[value]);
-            savedParamsError = false;
             showSyncingProgressDialog();
             MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setDeviceMode(value));
         });
