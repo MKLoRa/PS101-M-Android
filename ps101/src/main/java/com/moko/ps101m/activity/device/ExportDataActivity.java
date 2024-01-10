@@ -13,8 +13,6 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
-import androidx.recyclerview.widget.LinearLayoutManager;
-
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
@@ -42,7 +40,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedList;
@@ -139,7 +136,7 @@ public class ExportDataActivity extends BaseActivity {
                             String time = Utils.calendar2strDate(calendar, AppConstants.PATTERN_YYYY_MM_DD_HH_MM_SS);
                             int index = 5;
                             while (index < length) {
-                                int dataLength = value[index];
+                                int dataLength = value[index] & 0xff;
                                 String rawData = "";
                                 if (dataLength > 0) {
                                     index += 1;
