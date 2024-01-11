@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -40,6 +41,7 @@ public class NtpSeverSettingActivity extends BaseActivity {
     private ActivityNtpSeverSettingBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
+    private final String FILTER_ASCII = "[ -~]*";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +60,12 @@ public class NtpSeverSettingActivity extends BaseActivity {
         orderTasks.add(OrderTaskAssembler.getNtpServer());
         orderTasks.add(OrderTaskAssembler.getNtpSyncInterval());
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[0]));
+
+        InputFilter inputFilter = (source, start, end, dest, dStart, dEnd) -> {
+            if (!(source + "").matches(FILTER_ASCII)) return "";
+            return null;
+        };
+        mBind.etNtpUrl.setFilters(new InputFilter[]{new InputFilter.LengthFilter(64), inputFilter});
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 200)
