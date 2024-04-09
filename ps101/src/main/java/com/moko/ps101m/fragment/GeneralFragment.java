@@ -10,13 +10,18 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.moko.ble.lib.task.OrderTask;
 import com.moko.ps101m.databinding.FragmentGeneralBinding;
 import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GeneralFragment extends Fragment {
     private static final String TAG = GeneralFragment.class.getSimpleName();
     private FragmentGeneralBinding mBind;
+
     public GeneralFragment() {
     }
 
@@ -36,6 +41,10 @@ public class GeneralFragment extends Fragment {
         mBind.etHeartbeatInterval.setSelection(mBind.etHeartbeatInterval.getText().length());
     }
 
+    public void setContinuityEnable(int enable) {
+        mBind.cbContinuity.setChecked(enable == 1);
+    }
+
     public boolean isValid() {
         if (TextUtils.isEmpty(mBind.etHeartbeatInterval.getText())) return false;
         final String intervalStr = mBind.etHeartbeatInterval.getText().toString();
@@ -46,6 +55,9 @@ public class GeneralFragment extends Fragment {
     public void saveParams() {
         final String intervalStr = mBind.etHeartbeatInterval.getText().toString();
         final int interval = Integer.parseInt(intervalStr);
-        MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setHeartBeatInterval(interval));
+        List<OrderTask> orderTasks = new ArrayList<>(2);
+        orderTasks.add(OrderTaskAssembler.setHeartBeatInterval(interval));
+        orderTasks.add(OrderTaskAssembler.setContinuityTransferEnable(mBind.cbContinuity.isChecked() ? 1 : 0));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[0]));
     }
 }

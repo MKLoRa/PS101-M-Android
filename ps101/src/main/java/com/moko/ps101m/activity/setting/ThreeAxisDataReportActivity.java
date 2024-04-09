@@ -7,6 +7,7 @@ import android.view.View;
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
+import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.ps101m.activity.BaseActivity;
@@ -21,7 +22,9 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author: jun.liu
@@ -30,6 +33,7 @@ import java.util.Arrays;
  */
 public class ThreeAxisDataReportActivity extends BaseActivity {
     private ActivityAxisDataReportBinding mBind;
+    private boolean saveParamsError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +43,10 @@ public class ThreeAxisDataReportActivity extends BaseActivity {
 
         EventBus.getDefault().register(this);
         showSyncingProgressDialog();
-        MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getAxisDataReportInterval());
+        List<OrderTask> orderTasks = new ArrayList<>(2);
+        orderTasks.add(OrderTaskAssembler.getAxisDataReportEnable());
+        orderTasks.add(OrderTaskAssembler.getAxisDataReportInterval());
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[0]));
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 300)
@@ -75,20 +82,27 @@ public class ThreeAxisDataReportActivity extends BaseActivity {
                         int length = value[3] & 0xFF;
                         if (flag == 0x01) {
                             // write
-                            if (configKeyEnum == ParamsKeyEnum.KEY_AXIS_REPORT_INTERVAL) {
-                                if ((value[4] & 0xff) == 1) {
+                            if (configKeyEnum == ParamsKeyEnum.KEY_AXIS_REPORT_ENABLE) {
+                                if ((value[4] & 0xff) != 1) saveParamsError = true;
+                            } else if (configKeyEnum == ParamsKeyEnum.KEY_AXIS_REPORT_INTERVAL) {
+                                if ((value[4] & 0xff) != 1) saveParamsError = true;
+                                if (!saveParamsError) {
                                     ToastUtils.showToast(this, "Save Successfully！");
                                 } else {
                                     ToastUtils.showToast(this, "Opps！Save failed. Please check the input characters and try again.");
                                 }
                             }
-                        }else if (flag == 0x00) {
+                        } else if (flag == 0x00) {
                             // read
                             if (configKeyEnum == ParamsKeyEnum.KEY_AXIS_REPORT_INTERVAL) {
                                 if (length == 2) {
                                     int interval = MokoUtils.toInt(Arrays.copyOfRange(value, 4, value.length));
                                     mBind.etInterval.setText(String.valueOf(interval));
                                     mBind.etInterval.setSelection(mBind.etInterval.getText().length());
+                                }
+                            } else if (configKeyEnum == ParamsKeyEnum.KEY_AXIS_REPORT_ENABLE) {
+                                if (length == 1) {
+                                    mBind.cbSwitch.setChecked(value[4] == 1);
                                 }
                             }
                         }
@@ -101,9 +115,13 @@ public class ThreeAxisDataReportActivity extends BaseActivity {
     public void onSave(View view) {
         if (isWindowLocked()) return;
         if (isValid()) {
+            saveParamsError = false;
             showSyncingProgressDialog();
             int interval = Integer.parseInt(mBind.etInterval.getText().toString());
-            MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setAxisDataReportInterval(interval));
+            List<OrderTask> orderTasks = new ArrayList<>(2);
+            orderTasks.add(OrderTaskAssembler.setAxisDataReportEnable(mBind.cbSwitch.isChecked() ? 1 : 0));
+            orderTasks.add(OrderTaskAssembler.setAxisDataReportInterval(interval));
+            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[0]));
         } else {
             ToastUtils.showToast(this, "Para error!");
         }
@@ -112,7 +130,7 @@ public class ThreeAxisDataReportActivity extends BaseActivity {
     private boolean isValid() {
         if (TextUtils.isEmpty(mBind.etInterval.getText())) return false;
         int interval = Integer.parseInt(mBind.etInterval.getText().toString());
-        return interval >= 0 && interval <= 65535;
+        return interval >= 2 && interval <= 65535;
     }
 
     @Override

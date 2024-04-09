@@ -166,7 +166,7 @@
                 <TextView
                     android:id="@+id/tv_ble_fix_mechanism"
                     android:layout_width="110dp"
-                    android:layout_height="35dp"
+                    android:layout_height="40dp"
                     android:background="@drawable/shape_radius_blue_btn_bg"
                     android:gravity="center"
                     android:onClick="onBleFixMechanism"
@@ -201,7 +201,7 @@
                 <TextView
                     android:id="@+id/tv_scanning_type"
                     android:layout_width="wrap_content"
-                    android:layout_height="35dp"
+                    android:layout_height="40dp"
                     android:background="@drawable/shape_radius_blue_btn_bg"
                     android:gravity="center"
                     android:minWidth="150dp"

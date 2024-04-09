@@ -15,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.moko.ps101m.R;
 import com.moko.ps101m.activity.BaseActivity;
 import com.moko.ps101m.databinding.FragmentSslDeviceBinding;
 import com.moko.ps101m.dialog.BottomDialog;
@@ -186,5 +187,31 @@ public class SSLDeviceFragment extends Fragment {
 
     public String getClientCertPath() {
         return TextUtils.isEmpty(mBind.tvClientCertFile.getText()) ? null : mBind.tvClientCertFile.getText().toString().trim();
+    }
+
+    public boolean isValid() {
+        final String caFile = mBind.tvCaFile.getText().toString();
+        final String clientKeyFile = mBind.tvClientKeyFile.getText().toString();
+        final String clientCertFile = mBind.tvClientCertFile.getText().toString();
+        if (mConnectMode == 2) {
+            if (TextUtils.isEmpty(caFile)) {
+                ToastUtils.showToast(activity, getString(R.string.mqtt_verify_ca));
+                return false;
+            }
+        } else if (mConnectMode == 3) {
+            if (TextUtils.isEmpty(caFile)) {
+                ToastUtils.showToast(activity, getString(R.string.mqtt_verify_ca));
+                return false;
+            }
+            if (TextUtils.isEmpty(clientKeyFile)) {
+                ToastUtils.showToast(activity, getString(R.string.mqtt_verify_client_key));
+                return false;
+            }
+            if (TextUtils.isEmpty(clientCertFile)) {
+                ToastUtils.showToast(activity, getString(R.string.mqtt_verify_client_cert));
+                return false;
+            }
+        }
+        return true;
     }
 }

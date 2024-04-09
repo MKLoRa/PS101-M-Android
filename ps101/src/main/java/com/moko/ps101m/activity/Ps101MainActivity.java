@@ -1,5 +1,6 @@
 package com.moko.ps101m.activity;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -134,23 +135,23 @@ public class Ps101MainActivity extends BaseActivity implements MokoScanDeviceCal
         mHandler.postDelayed(() -> mokoBleScanner.stopScanDevice(), 1000 * 60);
     }
 
+    private Timer timer;
+
     @Override
     public void onStartScan() {
         beaconInfoHashMap.clear();
-        new Thread(() -> {
-            while (animation != null) {
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @SuppressLint("DefaultLocale")
+            @Override
+            public void run() {
+                updateDevices();
                 runOnUiThread(() -> {
                     adapter.replaceData(beaconInfos);
                     mBind.tvDeviceNum.setText(String.format("DEVICE(%d)", beaconInfos.size()));
                 });
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                updateDevices();
             }
-        }).start();
+        }, 100, 600);
     }
 
     @Override
@@ -164,6 +165,7 @@ public class Ps101MainActivity extends BaseActivity implements MokoScanDeviceCal
     public void onStopScan() {
         mBind.ivRefresh.clearAnimation();
         animation = null;
+        if (null != timer) timer.cancel();
     }
 
     private void updateDevices() {
@@ -405,7 +407,7 @@ public class Ps101MainActivity extends BaseActivity implements MokoScanDeviceCal
     }
 
     private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == RESULT_OK){
+        if (result.getResultCode() == RESULT_OK) {
             if (animation == null) startScan();
         }
     });
@@ -471,6 +473,8 @@ public class Ps101MainActivity extends BaseActivity implements MokoScanDeviceCal
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (null != timer) timer.cancel();
+        if (null != mHandler) mHandler.removeMessages(0);
         if (mReceiverTag) {
             mReceiverTag = false;
             unregisterReceiver(mReceiver);

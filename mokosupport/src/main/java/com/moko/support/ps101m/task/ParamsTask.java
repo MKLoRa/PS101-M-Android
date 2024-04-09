@@ -93,6 +93,16 @@ public class ParamsTask extends OrderTask {
         };
     }
 
+    public void setAxisDataReportEnable(int enable){
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_AXIS_REPORT_ENABLE.getParamsKey(),
+                (byte) 0x01,
+                (byte) enable
+        };
+    }
+
     public void setAxisDataReportInterval(@IntRange(from = 0, to = 65535) int interval) {
         byte[] bytes = MokoUtils.toByteArray(interval, 2);
         response.responseValue = data = new byte[]{
@@ -1613,7 +1623,7 @@ public class ParamsTask extends OrderTask {
     }
 
     public void setAccMotionCondition(@IntRange(from = 10, to = 250) int threshold,
-                                      @IntRange(from = 1, to = 15) int duration) {
+                                      @IntRange(from = 1, to = 50) int duration) {
         data = new byte[]{
                 (byte) 0xED,
                 (byte) 0x01,
@@ -1780,6 +1790,16 @@ public class ParamsTask extends OrderTask {
                 (byte) 0x01,
                 (byte) ParamsKeyEnum.KEY_CLEAR_STORAGE_DATA.getParamsKey(),
                 (byte) 0x00
+        };
+    }
+
+    public void setContinuityTransferEnable(int enable){
+        data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_CONTINUITY_TRANSFER_ENABLE.getParamsKey(),
+                (byte) 0x01,
+                (byte) enable
         };
     }
 

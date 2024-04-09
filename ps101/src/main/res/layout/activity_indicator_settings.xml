@@ -126,6 +126,78 @@
                 android:textStyle="bold" />
 
             <CheckBox
+                android:id="@+id/cbJoinCellular"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:background="@color/white_ffffff"
+                android:button="@null"
+                android:checked="true"
+                android:drawableRight="@drawable/selector_cb_btn"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="Joining cellular network"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <CheckBox
+                android:id="@+id/cbNoSimCardDetected"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="1dp"
+                android:layout_marginRight="10dp"
+                android:background="@color/white_ffffff"
+                android:button="@null"
+                android:checked="true"
+                android:drawableRight="@drawable/selector_cb_btn"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="No SIM card detected"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <CheckBox
+                android:id="@+id/cbCellularNetConnected"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="1dp"
+                android:layout_marginRight="10dp"
+                android:background="@color/white_ffffff"
+                android:button="@null"
+                android:checked="true"
+                android:drawableRight="@drawable/selector_cb_btn"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="Cellular network connected"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <CheckBox
+                android:id="@+id/cbMqttServerConnected"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="1dp"
+                android:layout_marginRight="10dp"
+                android:background="@color/white_ffffff"
+                android:button="@null"
+                android:checked="true"
+                android:drawableRight="@drawable/selector_cb_btn"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="MQTT Server connected"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <CheckBox
                 android:id="@+id/cbBleConnection"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"

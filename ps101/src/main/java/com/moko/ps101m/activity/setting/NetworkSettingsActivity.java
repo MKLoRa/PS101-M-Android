@@ -420,7 +420,7 @@ public class NetworkSettingsActivity extends BaseActivity implements RadioGroup.
             ToastUtils.showToast(this, "Subscribed and published topic can't be same !");
             return true;
         }
-        return !generalFragment.isValid() || !lwtFragment.isValid();
+        return !generalFragment.isValid() || !sslFragment.isValid() || !lwtFragment.isValid();
     }
 
     @Override

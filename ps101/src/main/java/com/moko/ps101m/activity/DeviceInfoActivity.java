@@ -181,13 +181,16 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                                         ToastUtils.showToast(this, "Time sync completed!");
                                     break;
                                 case KEY_NETWORK_RECONNECT_INTERVAL:
-                                case KEY_HEARTBEAT_INTERVAL:
                                 case KEY_DATA_COMMUNICATION_TYPE:
                                 case KEY_LOW_POWER_PERCENT:
                                 case KEY_TIME_ZONE:
                                 case KEY_BUZZER_SOUND_CHOOSE:
                                 case KEY_VIBRATION_INTENSITY:
                                 case KEY_LOW_POWER_PAYLOAD_ENABLE:
+                                case KEY_HEARTBEAT_INTERVAL:
+                                    savedParamsError = result != 1;
+                                    break;
+                                case KEY_CONTINUITY_TRANSFER_ENABLE:
                                     savedParamsError = result != 1;
                                     if (savedParamsError) {
                                         ToastUtils.showToast(this, "Opps！Save failed. Please check the input characters and try again.");
@@ -223,6 +226,12 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                                     if (length == 2) {
                                         int interval = MokoUtils.toInt(Arrays.copyOfRange(value, 4, value.length));
                                         generalFragment.setHeartbeatInterval(interval);
+                                    }
+                                    break;
+
+                                case KEY_CONTINUITY_TRANSFER_ENABLE:
+                                    if (length == 1) {
+                                        generalFragment.setContinuityEnable(value[4] & 0xff);
                                     }
                                     break;
 
@@ -414,7 +423,10 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                 .hide(deviceFragment)
                 .commit();
         showSyncingProgressDialog();
-        MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getHeartBeatInterval());
+        List<OrderTask> orderTasks = new ArrayList<>(2);
+        orderTasks.add(OrderTaskAssembler.getHeartBeatInterval());
+        orderTasks.add(OrderTaskAssembler.getContinuityTransferEnable());
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[0]));
     }
 
     private void showPosAndGetData() {

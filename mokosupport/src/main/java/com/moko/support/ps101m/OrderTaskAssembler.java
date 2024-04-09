@@ -1,5 +1,8 @@
 package com.moko.support.ps101m;
 
+import static com.moko.support.ps101m.entity.ParamsKeyEnum.KEY_AXIS_REPORT_INTERVAL;
+import static com.moko.support.ps101m.entity.ParamsKeyEnum.KEY_MQTT_LWT_PAYLOAD;
+
 import androidx.annotation.IntRange;
 import androidx.annotation.Nullable;
 
@@ -133,6 +136,12 @@ public class OrderTaskAssembler {
     public static OrderTask getBattery() {
         ParamsTask task = new ParamsTask();
         task.setData(ParamsKeyEnum.KEY_BATTERY_POWER);
+        return task;
+    }
+
+    public static OrderTask getContinuityTransferEnable(){
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.KEY_CONTINUITY_TRANSFER_ENABLE);
         return task;
     }
 
@@ -824,13 +833,19 @@ public class OrderTaskAssembler {
 
     public static OrderTask getMQTTLwtPayload() {
         ParamsTask task = new ParamsTask();
-        task.setData(ParamsKeyEnum.KEY_MQTT_LWT_PAYLOAD);
+        task.setData(KEY_MQTT_LWT_PAYLOAD);
         return task;
     }
 
     public static OrderTask getAxisDataReportInterval() {
         ParamsTask task = new ParamsTask();
-        task.setData(ParamsKeyEnum.KEY_AXIS_REPORT_INTERVAL);
+        task.setData(KEY_AXIS_REPORT_INTERVAL);
+        return task;
+    }
+
+    public static OrderTask getAxisDataReportEnable(){
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.KEY_AXIS_REPORT_ENABLE);
         return task;
     }
 
@@ -877,6 +892,12 @@ public class OrderTaskAssembler {
     public static OrderTask setAxisDataReportInterval(@IntRange(from = 0, to = 65535) int interval) {
         ParamsTask task = new ParamsTask();
         task.setAxisDataReportInterval(interval);
+        return task;
+    }
+
+    public static OrderTask setAxisDataReportEnable(int enable){
+        ParamsTask task = new ParamsTask();
+        task.setAxisDataReportEnable(enable);
         return task;
     }
 
@@ -1577,7 +1598,7 @@ public class OrderTaskAssembler {
     }
 
     public static OrderTask setAccMotionCondition(@IntRange(from = 10, to = 250) int threshold,
-                                                  @IntRange(from = 1, to = 15) int duration) {
+                                                  @IntRange(from = 1, to = 50) int duration) {
         ParamsTask task = new ParamsTask();
         task.setAccMotionCondition(threshold, duration);
         return task;
@@ -1695,6 +1716,12 @@ public class OrderTaskAssembler {
     public static OrderTask clearStorageData() {
         ParamsTask task = new ParamsTask();
         task.clearStorageData();
+        return task;
+    }
+
+    public static OrderTask setContinuityTransferEnable(int enable){
+        ParamsTask task = new ParamsTask();
+        task.setContinuityTransferEnable(enable);
         return task;
     }
 

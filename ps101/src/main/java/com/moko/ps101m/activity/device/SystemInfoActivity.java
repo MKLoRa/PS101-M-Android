@@ -55,7 +55,6 @@ public class SystemInfoActivity extends BaseActivity {
     private ActivitySystemInfoBinding mBind;
     private boolean mReceiverTag = false;
     private String mDeviceMac;
-    private String mDeviceName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +69,6 @@ public class SystemInfoActivity extends BaseActivity {
         mReceiverTag = true;
         showSyncingProgressDialog();
         List<OrderTask> orderTasks = new ArrayList<>();
-        orderTasks.add(OrderTaskAssembler.getAdvName());
         orderTasks.add(OrderTaskAssembler.getMacAddress());
         orderTasks.add(OrderTaskAssembler.getBattery());
         orderTasks.add(OrderTaskAssembler.getDeviceModel());
@@ -143,12 +141,6 @@ public class SystemInfoActivity extends BaseActivity {
                             if (flag == 0x00) {
                                 // read
                                 switch (configKeyEnum) {
-                                    case KEY_ADV_NAME:
-                                        if (length > 0) {
-                                            byte[] rawDataBytes = Arrays.copyOfRange(value, 4, 4 + length);
-                                            mDeviceName = new String(rawDataBytes);
-                                        }
-                                        break;
                                     case KEY_BATTERY_POWER:
                                         if (length > 0) {
                                             byte[] batteryBytes = Arrays.copyOfRange(value, 4, 4 + length);
@@ -233,7 +225,7 @@ public class SystemInfoActivity extends BaseActivity {
 
     public void onUpdateFirmware(View view) {
         if (isWindowLocked()) return;
-        if (TextUtils.isEmpty(mDeviceName) || TextUtils.isEmpty(mDeviceMac)) return;
+        if (TextUtils.isEmpty(mDeviceMac)) return;
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("*/*");//设置类型，我这里是任意类型，任意后缀的可以这样写。
         intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -353,7 +345,6 @@ public class SystemInfoActivity extends BaseActivity {
                     return;
                 }
                 final DfuServiceInitiator starter = new DfuServiceInitiator(mDeviceMac)
-                        .setDeviceName(mDeviceName)
                         .setKeepBond(false)
                         .setForeground(false)
                         .setDisableNotification(true);

@@ -104,6 +104,10 @@ public class IndicatorSettingsActivity extends BaseActivity {
                                     mBind.cbInfix.setChecked((indicator >> 5 & 0x01) == 1);
                                     mBind.cbFixSuccessful.setChecked((indicator >> 6 & 0x01) == 1);
                                     mBind.cbFailToFix.setChecked((indicator >> 7 & 0x01) == 1);
+                                    mBind.cbJoinCellular.setChecked((indicator >> 11 & 0x01) == 1);
+                                    mBind.cbNoSimCardDetected.setChecked((indicator >> 10 & 0x01) == 1);
+                                    mBind.cbCellularNetConnected.setChecked((indicator >> 12 & 0x01) == 1);
+                                    mBind.cbMqttServerConnected.setChecked((indicator >> 13 & 0x01) == 1);
                                 }
                             }
                         }
@@ -165,7 +169,12 @@ public class IndicatorSettingsActivity extends BaseActivity {
                 | (mBind.cbInfix.isChecked() ? 1 << 5 : 0)
                 | (mBind.cbFixSuccessful.isChecked() ? 1 << 6 : 0)
                 | (mBind.cbFailToFix.isChecked() ? 1 << 7 : 0)
-                | 1 << 8 | 1 << 9 | 1 << 10 | 1 << 11 | 1 << 12 | 1 << 13 | 1 << 14 | 1 << 15 | 1 << 16;
+                | 1 << 8 | 1 << 9
+                | (mBind.cbNoSimCardDetected.isChecked() ? 1 << 10 : 0)
+                | (mBind.cbJoinCellular.isChecked() ? 1 << 11 : 0)
+                | (mBind.cbCellularNetConnected.isChecked() ? 1 << 12 : 0)
+                | (mBind.cbMqttServerConnected.isChecked() ? 1 << 13 : 0)
+                | 1 << 14 | 1 << 15 | 1 << 16;
         showSyncingProgressDialog();
         MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setIndicatorStatus(indicator));
     }

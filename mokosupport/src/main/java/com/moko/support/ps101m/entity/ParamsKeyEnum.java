@@ -60,6 +60,7 @@ public enum ParamsKeyEnum implements Serializable {
     KEY_NTP_SERVER(0x2B),
     //ntp同步时间间隔
     KEY_NTP_SYNC_INTERVAL(0x2C),
+    KEY_CONTINUITY_TRANSFER_ENABLE(0x2D),
 
 
 
@@ -294,6 +295,8 @@ public enum ParamsKeyEnum implements Serializable {
     KEY_ALARM_SOS_NOTIFY_ENABLE(0xBD),
     //三轴数据上报间隔
     KEY_AXIS_REPORT_INTERVAL(0xBE),
+    KEY_AXIS_REPORT_ENABLE(0xBF),
+
 
 
 
