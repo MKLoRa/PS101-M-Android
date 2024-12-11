@@ -200,6 +200,10 @@
             android:name="com.moko.ps101m.activity.setting.NtpSeverSettingActivity"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".activity.setting.BleGatewayActivity"
+            android:screenOrientation="portrait" />
+
         <service android:name="com.moko.ps101m.service.DfuService" />
     </application>
 </manifest>

@@ -4,6 +4,7 @@ import static com.moko.support.ps101m.entity.ParamsKeyEnum.KEY_AXIS_REPORT_INTER
 import static com.moko.support.ps101m.entity.ParamsKeyEnum.KEY_MQTT_LWT_PAYLOAD;
 
 import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.moko.ble.lib.task.OrderTask;
@@ -139,7 +140,7 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask getContinuityTransferEnable(){
+    public static OrderTask getContinuityTransferEnable() {
         ParamsTask task = new ParamsTask();
         task.setData(ParamsKeyEnum.KEY_CONTINUITY_TRANSFER_ENABLE);
         return task;
@@ -843,7 +844,7 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask getAxisDataReportEnable(){
+    public static OrderTask getAxisDataReportEnable() {
         ParamsTask task = new ParamsTask();
         task.setData(ParamsKeyEnum.KEY_AXIS_REPORT_ENABLE);
         return task;
@@ -895,7 +896,7 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask setAxisDataReportEnable(int enable){
+    public static OrderTask setAxisDataReportEnable(int enable) {
         ParamsTask task = new ParamsTask();
         task.setAxisDataReportEnable(enable);
         return task;
@@ -1719,9 +1720,131 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask setContinuityTransferEnable(int enable){
+    public static OrderTask setContinuityTransferEnable(int enable) {
         ParamsTask task = new ParamsTask();
         task.setContinuityTransferEnable(enable);
+        return task;
+    }
+
+    //蓝牙网关参数
+
+    public static OrderTask getGatewaySwitch() {
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.KEY_GATEWAY_SWITCH);
+        return task;
+    }
+
+    public static OrderTask getGracePeriod() {
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.KEY_GRACE_PERIOD);
+        return task;
+    }
+
+    public static OrderTask getBeaconMinDuration() {
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.KEY_BEACON_MIN_DURATION);
+        return task;
+    }
+
+    public static OrderTask getDisplayMinDuration() {
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.KEY_DISPLAY_MIN_DURATION);
+        return task;
+    }
+
+    public static OrderTask getBeaconMinRssi() {
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.KEY_BEACON_MIN_RSSI);
+        return task;
+    }
+
+    public static OrderTask getBeaconFilter1() {
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.KEY_BEACON_FILTER1);
+        return task;
+    }
+
+    public static OrderTask getBeaconFilter2() {
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.KEY_BEACON_FILTER2);
+        return task;
+    }
+
+    public static OrderTask getDisplayMinRssi() {
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.KEY_DISPLAY_MIN_RSSI);
+        return task;
+    }
+
+    public static OrderTask getDisplayFilter1() {
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.KEY_DISPLAY_FILTER1);
+        return task;
+    }
+
+    public static OrderTask getDisplayFilter2() {
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.KEY_DISPLAY_FILTER2);
+        return task;
+    }
+
+    public static OrderTask setGatewaySwitch(int enable) {
+        ParamsTask task = new ParamsTask();
+        task.setGatewaySwitch(enable);
+        return task;
+    }
+
+    public static OrderTask setGracePeriod(@IntRange(from = 0, to = 65535) int period) {
+        ParamsTask task = new ParamsTask();
+        task.setGracePeriod(period);
+        return task;
+    }
+
+    public static OrderTask setBeaconMinDuration(@IntRange(from = 0, to = 255) int duration) {
+        ParamsTask task = new ParamsTask();
+        task.setBeaconMinDuration(duration);
+        return task;
+    }
+
+    public static OrderTask setDisplayMinDuration(@IntRange(from = 0, to = 255) int duration) {
+        ParamsTask task = new ParamsTask();
+        task.setDisplayMinDuration(duration);
+        return task;
+    }
+
+    public static OrderTask setBeaconMinRssi(@IntRange(from = -127, to = 0) int rssi) {
+        ParamsTask task = new ParamsTask();
+        task.setGatewayMinRssi(rssi, ParamsKeyEnum.KEY_BEACON_MIN_RSSI);
+        return task;
+    }
+
+    public static OrderTask setBeaconFilter1(@Nullable String filter) {
+        ParamsTask task = new ParamsTask();
+        task.setGatewayFilter(filter, ParamsKeyEnum.KEY_BEACON_FILTER1);
+        return task;
+    }
+
+    public static OrderTask setBeaconFilter2(@Nullable String filter) {
+        ParamsTask task = new ParamsTask();
+        task.setGatewayFilter(filter, ParamsKeyEnum.KEY_BEACON_FILTER2);
+        return task;
+    }
+
+    public static OrderTask setDisplayMinRssi(@IntRange(from = -127, to = 0) int rssi) {
+        ParamsTask task = new ParamsTask();
+        task.setGatewayMinRssi(rssi, ParamsKeyEnum.KEY_DISPLAY_MIN_RSSI);
+        return task;
+    }
+
+    public static OrderTask setDisplayFilter1(@Nullable String filter) {
+        ParamsTask task = new ParamsTask();
+        task.setGatewayFilter(filter, ParamsKeyEnum.KEY_DISPLAY_FILTER1);
+        return task;
+    }
+
+    public static OrderTask setDisplayFilter2(@Nullable String filter) {
+        ParamsTask task = new ParamsTask();
+        task.setGatewayFilter(filter, ParamsKeyEnum.KEY_DISPLAY_FILTER2);
         return task;
     }
 

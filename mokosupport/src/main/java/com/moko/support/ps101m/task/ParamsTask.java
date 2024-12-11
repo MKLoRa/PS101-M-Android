@@ -3,6 +3,7 @@ package com.moko.support.ps101m.task;
 import android.text.TextUtils;
 
 import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.moko.ble.lib.task.OrderTask;
@@ -93,7 +94,7 @@ public class ParamsTask extends OrderTask {
         };
     }
 
-    public void setAxisDataReportEnable(int enable){
+    public void setAxisDataReportEnable(int enable) {
         response.responseValue = data = new byte[]{
                 (byte) 0xED,
                 (byte) 0x01,
@@ -1793,7 +1794,7 @@ public class ParamsTask extends OrderTask {
         };
     }
 
-    public void setContinuityTransferEnable(int enable){
+    public void setContinuityTransferEnable(int enable) {
         data = new byte[]{
                 (byte) 0xED,
                 (byte) 0x01,
@@ -2009,5 +2010,78 @@ public class ParamsTask extends OrderTask {
             }
         }
         MokoSupport.getInstance().sendDirectOrder(this);
+    }
+
+    //网关beacon参数
+    public void setGatewaySwitch(int enable) {
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_GATEWAY_SWITCH.getParamsKey(),
+                (byte) 0x01,
+                (byte) enable
+        };
+    }
+
+    public void setGracePeriod(@IntRange(from = 0, to = 65535) int period) {
+        byte[] bytes = MokoUtils.toByteArray(period, 2);
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_GRACE_PERIOD.getParamsKey(),
+                (byte) 0x02,
+                bytes[0],
+                bytes[1]
+        };
+    }
+
+    public void setBeaconMinDuration(@IntRange(from = 0, to = 255) int duration) {
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_BEACON_MIN_DURATION.getParamsKey(),
+                (byte) 0x01,
+                (byte) duration
+        };
+    }
+
+    public void setDisplayMinDuration(@IntRange(from = 0, to = 255) int duration) {
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_DISPLAY_MIN_DURATION.getParamsKey(),
+                (byte) 0x01,
+                (byte) duration
+        };
+    }
+
+    public void setGatewayMinRssi(@IntRange(from = -127, to = 0) int rssi, @NonNull ParamsKeyEnum keyEnum) {
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) keyEnum.getParamsKey(),
+                (byte) 0x01,
+                (byte) rssi
+        };
+    }
+
+    public void setGatewayFilter(@Nullable String filter, @NonNull ParamsKeyEnum keyEnum) {
+        if (TextUtils.isEmpty(filter)) {
+            response.responseValue = data = new byte[]{
+                    (byte) 0xED,
+                    (byte) 0x01,
+                    (byte) keyEnum.getParamsKey(),
+                    (byte) 0x00
+            };
+        } else {
+            byte[] bytes = filter.getBytes();
+            data = new byte[4 + bytes.length];
+            data[0] = (byte) 0xED;
+            data[1] = 0x01;
+            data[2] = (byte) keyEnum.getParamsKey();
+            data[3] = (byte) bytes.length;
+            System.arraycopy(bytes, 0, data, 4, bytes.length);
+            response.responseValue = data;
+        }
     }
 }

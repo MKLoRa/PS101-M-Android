@@ -307,6 +307,20 @@ public enum ParamsKeyEnum implements Serializable {
     KEY_CLEAR_STORAGE_DATA(0xC1),
     //暂停/恢复传输
     KEY_SYNC_ENABLE(0xC2),
+
+
+
+    //蓝牙网关参数
+    KEY_GATEWAY_SWITCH(0xF0),
+    KEY_GRACE_PERIOD(0xF1),
+    KEY_BEACON_MIN_DURATION(0xF2),
+    KEY_DISPLAY_MIN_DURATION(0xF3),
+    KEY_BEACON_MIN_RSSI(0xF4),
+    KEY_BEACON_FILTER1(0xF5),
+    KEY_BEACON_FILTER2(0xF6),
+    KEY_DISPLAY_MIN_RSSI(0xF7),
+    KEY_DISPLAY_FILTER1(0xF8),
+    KEY_DISPLAY_FILTER2(0xF9),
     ;
 
     private final int paramsKey;

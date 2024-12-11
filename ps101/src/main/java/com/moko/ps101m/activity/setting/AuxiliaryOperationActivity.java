@@ -24,6 +24,11 @@ public class AuxiliaryOperationActivity extends BaseActivity {
             if (isWindowLocked()) return;
             startActivity(new Intent(this, ThreeAxisDataReportActivity.class));
         });
+
+        mBind.tvBleGateway.setOnClickListener(v -> {
+            if (isWindowLocked()) return;
+            startActivity(new Intent(this, BleGatewayActivity.class));
+        });
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 200)
