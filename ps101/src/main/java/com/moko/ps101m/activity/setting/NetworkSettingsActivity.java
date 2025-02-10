@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.inputmethod.TextAppearanceInfo;
 import android.widget.RadioGroup;
 
 import androidx.annotation.IdRes;
@@ -93,7 +94,9 @@ public class NetworkSettingsActivity extends BaseActivity implements RadioGroup.
         mBind.etMqttClientId.setFilters(new InputFilter[]{new InputFilter.LengthFilter(64), inputFilter});
         mBind.etMqttSubscribeTopic.setFilters(new InputFilter[]{new InputFilter.LengthFilter(128), inputFilter});
         mBind.etMqttPublishTopic.setFilters(new InputFilter[]{new InputFilter.LengthFilter(128), inputFilter});
-        mBind.etApn.setFilters(new InputFilter[]{new InputFilter.LengthFilter(100), inputFilter});
+        mBind.etApn.setFilters(new InputFilter[]{new InputFilter.LengthFilter(59), inputFilter});
+        mBind.etApnUsername.setFilters(new InputFilter[]{new InputFilter.LengthFilter(99), inputFilter});
+        mBind.etApnPassword.setFilters(new InputFilter[]{new InputFilter.LengthFilter(99), inputFilter});
         createFragment();
         NetworkFragmentAdapter adapter = new NetworkFragmentAdapter(this);
         adapter.setFragmentList(fragments);
@@ -116,28 +119,28 @@ public class NetworkSettingsActivity extends BaseActivity implements RadioGroup.
         mBind.rgMqtt.setOnCheckedChangeListener(this);
         expertFilePath = getExternalFilesDir("mqttSetting").getAbsolutePath() + File.separator + "Settings_for_Device.xls";
         showSyncingProgressDialog();
-        mBind.title.postDelayed(() -> {
-            List<OrderTask> orderTasks = new ArrayList<>();
-            orderTasks.add(OrderTaskAssembler.getMQTTHost());
-            orderTasks.add(OrderTaskAssembler.getMQTTPort());
-            orderTasks.add(OrderTaskAssembler.getMQTTClientId());
-            orderTasks.add(OrderTaskAssembler.getMQTTSubscribeTopic());
-            orderTasks.add(OrderTaskAssembler.getMQTTPublishTopic());
-            orderTasks.add(OrderTaskAssembler.getMQTTCleanSession());
-            orderTasks.add(OrderTaskAssembler.getMQTTQos());
-            orderTasks.add(OrderTaskAssembler.getMQTTKeepAlive());
-            orderTasks.add(OrderTaskAssembler.getApn());
-            orderTasks.add(OrderTaskAssembler.getNetworkFormat());
-            orderTasks.add(OrderTaskAssembler.getMQTTUsername());
-            orderTasks.add(OrderTaskAssembler.getMQTTPassword());
-            orderTasks.add(OrderTaskAssembler.getMQTTConnectMode());
-            orderTasks.add(OrderTaskAssembler.getMQTTLwtEnable());
-            orderTasks.add(OrderTaskAssembler.getMQTTLwtRetain());
-            orderTasks.add(OrderTaskAssembler.getMQTTLwtQos());
-            orderTasks.add(OrderTaskAssembler.getMQTTLwtTopic());
-            orderTasks.add(OrderTaskAssembler.getMQTTLwtPayload());
-            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-        }, 500);
+        List<OrderTask> orderTasks = new ArrayList<>(20);
+        orderTasks.add(OrderTaskAssembler.getMQTTHost());
+        orderTasks.add(OrderTaskAssembler.getMQTTPort());
+        orderTasks.add(OrderTaskAssembler.getMQTTClientId());
+        orderTasks.add(OrderTaskAssembler.getMQTTSubscribeTopic());
+        orderTasks.add(OrderTaskAssembler.getMQTTPublishTopic());
+        orderTasks.add(OrderTaskAssembler.getMQTTCleanSession());
+        orderTasks.add(OrderTaskAssembler.getMQTTQos());
+        orderTasks.add(OrderTaskAssembler.getMQTTKeepAlive());
+        orderTasks.add(OrderTaskAssembler.getApn());
+        orderTasks.add(OrderTaskAssembler.getApnUsername());
+        orderTasks.add(OrderTaskAssembler.getApnPassword());
+        orderTasks.add(OrderTaskAssembler.getNetworkFormat());
+        orderTasks.add(OrderTaskAssembler.getMQTTUsername());
+        orderTasks.add(OrderTaskAssembler.getMQTTPassword());
+        orderTasks.add(OrderTaskAssembler.getMQTTConnectMode());
+        orderTasks.add(OrderTaskAssembler.getMQTTLwtEnable());
+        orderTasks.add(OrderTaskAssembler.getMQTTLwtRetain());
+        orderTasks.add(OrderTaskAssembler.getMQTTLwtQos());
+        orderTasks.add(OrderTaskAssembler.getMQTTLwtTopic());
+        orderTasks.add(OrderTaskAssembler.getMQTTLwtPayload());
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         mBind.tvNetworkFormat.setOnClickListener(v -> onNetworkFormatClick());
     }
 
@@ -246,6 +249,8 @@ public class NetworkSettingsActivity extends BaseActivity implements RadioGroup.
                                     case KEY_MQTT_QOS:
                                     case KEY_MQTT_KEEP_ALIVE:
                                     case KEY_APN:
+                                    case KEY_APN_USERNAME:
+                                    case KEY_APN_PASSWORD:
                                     case KEY_NETWORK_FORMAT:
                                     case KEY_CONNECT_MODE:
                                     case KEY_MQTT_LWT_ENABLE:
@@ -303,6 +308,14 @@ public class NetworkSettingsActivity extends BaseActivity implements RadioGroup.
                                     case KEY_APN:
                                         mBind.etApn.setText(new String(Arrays.copyOfRange(value, 4, value.length)));
                                         mBind.etApn.setSelection(mBind.etApn.getText().length());
+                                        break;
+                                    case KEY_APN_USERNAME:
+                                        mBind.etApnUsername.setText(new String(Arrays.copyOfRange(value, 4, value.length)));
+                                        mBind.etApnUsername.setSelection(mBind.etApnUsername.getText().length());
+                                        break;
+                                    case KEY_APN_PASSWORD:
+                                        mBind.etApnPassword.setText(new String(Arrays.copyOfRange(value, 4, value.length)));
+                                        mBind.etApnPassword.setSelection(mBind.etApnPassword.getText().length());
                                         break;
                                     case KEY_NETWORK_FORMAT:
                                         networkFormatSelect = value[4] & 0xff;
@@ -450,6 +463,10 @@ public class NetworkSettingsActivity extends BaseActivity implements RadioGroup.
             orderTasks.add(OrderTaskAssembler.setMQTTKeepAlive(generalFragment.getKeepAlive()));
             String apn = TextUtils.isEmpty(mBind.etApn.getText()) ? null : mBind.etApn.getText().toString().trim();
             orderTasks.add(OrderTaskAssembler.setApn(apn));
+            String apnUsername = TextUtils.isEmpty(mBind.etApnUsername.getText()) ? null : mBind.etApnUsername.getText().toString().trim();
+            String apnPassword = TextUtils.isEmpty(mBind.etApnPassword.getText()) ? null : mBind.etApnPassword.getText().toString().trim();
+            orderTasks.add(OrderTaskAssembler.setApnUsername(apnUsername));
+            orderTasks.add(OrderTaskAssembler.setApnPassword(apnPassword));
             orderTasks.add(OrderTaskAssembler.setNetworkFormat(networkFormatSelect));
             orderTasks.add(OrderTaskAssembler.setMQTTUsername(userFragment.getUsername()));
             orderTasks.add(OrderTaskAssembler.setMQTTPassword(userFragment.getPassword()));

@@ -39,24 +39,23 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:padding="10dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cl_version"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/white_ffffff"
-                android:padding="10dp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:background="@drawable/shape_radius_white_bg"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp">
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="50dp"
                     android:gravity="center_vertical"
                     android:text="Software Version"
                     android:textColor="@color/black_333333"
@@ -68,25 +67,25 @@
                 <TextView
                     android:id="@+id/tv_software_version"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="50dp"
                     android:gravity="center_vertical"
-                    android:text=""
                     android:textColor="@color/black_333333"
                     android:textSize="15sp"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="12313131231" />
 
                 <View
                     style="@style/divider_line"
                     android:layout_width="0dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="1dp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_software_version" />
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="50dp"
                     android:gravity="center_vertical"
                     android:text="Firmware Version"
                     android:textColor="@color/black_333333"
@@ -98,8 +97,8 @@
                 <TextView
                     android:id="@+id/tv_firmware_version"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="20dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="2dp"
                     android:layout_marginRight="90dp"
                     android:gravity="center_vertical"
                     android:textColor="@color/black_333333"
@@ -124,14 +123,14 @@
                 <View
                     style="@style/divider_line"
                     android:layout_width="0dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="1dp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_firmware_version" />
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="50dp"
                     android:gravity="center_vertical"
                     android:text="Hardware Version"
                     android:textColor="@color/black_333333"
@@ -143,13 +142,14 @@
                 <TextView
                     android:id="@+id/tv_hardware_version"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="20dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="2dp"
                     android:gravity="center_vertical"
                     android:textColor="@color/black_333333"
                     android:textSize="15sp"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_firmware_version" />
+                    app:layout_constraintTop_toBottomOf="@id/tv_firmware_version"
+                    tools:text="12313131231" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <LinearLayout
@@ -157,15 +157,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:background="@color/white_ffffff"
+                android:background="@drawable/shape_radius_white_bg"
                 android:orientation="horizontal"
                 android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                app:layout_constraintTop_toBottomOf="@+id/cl_version">
+                android:paddingEnd="10dp">
 
                 <TextView
                     android:layout_width="0px"
-                    android:layout_height="60dp"
+                    android:layout_height="50dp"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:text="Battery Voltage"
@@ -176,7 +175,7 @@
                 <TextView
                     android:id="@+id/tvBattery"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="50dp"
                     android:gravity="center_vertical"
                     android:textColor="@color/black_333333"
                     android:textSize="15sp"
@@ -185,18 +184,16 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cl_system"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:background="@color/white_ffffff"
-                android:padding="10dp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layoutBattery">
+                android:background="@drawable/shape_radius_white_bg"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp">
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="50dp"
                     android:gravity="center_vertical"
                     android:text="Mac Address"
                     android:textColor="@color/black_333333"
@@ -208,24 +205,25 @@
                 <TextView
                     android:id="@+id/tv_mac_address"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="50dp"
                     android:gravity="center_vertical"
                     android:textColor="@color/black_333333"
                     android:textSize="15sp"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="12313131231" />
 
                 <View
                     style="@style/divider_line"
                     android:layout_width="0dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="1dp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_mac_address" />
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="50dp"
                     android:gravity="center_vertical"
                     android:text="Product Model"
                     android:textColor="@color/black_333333"
@@ -237,27 +235,27 @@
                 <TextView
                     android:id="@+id/tv_product_model"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="20dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="2dp"
                     android:gravity="center_vertical"
                     android:textColor="@color/black_333333"
                     android:textSize="15sp"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_mac_address" />
+                    app:layout_constraintTop_toBottomOf="@id/tv_mac_address"
+                    tools:text="2222222" />
 
                 <View
                     style="@style/divider_line"
                     android:layout_width="0dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="1dp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_product_model" />
 
-
                 <TextView
                     android:id="@+id/textManufacture"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="50dp"
                     android:gravity="center_vertical"
                     android:text="Manufacturer"
                     android:textColor="@color/black_333333"
@@ -269,23 +267,92 @@
                 <TextView
                     android:id="@+id/tv_manufacture"
                     android:layout_width="0px"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="20dp"
-                    android:gravity="center_vertical|right"
-                    tools:text="13131313131313213213"
+                    android:layout_height="50dp"
                     android:layout_marginStart="10dp"
-                    app:layout_constraintLeft_toRightOf="@+id/textManufacture"
+                    android:layout_marginTop="2dp"
+                    android:gravity="center_vertical|right"
                     android:textColor="@color/black_333333"
                     android:textSize="15sp"
+                    app:layout_constraintLeft_toRightOf="@+id/textManufacture"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_product_model" />
+                    app:layout_constraintTop_toBottomOf="@id/tv_product_model"
+                    tools:text="13131313131313213213" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@color/white_ffffff"
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                android:paddingEnd="10dp"
+                android:paddingStart="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:text="ICCID"
+                        android:textColor="@color/black_333333"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvIccId"
+                        android:layout_width="0px"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical|right"
+                        android:textColor="@color/black_333333"
+                        android:textSize="15sp"
+                        tools:text="13131313131313213213" />
+                </LinearLayout>
+
+                <View
+                    style="@style/divider_line"
+                    android:layout_width="match_parent" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:text="IMEI"
+                        android:textColor="@color/black_333333"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvImei"
+                        android:layout_width="0px"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical|right"
+                        android:textColor="@color/black_333333"
+                        android:textSize="15sp"
+                        tools:text="13131313131313213213" />
+                </LinearLayout>
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/tv_debug"
-                android:layout_width="0dp"
-                android:layout_height="55dp"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
                 android:layout_marginTop="10dp"
                 android:background="@color/white_ffffff"
                 android:drawableRight="@drawable/ic_arrow_right"
@@ -296,18 +363,12 @@
                 android:text="Debugger Mode"
                 android:textColor="@color/black_333333"
                 android:textSize="15sp"
-                android:textStyle="bold"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/cl_system" />
+                android:textStyle="bold" />
 
             <View
-                android:layout_width="0dp"
-                android:layout_height="200dp"
-                android:onClick="onTest"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_debug" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:onClick="onTest" />
+        </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

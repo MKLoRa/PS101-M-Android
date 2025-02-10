@@ -61,6 +61,7 @@ public enum ParamsKeyEnum implements Serializable {
     //ntp同步时间间隔
     KEY_NTP_SYNC_INTERVAL(0x2C),
     KEY_CONTINUITY_TRANSFER_ENABLE(0x2D),
+    KEY_ICC_ID(0x2F),
 
 
 
@@ -234,10 +235,13 @@ public enum ParamsKeyEnum implements Serializable {
 
     ////网络通信参数
     //网络重连间隔
+    KEY_APN_USERNAME(0x88),
+    KEY_APN_PASSWORD(0x89),
     KEY_APN(0x90),
     KEY_NETWORK_FORMAT(0x91),
     KEY_DATA_COMMUNICATION_TYPE(0x92),
     KEY_NETWORK_RECONNECT_INTERVAL(0x93),
+    KEY_IMEI(0x94),
 
 
     //////

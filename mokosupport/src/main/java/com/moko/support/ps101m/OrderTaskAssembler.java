@@ -145,6 +145,12 @@ public class OrderTaskAssembler {
         return task;
     }
 
+    public static OrderTask getIccId(){
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.KEY_ICC_ID);
+        return task;
+    }
+
     public static OrderTask getMacAddress() {
         ParamsTask task = new ParamsTask();
         task.setData(ParamsKeyEnum.KEY_CHIP_MAC);
@@ -729,6 +735,12 @@ public class OrderTaskAssembler {
         return task;
     }
 
+    public static OrderTask getImei(){
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.KEY_IMEI);
+        return task;
+    }
+
     public static OrderTask getMQTTHost() {
         ParamsTask task = new ParamsTask();
         task.setData(ParamsKeyEnum.KEY_MQTT_HOST);
@@ -780,6 +792,18 @@ public class OrderTaskAssembler {
     public static OrderTask getApn() {
         ParamsTask task = new ParamsTask();
         task.setData(ParamsKeyEnum.KEY_APN);
+        return task;
+    }
+
+    public static OrderTask getApnUsername() {
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.KEY_APN_USERNAME);
+        return task;
+    }
+
+    public static OrderTask getApnPassword() {
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.KEY_APN_PASSWORD);
         return task;
     }
 
@@ -952,6 +976,18 @@ public class OrderTaskAssembler {
     public static OrderTask setApn(@Nullable String apn) {
         ParamsTask task = new ParamsTask();
         task.setApn(apn);
+        return task;
+    }
+
+    public static OrderTask setApnUsername(@Nullable String apnUsername){
+        ParamsTask task = new ParamsTask();
+        task.setApnUsername(apnUsername);
+        return task;
+    }
+
+    public static OrderTask setApnPassword(@Nullable String apnPassword){
+        ParamsTask task = new ParamsTask();
+        task.setApnPassword(apnPassword);
         return task;
     }
 

@@ -68,7 +68,7 @@ public class SystemInfoActivity extends BaseActivity {
         registerReceiver(mReceiver, filter);
         mReceiverTag = true;
         showSyncingProgressDialog();
-        List<OrderTask> orderTasks = new ArrayList<>();
+        List<OrderTask> orderTasks = new ArrayList<>(9);
         orderTasks.add(OrderTaskAssembler.getMacAddress());
         orderTasks.add(OrderTaskAssembler.getBattery());
         orderTasks.add(OrderTaskAssembler.getDeviceModel());
@@ -76,6 +76,8 @@ public class SystemInfoActivity extends BaseActivity {
         orderTasks.add(OrderTaskAssembler.getFirmwareVersion());
         orderTasks.add(OrderTaskAssembler.getHardwareVersion());
         orderTasks.add(OrderTaskAssembler.getManufacturer());
+        orderTasks.add(OrderTaskAssembler.getIccId());
+        orderTasks.add(OrderTaskAssembler.getImei());
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         DfuServiceListenerHelper.registerProgressListener(this, mDfuProgressListener);
     }
@@ -161,6 +163,18 @@ public class SystemInfoActivity extends BaseActivity {
                                             builder.insert(14, ":");
                                             mDeviceMac = builder.toString().toUpperCase();
                                             mBind.tvMacAddress.setText(mDeviceMac);
+                                        }
+                                        break;
+
+                                    case KEY_ICC_ID:
+                                        if (length > 0) {
+                                            mBind.tvIccId.setText(new String(Arrays.copyOfRange(value, 4, value.length)));
+                                        }
+                                        break;
+
+                                    case KEY_IMEI:
+                                        if (length > 0) {
+                                            mBind.tvImei.setText(new String(Arrays.copyOfRange(value, 4, value.length)));
                                         }
                                         break;
                                 }

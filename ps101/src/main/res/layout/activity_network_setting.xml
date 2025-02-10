@@ -324,8 +324,8 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginRight="12dp"
                     android:background="@drawable/shape_radius_edit_bg"
-                    android:hint="0-100 Characters"
-                    android:maxLength="100"
+                    android:hint="0-59 Characters"
+                    android:maxLength="59"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
                     android:singleLine="true"
@@ -335,7 +335,63 @@
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.75" />
+                    app:layout_constraintWidth_percent="0.7" />
+
+                <EditText
+                    android:id="@+id/etApnUsername"
+                    android:layout_width="0px"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/shape_radius_edit_bg"
+                    android:hint="0-99 Characters"
+                    android:maxLength="99"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:singleLine="true"
+                    android:textColor="@color/black_333333"
+                    android:textSize="15sp"
+                    app:layout_constraintLeft_toLeftOf="@+id/etApn"
+                    app:layout_constraintRight_toRightOf="@+id/etApn"
+                    app:layout_constraintTop_toBottomOf="@+id/etApn" />
+
+                <EditText
+                    android:id="@+id/etApnPassword"
+                    android:layout_width="0px"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/shape_radius_edit_bg"
+                    android:hint="0-99 Characters"
+                    android:maxLength="99"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:singleLine="true"
+                    android:textColor="@color/black_333333"
+                    android:textSize="15sp"
+                    app:layout_constraintLeft_toLeftOf="@+id/etApn"
+                    app:layout_constraintRight_toRightOf="@+id/etApn"
+                    app:layout_constraintTop_toBottomOf="@+id/etApnUsername" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="12dp"
+                    android:text="Password"
+                    android:textColor="@color/black_333333"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/etApnPassword"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/etApnPassword" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="12dp"
+                    android:text="Username"
+                    android:textColor="@color/black_333333"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/etApnUsername"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/etApnUsername" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -352,7 +408,7 @@
                     android:id="@+id/tvNetworkFormat"
                     android:layout_width="wrap_content"
                     android:layout_height="45dp"
-                    android:layout_marginTop="15dp"
+                    android:layout_marginTop="10dp"
                     android:layout_marginRight="12dp"
                     android:background="@drawable/shape_radius_blue_btn_bg"
                     android:gravity="center"
@@ -362,7 +418,7 @@
                     android:textColor="@color/white_ffffff"
                     android:textSize="15sp"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/etApn"
+                    app:layout_constraintTop_toBottomOf="@+id/etApnPassword"
                     tools:text="NB-IOT" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 

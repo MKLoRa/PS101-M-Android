@@ -93,7 +93,7 @@ public class ParamsTask extends OrderTask {
         };
     }
 
-    public void setAxisDataReportEnable(int enable){
+    public void setAxisDataReportEnable(int enable) {
         response.responseValue = data = new byte[]{
                 (byte) 0xED,
                 (byte) 0x01,
@@ -222,6 +222,48 @@ public class ParamsTask extends OrderTask {
                     (byte) 0xED,
                     (byte) 0x01,
                     (byte) ParamsKeyEnum.KEY_APN.getParamsKey(),
+                    (byte) 0x00
+            };
+        }
+        response.responseValue = data;
+    }
+
+    public void setApnUsername(@Nullable String apnUsername) {
+        if (!TextUtils.isEmpty(apnUsername)) {
+            byte[] bytes = apnUsername.getBytes();
+            int length = bytes.length;
+            data = new byte[length + 4];
+            data[0] = (byte) 0xED;
+            data[1] = (byte) 0x01;
+            data[2] = (byte) ParamsKeyEnum.KEY_APN_USERNAME.getParamsKey();
+            data[3] = (byte) length;
+            System.arraycopy(bytes, 0, data, 4, bytes.length);
+        } else {
+            data = new byte[]{
+                    (byte) 0xED,
+                    (byte) 0x01,
+                    (byte) ParamsKeyEnum.KEY_APN_USERNAME.getParamsKey(),
+                    (byte) 0x00
+            };
+        }
+        response.responseValue = data;
+    }
+
+    public void setApnPassword(@Nullable String apnPassword) {
+        if (!TextUtils.isEmpty(apnPassword)) {
+            byte[] bytes = apnPassword.getBytes();
+            int length = bytes.length;
+            data = new byte[length + 4];
+            data[0] = (byte) 0xED;
+            data[1] = (byte) 0x01;
+            data[2] = (byte) ParamsKeyEnum.KEY_APN_PASSWORD.getParamsKey();
+            data[3] = (byte) length;
+            System.arraycopy(bytes, 0, data, 4, bytes.length);
+        } else {
+            data = new byte[]{
+                    (byte) 0xED,
+                    (byte) 0x01,
+                    (byte) ParamsKeyEnum.KEY_APN_PASSWORD.getParamsKey(),
                     (byte) 0x00
             };
         }
@@ -1793,7 +1835,7 @@ public class ParamsTask extends OrderTask {
         };
     }
 
-    public void setContinuityTransferEnable(int enable){
+    public void setContinuityTransferEnable(int enable) {
         data = new byte[]{
                 (byte) 0xED,
                 (byte) 0x01,
