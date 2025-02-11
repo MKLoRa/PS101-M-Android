@@ -72,6 +72,7 @@ public class NetworkSettingsActivity extends BaseActivity implements RadioGroup.
     private final String[] netWorkFormatArray = {"NB-IOT", "eMTC", "NB-IOT->eMTC", "eMTC->NB-IOT"};
     private int networkFormatSelect;
     private boolean mReceiverTag;
+    private int version;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,13 +91,17 @@ public class NetworkSettingsActivity extends BaseActivity implements RadioGroup.
             }
             return null;
         };
+        version = getIntent().getIntExtra("version", 0);
         mBind.etMqttHost.setFilters(new InputFilter[]{new InputFilter.LengthFilter(64), inputFilter});
         mBind.etMqttClientId.setFilters(new InputFilter[]{new InputFilter.LengthFilter(64), inputFilter});
         mBind.etMqttSubscribeTopic.setFilters(new InputFilter[]{new InputFilter.LengthFilter(128), inputFilter});
         mBind.etMqttPublishTopic.setFilters(new InputFilter[]{new InputFilter.LengthFilter(128), inputFilter});
         mBind.etApn.setFilters(new InputFilter[]{new InputFilter.LengthFilter(59), inputFilter});
-        mBind.etApnUsername.setFilters(new InputFilter[]{new InputFilter.LengthFilter(99), inputFilter});
-        mBind.etApnPassword.setFilters(new InputFilter[]{new InputFilter.LengthFilter(99), inputFilter});
+        if (version >= 108) {
+            mBind.group.setVisibility(View.VISIBLE);
+            mBind.etApnUsername.setFilters(new InputFilter[]{new InputFilter.LengthFilter(99), inputFilter});
+            mBind.etApnPassword.setFilters(new InputFilter[]{new InputFilter.LengthFilter(99), inputFilter});
+        }
         createFragment();
         NetworkFragmentAdapter adapter = new NetworkFragmentAdapter(this);
         adapter.setFragmentList(fragments);
@@ -129,8 +134,10 @@ public class NetworkSettingsActivity extends BaseActivity implements RadioGroup.
         orderTasks.add(OrderTaskAssembler.getMQTTQos());
         orderTasks.add(OrderTaskAssembler.getMQTTKeepAlive());
         orderTasks.add(OrderTaskAssembler.getApn());
-        orderTasks.add(OrderTaskAssembler.getApnUsername());
-        orderTasks.add(OrderTaskAssembler.getApnPassword());
+        if (version >= 108) {
+            orderTasks.add(OrderTaskAssembler.getApnUsername());
+            orderTasks.add(OrderTaskAssembler.getApnPassword());
+        }
         orderTasks.add(OrderTaskAssembler.getNetworkFormat());
         orderTasks.add(OrderTaskAssembler.getMQTTUsername());
         orderTasks.add(OrderTaskAssembler.getMQTTPassword());
@@ -463,10 +470,12 @@ public class NetworkSettingsActivity extends BaseActivity implements RadioGroup.
             orderTasks.add(OrderTaskAssembler.setMQTTKeepAlive(generalFragment.getKeepAlive()));
             String apn = TextUtils.isEmpty(mBind.etApn.getText()) ? null : mBind.etApn.getText().toString().trim();
             orderTasks.add(OrderTaskAssembler.setApn(apn));
-            String apnUsername = TextUtils.isEmpty(mBind.etApnUsername.getText()) ? null : mBind.etApnUsername.getText().toString().trim();
-            String apnPassword = TextUtils.isEmpty(mBind.etApnPassword.getText()) ? null : mBind.etApnPassword.getText().toString().trim();
-            orderTasks.add(OrderTaskAssembler.setApnUsername(apnUsername));
-            orderTasks.add(OrderTaskAssembler.setApnPassword(apnPassword));
+            if (version >= 108) {
+                String apnUsername = TextUtils.isEmpty(mBind.etApnUsername.getText()) ? null : mBind.etApnUsername.getText().toString().trim();
+                String apnPassword = TextUtils.isEmpty(mBind.etApnPassword.getText()) ? null : mBind.etApnPassword.getText().toString().trim();
+                orderTasks.add(OrderTaskAssembler.setApnUsername(apnUsername));
+                orderTasks.add(OrderTaskAssembler.setApnPassword(apnPassword));
+            }
             orderTasks.add(OrderTaskAssembler.setNetworkFormat(networkFormatSelect));
             orderTasks.add(OrderTaskAssembler.setMQTTUsername(userFragment.getUsername()));
             orderTasks.add(OrderTaskAssembler.setMQTTPassword(userFragment.getPassword()));

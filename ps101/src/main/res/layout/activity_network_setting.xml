@@ -372,6 +372,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/etApnUsername" />
 
                 <TextView
+                    android:id="@+id/tvApnPassword"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="12dp"
@@ -383,6 +384,7 @@
                     app:layout_constraintTop_toTopOf="@+id/etApnPassword" />
 
                 <TextView
+                    android:id="@+id/tvApnUsername"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="12dp"
@@ -392,6 +394,13 @@
                     app:layout_constraintBottom_toBottomOf="@+id/etApnUsername"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/etApnUsername" />
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:constraint_referenced_ids="etApnUsername,etApnPassword,tvApnPassword,tvApnUsername" />
 
                 <TextView
                     android:layout_width="wrap_content"

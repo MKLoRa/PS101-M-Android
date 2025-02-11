@@ -281,12 +281,15 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <LinearLayout
+                android:id="@+id/layoutImei"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:background="@color/white_ffffff"
                 android:gravity="center_vertical"
                 android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible"
                 android:paddingEnd="10dp"
                 android:paddingStart="10dp">
 

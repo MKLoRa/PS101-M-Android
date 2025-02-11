@@ -32,6 +32,7 @@ import com.moko.ps101m.activity.setting.AuxiliaryOperationActivity;
 import com.moko.ps101m.activity.setting.AxisSettingActivity;
 import com.moko.ps101m.activity.setting.BleSettingsActivity;
 import com.moko.ps101m.activity.setting.DeviceModeActivity;
+import com.moko.ps101m.activity.setting.NetworkSettingsActivity;
 import com.moko.ps101m.databinding.ActivityDeviceInfoBinding;
 import com.moko.ps101m.dialog.AlertMessageDialog;
 import com.moko.ps101m.dialog.ChangePasswordDialog;
@@ -85,16 +86,15 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             MokoSupport.getInstance().enableBluetooth();
         } else {
             showSyncingProgressDialog();
-            mBind.frameContainer.postDelayed(() -> {
-                List<OrderTask> orderTasks = new ArrayList<>();
-                // sync time after connect success;
-                orderTasks.add(OrderTaskAssembler.setTime());
-                // get lora params
-                orderTasks.add(OrderTaskAssembler.getNetworkStatus());
-                orderTasks.add(OrderTaskAssembler.getMqttConnectionStatus());
-                orderTasks.add(OrderTaskAssembler.getNetworkReconnectInterval());
-                MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-            }, 300);
+            List<OrderTask> orderTasks = new ArrayList<>();
+            // sync time after connect success;
+            orderTasks.add(OrderTaskAssembler.setTime());
+            // get lora params
+            orderTasks.add(OrderTaskAssembler.getNetworkStatus());
+            orderTasks.add(OrderTaskAssembler.getMqttConnectionStatus());
+            orderTasks.add(OrderTaskAssembler.getNetworkReconnectInterval());
+            orderTasks.add(OrderTaskAssembler.getFirmwareVersion());
+            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         }
     }
 
@@ -275,10 +275,18 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                             }
                         }
                     }
+                } else if (orderCHAR == OrderCHAR.CHAR_FIRMWARE_REVISION) {
+                    String version = new String(value);
+                    String result = version.replaceAll("V", "").replaceAll("v", "").replaceAll("\\.", "");
+                    firmwareVersion = Integer.parseInt(result);
+                    if (null != networkFragment) {
+                        networkFragment.setVersion(firmwareVersion);
+                    }
                 }
             }
         });
     }
+    private int firmwareVersion;
 
     private void showAlertDialog(String title, String msg, String confirm) {
         AlertMessageDialog dialog = new AlertMessageDialog();
@@ -553,7 +561,9 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
 
     public void onDeviceInfo(View view) {
         if (isWindowLocked()) return;
-        launcher.launch(new Intent(this, SystemInfoActivity.class));
+        Intent intent = new Intent(this, SystemInfoActivity.class);
+        intent.putExtra("version", firmwareVersion);
+        launcher.launch(intent);
     }
 
     private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {

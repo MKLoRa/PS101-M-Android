@@ -67,6 +67,8 @@ public class SystemInfoActivity extends BaseActivity {
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(mReceiver, filter);
         mReceiverTag = true;
+        int version = getIntent().getIntExtra("version", 0);
+        if (version >= 108) mBind.layoutImei.setVisibility(View.VISIBLE);
         showSyncingProgressDialog();
         List<OrderTask> orderTasks = new ArrayList<>(9);
         orderTasks.add(OrderTaskAssembler.getMacAddress());
@@ -76,8 +78,10 @@ public class SystemInfoActivity extends BaseActivity {
         orderTasks.add(OrderTaskAssembler.getFirmwareVersion());
         orderTasks.add(OrderTaskAssembler.getHardwareVersion());
         orderTasks.add(OrderTaskAssembler.getManufacturer());
-        orderTasks.add(OrderTaskAssembler.getIccId());
-        orderTasks.add(OrderTaskAssembler.getImei());
+        if (version >= 108) {
+            orderTasks.add(OrderTaskAssembler.getIccId());
+            orderTasks.add(OrderTaskAssembler.getImei());
+        }
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         DfuServiceListenerHelper.registerProgressListener(this, mDfuProgressListener);
     }

@@ -17,6 +17,7 @@ import com.moko.ps101m.databinding.FragmentNetworkBinding;
 public class NetworkFragment extends Fragment {
     private static final String TAG = NetworkFragment.class.getSimpleName();
     private FragmentNetworkBinding mBind;
+    private int version;
 
     public NetworkFragment() {
     }
@@ -29,7 +30,11 @@ public class NetworkFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
         mBind = FragmentNetworkBinding.inflate(inflater, container, false);
-        mBind.tvNetworkSetting.setOnClickListener(v-> startActivity(new Intent(requireActivity(), NetworkSettingsActivity.class)));
+        mBind.tvNetworkSetting.setOnClickListener(v -> {
+            Intent intent = new Intent(requireActivity(), NetworkSettingsActivity.class);
+            intent.putExtra("version", version);
+            startActivity(intent);
+        });
         return mBind.getRoot();
     }
 
@@ -40,6 +45,10 @@ public class NetworkFragment extends Fragment {
 
     public void setMqttConnectionStatus(int status) {
         mBind.tvMqttConnectionStatus.setText(status == 1 ? "Connected" : "Connecting");
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
 
     public void setNetworkStatus(int networkCheck) {
@@ -65,7 +74,7 @@ public class NetworkFragment extends Fragment {
         return interval <= 100;
     }
 
-    public int getReconnectInterval(){
+    public int getReconnectInterval() {
         return Integer.parseInt(mBind.etInterval.getText().toString());
     }
 }
