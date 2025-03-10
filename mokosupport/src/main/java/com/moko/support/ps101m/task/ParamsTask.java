@@ -2084,4 +2084,36 @@ public class ParamsTask extends OrderTask {
             response.responseValue = data;
         }
     }
+
+    public void setDisplayUpdateMode(int mode) {
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_DISPLAY_UPDATE_MODE.getParamsKey(),
+                (byte) 0x01,
+                (byte) mode
+        };
+    }
+
+    public void setDisplayUpdatePins(int pins) {
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_DISPLAY_UPDATE_PINS.getParamsKey(),
+                (byte) 0x01,
+                (byte) pins
+        };
+    }
+
+    public void setDisplayUpdateDuration(int duration) {
+        byte[] bytes = MokoUtils.toByteArray(duration, 2);
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_DISPLAY_UPDATE_DURATION.getParamsKey(),
+                (byte) 0x02,
+                bytes[0],
+                bytes[1]
+        };
+    }
 }

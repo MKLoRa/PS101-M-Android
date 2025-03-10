@@ -20,6 +20,7 @@ import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.ps101m.R;
 import com.moko.ps101m.activity.BaseActivity;
 import com.moko.ps101m.databinding.ActivityBleGatewayBinding;
+import com.moko.ps101m.dialog.BottomDialog;
 import com.moko.ps101m.utils.ToastUtils;
 import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
@@ -44,6 +45,8 @@ public class BleGatewayActivity extends BaseActivity implements SeekBar.OnSeekBa
     private boolean mReceiverTag = false;
     private final String FILTER_ASCII = "[ -~]*";
     private boolean isParamsError;
+    private final String[] modeValues = {"False", "True"};
+    private int mSelected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +70,7 @@ public class BleGatewayActivity extends BaseActivity implements SeekBar.OnSeekBa
         mBind.sbBeaconMinRssi.setOnSeekBarChangeListener(this);
         mBind.sbDisplayMinRssi.setOnSeekBarChangeListener(this);
         showSyncingProgressDialog();
-        List<OrderTask> orderTasks = new ArrayList<>(10);
+        List<OrderTask> orderTasks = new ArrayList<>(14);
         orderTasks.add(OrderTaskAssembler.getGatewaySwitch());
         orderTasks.add(OrderTaskAssembler.getGracePeriod());
         orderTasks.add(OrderTaskAssembler.getBeaconMinDuration());
@@ -78,7 +81,20 @@ public class BleGatewayActivity extends BaseActivity implements SeekBar.OnSeekBa
         orderTasks.add(OrderTaskAssembler.getDisplayMinRssi());
         orderTasks.add(OrderTaskAssembler.getDisplayFilter1());
         orderTasks.add(OrderTaskAssembler.getDisplayFilter2());
+        orderTasks.add(OrderTaskAssembler.getDisplayUpdateMode());
+        orderTasks.add(OrderTaskAssembler.getDisplayUpdatePins());
+        orderTasks.add(OrderTaskAssembler.getDisplayUpdateDuration());
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[0]));
+
+        mBind.tvDisplayUpdateMode.setOnClickListener(v -> {
+            BottomDialog dialog = new BottomDialog();
+            dialog.setDatas(new ArrayList<>(Arrays.asList(modeValues)), mSelected);
+            dialog.setListener(value -> {
+                mSelected = value;
+                mBind.tvDisplayUpdateMode.setText(modeValues[value]);
+            });
+            dialog.show(getSupportFragmentManager());
+        });
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 300)
@@ -125,6 +141,9 @@ public class BleGatewayActivity extends BaseActivity implements SeekBar.OnSeekBa
                                 case KEY_BEACON_FILTER2:
                                 case KEY_DISPLAY_MIN_DURATION:
                                 case KEY_DISPLAY_MIN_RSSI:
+                                case KEY_DISPLAY_UPDATE_MODE:
+                                case KEY_DISPLAY_UPDATE_PINS:
+                                case KEY_DISPLAY_UPDATE_DURATION:
                                 case KEY_DISPLAY_FILTER1:
                                     if (result != 0x01) isParamsError = true;
                                     break;
@@ -132,7 +151,7 @@ public class BleGatewayActivity extends BaseActivity implements SeekBar.OnSeekBa
                                 case KEY_DISPLAY_FILTER2:
                                     if (result != 0x01) isParamsError = true;
                                     if (isParamsError) {
-                                        ToastUtils.showToast(BleGatewayActivity.this, "Opps！Save failed. Please check the input characters and try again.");
+                                        ToastUtils.showToast(this, "Opps！Save failed. Please check the input characters and try again.");
                                     } else {
                                         ToastUtils.showToast(this, "Save Successfully！");
                                     }
@@ -190,6 +209,22 @@ public class BleGatewayActivity extends BaseActivity implements SeekBar.OnSeekBa
                                     mBind.etDisplayFilter2.setText(new String(Arrays.copyOfRange(value, 4, value.length)));
                                     mBind.etDisplayFilter2.setSelection(mBind.etDisplayFilter2.getText().length());
                                     break;
+
+                                case KEY_DISPLAY_UPDATE_MODE:
+                                    mSelected = value[4];
+                                    mBind.tvDisplayUpdateMode.setText(modeValues[mSelected]);
+                                    break;
+
+                                case KEY_DISPLAY_UPDATE_PINS:
+                                    mBind.etDisplayUpdatePins.setText((MokoUtils.byte2HexString(value[4])));
+                                    mBind.etDisplayUpdatePins.setSelection(mBind.etDisplayUpdatePins.getText().length());
+                                    break;
+
+                                case KEY_DISPLAY_UPDATE_DURATION:
+                                    int duration = MokoUtils.toInt(Arrays.copyOfRange(value, 4, value.length));
+                                    mBind.etDisplayUpdateDuration.setText(String.valueOf(duration));
+                                    mBind.etDisplayUpdateDuration.setSelection(mBind.etDisplayUpdateDuration.getText().length());
+                                    break;
                             }
                         }
                     }
@@ -218,7 +253,7 @@ public class BleGatewayActivity extends BaseActivity implements SeekBar.OnSeekBa
         if (isValid()) {
             isParamsError = false;
             showSyncingProgressDialog();
-            List<OrderTask> orderTasks = new ArrayList<>(10);
+            List<OrderTask> orderTasks = new ArrayList<>(14);
             orderTasks.add(OrderTaskAssembler.setGatewaySwitch(mBind.cbFunSwitch.isChecked() ? 1 : 0));
             orderTasks.add(OrderTaskAssembler.setGracePeriod(Integer.parseInt(mBind.etGracePeriod.getText().toString())));
             orderTasks.add(OrderTaskAssembler.setBeaconMinDuration(Integer.parseInt(mBind.etBeaconMinDuration.getText().toString())));
@@ -231,6 +266,10 @@ public class BleGatewayActivity extends BaseActivity implements SeekBar.OnSeekBa
             orderTasks.add(OrderTaskAssembler.setDisplayMinRssi(mBind.sbDisplayMinRssi.getProgress() - 127));
             String displayFilter1 = TextUtils.isEmpty(mBind.etDisplayFilter1.getText()) ? null : mBind.etDisplayFilter1.getText().toString();
             String displayFilter2 = TextUtils.isEmpty(mBind.etDisplayFilter2.getText()) ? null : mBind.etDisplayFilter2.getText().toString();
+            orderTasks.add(OrderTaskAssembler.setDisplayUpdateMode(mSelected));
+            orderTasks.add(OrderTaskAssembler.setDisplayUpdatePins(Integer.parseInt(mBind.etDisplayUpdatePins.getText().toString(), 16)));
+            orderTasks.add(OrderTaskAssembler.setDisplayUpdateDuration(Integer.parseInt(mBind.etDisplayUpdateDuration.getText().toString())));
+
             orderTasks.add(OrderTaskAssembler.setDisplayFilter1(displayFilter1));
             orderTasks.add(OrderTaskAssembler.setDisplayFilter2(displayFilter2));
             MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[0]));
@@ -241,8 +280,20 @@ public class BleGatewayActivity extends BaseActivity implements SeekBar.OnSeekBa
 
     private boolean isValid() {
         if (TextUtils.isEmpty(mBind.etGracePeriod.getText())) return false;
+        int gracePeriod = Integer.parseInt(mBind.etGracePeriod.getText().toString());
+        if (gracePeriod > 65535) return false;
         if (TextUtils.isEmpty(mBind.etBeaconMinDuration.getText())) return false;
-        return !TextUtils.isEmpty(mBind.etDisplayMinDuration.getText());
+        int beaconMinDur = Integer.parseInt(mBind.etBeaconMinDuration.getText().toString());
+        if (beaconMinDur > 255) return false;
+        if (TextUtils.isEmpty(mBind.etDisplayMinDuration.getText())) return false;
+        int displayMin = Integer.parseInt(mBind.etDisplayMinDuration.getText().toString());
+        if (displayMin > 255) return false;
+        if (TextUtils.isEmpty(mBind.etDisplayUpdatePins.getText())) return false;
+        int updatePins = Integer.parseInt(mBind.etDisplayUpdatePins.getText().toString(), 16);
+        if (updatePins > 0xff) return false;
+        if (TextUtils.isEmpty(mBind.etDisplayUpdateDuration.getText())) return false;
+        int updateDur = Integer.parseInt(mBind.etDisplayUpdateDuration.getText().toString());
+        return updateDur <= 65535;
     }
 
     @Override

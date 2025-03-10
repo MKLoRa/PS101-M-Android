@@ -321,6 +321,9 @@ public enum ParamsKeyEnum implements Serializable {
     KEY_DISPLAY_MIN_RSSI(0xF7),
     KEY_DISPLAY_FILTER1(0xF8),
     KEY_DISPLAY_FILTER2(0xF9),
+    KEY_DISPLAY_UPDATE_MODE(0xFA),
+    KEY_DISPLAY_UPDATE_PINS(0xFB),
+    KEY_DISPLAY_UPDATE_DURATION(0xFC),
     ;
 
     private final int paramsKey;

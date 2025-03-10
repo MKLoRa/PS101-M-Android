@@ -1788,6 +1788,24 @@ public class OrderTaskAssembler {
         return task;
     }
 
+    public static OrderTask getDisplayUpdateMode(){
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.KEY_DISPLAY_UPDATE_MODE);
+        return task;
+    }
+
+    public static OrderTask getDisplayUpdatePins(){
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.KEY_DISPLAY_UPDATE_PINS);
+        return task;
+    }
+
+    public static OrderTask getDisplayUpdateDuration(){
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.KEY_DISPLAY_UPDATE_DURATION);
+        return task;
+    }
+
     public static OrderTask setGatewaySwitch(int enable) {
         ParamsTask task = new ParamsTask();
         task.setGatewaySwitch(enable);
@@ -1845,6 +1863,24 @@ public class OrderTaskAssembler {
     public static OrderTask setDisplayFilter2(@Nullable String filter) {
         ParamsTask task = new ParamsTask();
         task.setGatewayFilter(filter, ParamsKeyEnum.KEY_DISPLAY_FILTER2);
+        return task;
+    }
+
+    public static OrderTask setDisplayUpdateMode(int mode) {
+        ParamsTask task = new ParamsTask();
+        task.setDisplayUpdateMode(mode);
+        return task;
+    }
+
+    public static OrderTask setDisplayUpdatePins(int pins) {
+        ParamsTask task = new ParamsTask();
+        task.setDisplayUpdatePins(pins);
+        return task;
+    }
+
+    public static OrderTask setDisplayUpdateDuration(int duration) {
+        ParamsTask task = new ParamsTask();
+        task.setDisplayUpdateDuration(duration);
         return task;
     }
 
