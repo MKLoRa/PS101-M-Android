@@ -18,7 +18,7 @@ import androidx.fragment.app.Fragment;
 import com.moko.ps101m.R;
 import com.moko.ps101m.activity.BaseActivity;
 import com.moko.ps101m.databinding.FragmentSslDeviceBinding;
-import com.moko.ps101m.dialog.BottomDialog;
+import com.moko.lib.loraui.dialog.BottomDialog;
 import com.moko.ps101m.utils.FileUtils;
 import com.moko.ps101m.utils.ToastUtils;
 

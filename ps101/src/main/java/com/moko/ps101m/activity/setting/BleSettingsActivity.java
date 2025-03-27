@@ -14,7 +14,7 @@ import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ps101m.R;
 import com.moko.ps101m.activity.BaseActivity;
 import com.moko.ps101m.databinding.ActivityBleSettingsBinding;
-import com.moko.ps101m.dialog.ChangePasswordDialog;
+import com.moko.lib.loraui.dialog.ChangePasswordDialog;
 import com.moko.ps101m.entity.TxPowerEnum;
 import com.moko.ps101m.utils.ToastUtils;
 import com.moko.support.ps101m.MokoSupport;

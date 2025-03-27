@@ -25,7 +25,7 @@ import com.moko.ps101m.R;
 import com.moko.ps101m.activity.BaseActivity;
 import com.moko.ps101m.adapter.TimePointAdapter;
 import com.moko.ps101m.databinding.ActivityTimingModeBinding;
-import com.moko.ps101m.dialog.BottomDialog;
+import com.moko.lib.loraui.dialog.BottomDialog;
 import com.moko.ps101m.entity.TimePoint;
 import com.moko.ps101m.utils.ToastUtils;
 import com.moko.support.ps101m.MokoSupport;

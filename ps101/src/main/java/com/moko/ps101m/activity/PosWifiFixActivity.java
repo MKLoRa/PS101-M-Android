@@ -18,7 +18,7 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ps101m.R;
 import com.moko.ps101m.databinding.ActivityPosWifiBinding;
-import com.moko.ps101m.dialog.BottomDialog;
+import com.moko.lib.loraui.dialog.BottomDialog;
 import com.moko.ps101m.utils.ToastUtils;
 import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;

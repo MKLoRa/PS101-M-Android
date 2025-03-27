@@ -16,7 +16,7 @@ import com.moko.ps101m.R;
 import com.moko.ps101m.activity.DeviceInfoActivity;
 import com.moko.ps101m.activity.setting.NtpSeverSettingActivity;
 import com.moko.ps101m.databinding.FragmentDeviceBinding;
-import com.moko.ps101m.dialog.BottomDialog;
+import com.moko.lib.loraui.dialog.BottomDialog;
 import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 

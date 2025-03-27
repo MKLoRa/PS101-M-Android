@@ -14,7 +14,7 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ps101m.activity.BaseActivity;
 import com.moko.ps101m.databinding.ActivityDownlinkForPosBinding;
-import com.moko.ps101m.dialog.BottomDialog;
+import com.moko.lib.loraui.dialog.BottomDialog;
 import com.moko.ps101m.utils.ToastUtils;
 import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;

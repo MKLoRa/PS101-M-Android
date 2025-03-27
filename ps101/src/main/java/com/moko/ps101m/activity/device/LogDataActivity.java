@@ -17,7 +17,7 @@ import com.moko.ps101m.activity.BaseActivity;
 import com.moko.ps101m.activity.Ps101MainActivity;
 import com.moko.ps101m.adapter.LogDataListAdapter;
 import com.moko.ps101m.databinding.ActivityLogDataBinding;
-import com.moko.ps101m.dialog.AlertMessageDialog;
+import com.moko.lib.loraui.dialog.AlertMessageDialog;
 import com.moko.ps101m.entity.LogData;
 import com.moko.ps101m.utils.Utils;
 import com.moko.support.ps101m.MokoSupport;

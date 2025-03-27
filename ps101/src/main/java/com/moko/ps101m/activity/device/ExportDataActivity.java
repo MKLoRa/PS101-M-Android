@@ -24,7 +24,7 @@ import com.moko.ps101m.activity.BaseActivity;
 import com.moko.ps101m.activity.Ps101MainActivity;
 import com.moko.ps101m.adapter.ExportDataListAdapter;
 import com.moko.ps101m.databinding.ActivityExportDataBinding;
-import com.moko.ps101m.dialog.AlertMessageDialog;
+import com.moko.lib.loraui.dialog.AlertMessageDialog;
 import com.moko.ps101m.utils.ToastUtils;
 import com.moko.ps101m.utils.Utils;
 import com.moko.support.ps101m.MokoSupport;
