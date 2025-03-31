@@ -84,6 +84,7 @@ public class BleGatewayActivity extends BaseActivity implements SeekBar.OnSeekBa
         orderTasks.add(OrderTaskAssembler.getDisplayUpdateMode());
         orderTasks.add(OrderTaskAssembler.getDisplayUpdatePins());
         orderTasks.add(OrderTaskAssembler.getDisplayUpdateDuration());
+        orderTasks.add(OrderTaskAssembler.getDisplayUpdateInterval());
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[0]));
 
         mBind.tvDisplayUpdateMode.setOnClickListener(v -> {
@@ -144,6 +145,7 @@ public class BleGatewayActivity extends BaseActivity implements SeekBar.OnSeekBa
                                 case KEY_DISPLAY_UPDATE_MODE:
                                 case KEY_DISPLAY_UPDATE_PINS:
                                 case KEY_DISPLAY_UPDATE_DURATION:
+                                case KEY_DISPLAY_UPDATE_INTERVAL:
                                 case KEY_DISPLAY_FILTER1:
                                     if (result != 0x01) isParamsError = true;
                                     break;
@@ -225,6 +227,10 @@ public class BleGatewayActivity extends BaseActivity implements SeekBar.OnSeekBa
                                     mBind.etDisplayUpdateDuration.setText(String.valueOf(duration));
                                     mBind.etDisplayUpdateDuration.setSelection(mBind.etDisplayUpdateDuration.getText().length());
                                     break;
+                                case KEY_DISPLAY_UPDATE_INTERVAL:
+                                    mBind.etDisplayUpdateInterval.setText(String.valueOf(value[4] & 0xff));
+                                    mBind.etDisplayUpdateInterval.setSelection(mBind.etDisplayUpdateInterval.getText().length());
+                                    break;
                             }
                         }
                     }
@@ -269,6 +275,7 @@ public class BleGatewayActivity extends BaseActivity implements SeekBar.OnSeekBa
             orderTasks.add(OrderTaskAssembler.setDisplayUpdateMode(mSelected));
             orderTasks.add(OrderTaskAssembler.setDisplayUpdatePins(Integer.parseInt(mBind.etDisplayUpdatePins.getText().toString(), 16)));
             orderTasks.add(OrderTaskAssembler.setDisplayUpdateDuration(Integer.parseInt(mBind.etDisplayUpdateDuration.getText().toString())));
+            orderTasks.add(OrderTaskAssembler.setDisplayUpdateInterval(Integer.parseInt(mBind.etDisplayUpdateInterval.getText().toString())));
 
             orderTasks.add(OrderTaskAssembler.setDisplayFilter1(displayFilter1));
             orderTasks.add(OrderTaskAssembler.setDisplayFilter2(displayFilter2));
@@ -293,7 +300,9 @@ public class BleGatewayActivity extends BaseActivity implements SeekBar.OnSeekBa
         if (updatePins > 0xff) return false;
         if (TextUtils.isEmpty(mBind.etDisplayUpdateDuration.getText())) return false;
         int updateDur = Integer.parseInt(mBind.etDisplayUpdateDuration.getText().toString());
-        return updateDur <= 65535;
+        if (updateDur > 65535) return false;
+        int updateInterval = Integer.parseInt(mBind.etDisplayUpdateInterval.getText().toString());
+        return updateInterval <= 255;
     }
 
     @Override

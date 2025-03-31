@@ -1805,6 +1805,11 @@ public class OrderTaskAssembler {
         task.setData(ParamsKeyEnum.KEY_DISPLAY_UPDATE_DURATION);
         return task;
     }
+    public static OrderTask getDisplayUpdateInterval(){
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.KEY_DISPLAY_UPDATE_INTERVAL);
+        return task;
+    }
 
     public static OrderTask setGatewaySwitch(int enable) {
         ParamsTask task = new ParamsTask();
@@ -1881,6 +1886,11 @@ public class OrderTaskAssembler {
     public static OrderTask setDisplayUpdateDuration(int duration) {
         ParamsTask task = new ParamsTask();
         task.setDisplayUpdateDuration(duration);
+        return task;
+    }
+    public static OrderTask setDisplayUpdateInterval(int interval) {
+        ParamsTask task = new ParamsTask();
+        task.setDisplayUpdateInterval(interval);
         return task;
     }
 

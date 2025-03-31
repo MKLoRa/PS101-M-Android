@@ -2116,4 +2116,13 @@ public class ParamsTask extends OrderTask {
                 bytes[1]
         };
     }
+    public void setDisplayUpdateInterval(int interval) {
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_DISPLAY_UPDATE_INTERVAL.getParamsKey(),
+                (byte) 0x01,
+                (byte) interval
+        };
+    }
 }

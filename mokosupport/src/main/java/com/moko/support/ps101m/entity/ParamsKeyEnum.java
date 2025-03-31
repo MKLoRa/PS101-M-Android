@@ -324,6 +324,7 @@ public enum ParamsKeyEnum implements Serializable {
     KEY_DISPLAY_UPDATE_MODE(0xFA),
     KEY_DISPLAY_UPDATE_PINS(0xFB),
     KEY_DISPLAY_UPDATE_DURATION(0xFC),
+    KEY_DISPLAY_UPDATE_INTERVAL(0xFD),
     ;
 
     private final int paramsKey;
