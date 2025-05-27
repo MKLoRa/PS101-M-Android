@@ -41,7 +41,7 @@ import com.moko.lib.loraui.dialog.ScanFilterDialog;
 import com.moko.ps101m.entity.AdvInfo;
 import com.moko.ps101m.utils.AdvInfoAnalysisImpl;
 import com.moko.ps101m.utils.SPUtiles;
-import com.moko.ps101m.utils.ToastUtils;
+import com.moko.lib.loraui.utils.ToastUtils;
 import com.moko.support.ps101m.MokoBleScanner;
 import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
@@ -97,7 +97,7 @@ public class Ps101MainActivity extends BaseActivity implements MokoScanDeviceCal
             PATH_LOGCAT = getFilesDir().getAbsolutePath() + File.separator + (BuildConfig.IS_LIBRARY ? "MKLoRa" : "PS101M");
         }
         MokoSupport.getInstance().init(getApplicationContext());
-        mSavedPassword = SPUtiles.getStringValue(this, AppConstants.SP_KEY_SAVED_PASSWORD_LW006, "");
+        mSavedPassword = SPUtiles.getStringValue(this, AppConstants.SP_KEY_SAVED_PASSWORD_PS101, "");
         beaconInfoHashMap = new ConcurrentHashMap<>();
         beaconInfos = new ArrayList<>();
         adapter = new DeviceListAdapter();
@@ -437,7 +437,7 @@ public class Ps101MainActivity extends BaseActivity implements MokoScanDeviceCal
                         int result = value[4] & 0xFF;
                         if (1 == result) {
                             mSavedPassword = mPassword;
-                            SPUtiles.setStringValue(this, AppConstants.SP_KEY_SAVED_PASSWORD_LW006, mSavedPassword);
+                            SPUtiles.setStringValue(this, AppConstants.SP_KEY_SAVED_PASSWORD_PS101, mSavedPassword);
                             XLog.i("Success");
                             Intent i = new Intent(this, DeviceInfoActivity.class);
                             launcher.launch(i);

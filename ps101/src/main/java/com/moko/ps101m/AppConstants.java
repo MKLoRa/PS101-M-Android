@@ -11,10 +11,10 @@ public class AppConstants {
     public static final String PATTERN_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
     // action
     // sp
-    public static final String SP_NAME = "sp_name_ps101";
+    public static final String SP_NAME = "sp_name_sp101m";
 
     public static final String SP_KEY_DEVICE_ADDRESS = "sp_key_device_address";
-    public static final String SP_KEY_SAVED_PASSWORD_LW006 = "SP_KEY_SAVED_PASSWORD_LW006";
+    public static final String SP_KEY_SAVED_PASSWORD_PS101 = "SP_KEY_SAVED_PASSWORD_PS101";
     // extra_key
     // 设备列表\
     public static final String EXTRA_KEY_DEVICE_PARAM = "EXTRA_KEY_DEVICE_PARAM";

@@ -30,7 +30,7 @@ import com.moko.ps101m.activity.BaseActivity;
 import com.moko.ps101m.databinding.ActivitySystemInfoBinding;
 import com.moko.ps101m.service.DfuService;
 import com.moko.ps101m.utils.FileUtils;
-import com.moko.ps101m.utils.ToastUtils;
+import com.moko.lib.loraui.utils.ToastUtils;
 import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;

@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.moko.ps101m.databinding.FragmentGeneralDeviceBinding;
-import com.moko.ps101m.utils.ToastUtils;
+import com.moko.lib.loraui.utils.ToastUtils;
 
 public class GeneralDeviceFragment extends Fragment {
     private static final String TAG = GeneralDeviceFragment.class.getSimpleName();

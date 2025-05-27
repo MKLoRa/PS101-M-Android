@@ -20,7 +20,7 @@ import com.moko.ps101m.activity.BaseActivity;
 import com.moko.ps101m.databinding.FragmentSslDeviceBinding;
 import com.moko.lib.loraui.dialog.BottomDialog;
 import com.moko.ps101m.utils.FileUtils;
-import com.moko.ps101m.utils.ToastUtils;
+import com.moko.lib.loraui.utils.ToastUtils;
 
 import java.io.File;
 import java.util.ArrayList;

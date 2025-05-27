@@ -40,7 +40,7 @@ import com.moko.ps101m.fragment.DeviceFragment;
 import com.moko.ps101m.fragment.GeneralFragment;
 import com.moko.ps101m.fragment.NetworkFragment;
 import com.moko.ps101m.fragment.PositionFragment;
-import com.moko.ps101m.utils.ToastUtils;
+import com.moko.lib.loraui.utils.ToastUtils;
 import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
