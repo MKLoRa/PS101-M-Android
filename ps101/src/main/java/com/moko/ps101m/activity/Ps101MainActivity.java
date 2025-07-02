@@ -16,32 +16,26 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.elvishew.xlog.XLog;
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTaskResponse;
+import com.moko.lib.loraui.dialog.AlertMessageDialog;
+import com.moko.lib.loraui.dialog.LoadingMessageDialog;
+import com.moko.lib.loraui.dialog.PasswordDialog;
+import com.moko.lib.loraui.dialog.ScanFilterDialog;
+import com.moko.lib.loraui.utils.ToastUtils;
 import com.moko.ps101m.AppConstants;
 import com.moko.ps101m.BuildConfig;
 import com.moko.ps101m.R;
 import com.moko.ps101m.activity.device.LogDataActivity;
 import com.moko.ps101m.adapter.DeviceListAdapter;
 import com.moko.ps101m.databinding.Ps101ActivityMainBinding;
-import com.moko.lib.loraui.dialog.AlertMessageDialog;
-import com.moko.lib.loraui.dialog.LoadingMessageDialog;
-import com.moko.lib.loraui.dialog.PasswordDialog;
-import com.moko.lib.loraui.dialog.ScanFilterDialog;
 import com.moko.ps101m.entity.AdvInfo;
 import com.moko.ps101m.utils.AdvInfoAnalysisImpl;
 import com.moko.ps101m.utils.SPUtiles;
-import com.moko.lib.loraui.utils.ToastUtils;
 import com.moko.support.ps101m.MokoBleScanner;
 import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
@@ -60,6 +54,12 @@ import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 public class Ps101MainActivity extends BaseActivity implements MokoScanDeviceCallback, BaseQuickAdapter.OnItemChildClickListener {
     private Ps101ActivityMainBinding mBind;

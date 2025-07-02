@@ -18,6 +18,7 @@ public class NetworkFragment extends Fragment {
     private static final String TAG = NetworkFragment.class.getSimpleName();
     private FragmentNetworkBinding mBind;
     private int version;
+    private int mNetworkStatus;
 
     public NetworkFragment() {
     }
@@ -45,6 +46,7 @@ public class NetworkFragment extends Fragment {
 
     public void setMqttConnectionStatus(int status) {
         mBind.tvMqttConnectionStatus.setText(status == 1 ? "Connected" : "Connecting");
+        mBind.tvSyncDevices2Cloud.setVisibility(status == 1 && mNetworkStatus == 1 ? View.VISIBLE : View.GONE);
     }
 
     public void setVersion(int version) {
@@ -52,6 +54,7 @@ public class NetworkFragment extends Fragment {
     }
 
     public void setNetworkStatus(int networkCheck) {
+        mNetworkStatus = networkCheck;
         String networkCheckDisPlay = "";
         switch (networkCheck) {
             case 0:

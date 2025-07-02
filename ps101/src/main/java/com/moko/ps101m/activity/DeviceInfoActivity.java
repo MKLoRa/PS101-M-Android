@@ -11,17 +11,31 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.RadioGroup;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.IdRes;
-import androidx.fragment.app.FragmentManager;
-
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpHeaders;
+import com.lzy.okgo.model.Response;
+import com.lzy.okgo.request.base.Request;
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
+import com.moko.lib.loraiot.IoTDMConstants;
+import com.moko.lib.loraiot.Urls;
+import com.moko.lib.loraiot.activity.SyncDeviceActivity;
+import com.moko.lib.loraiot.dialog.LoginDialog;
+import com.moko.lib.loraiot.entity.CommonResp;
+import com.moko.lib.loraiot.entity.LoginEntity;
+import com.moko.lib.loraiot.entity.SyncDevice;
+import com.moko.lib.loraiot.utils.IoTDMSPUtils;
+import com.moko.lib.loraui.dialog.AlertMessageDialog;
+import com.moko.lib.loraui.dialog.ChangePasswordDialog;
+import com.moko.lib.loraui.utils.ToastUtils;
 import com.moko.ps101m.AppConstants;
 import com.moko.ps101m.R;
 import com.moko.ps101m.activity.device.ExportDataActivity;
@@ -32,15 +46,11 @@ import com.moko.ps101m.activity.setting.AuxiliaryOperationActivity;
 import com.moko.ps101m.activity.setting.AxisSettingActivity;
 import com.moko.ps101m.activity.setting.BleSettingsActivity;
 import com.moko.ps101m.activity.setting.DeviceModeActivity;
-import com.moko.ps101m.activity.setting.NetworkSettingsActivity;
 import com.moko.ps101m.databinding.ActivityDeviceInfoBinding;
-import com.moko.lib.loraui.dialog.AlertMessageDialog;
-import com.moko.lib.loraui.dialog.ChangePasswordDialog;
 import com.moko.ps101m.fragment.DeviceFragment;
 import com.moko.ps101m.fragment.GeneralFragment;
 import com.moko.ps101m.fragment.NetworkFragment;
 import com.moko.ps101m.fragment.PositionFragment;
-import com.moko.lib.loraui.utils.ToastUtils;
 import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
@@ -50,11 +60,18 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.IdRes;
+import androidx.fragment.app.FragmentManager;
+import okhttp3.RequestBody;
 
 public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnCheckedChangeListener {
     private ActivityDeviceInfoBinding mBind;
@@ -66,6 +83,9 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     private boolean mReceiverTag;
     private int disConnectType;
     private boolean savedParamsError;
+    private String mSubscribeTopic;
+    private String mPublishTopic;
+    private String mDeviceMac;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +113,9 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             orderTasks.add(OrderTaskAssembler.getNetworkStatus());
             orderTasks.add(OrderTaskAssembler.getMqttConnectionStatus());
             orderTasks.add(OrderTaskAssembler.getNetworkReconnectInterval());
+            orderTasks.add(OrderTaskAssembler.getMQTTSubscribeTopic());
+            orderTasks.add(OrderTaskAssembler.getMQTTPublishTopic());
+            orderTasks.add(OrderTaskAssembler.getMacAddress());
             orderTasks.add(OrderTaskAssembler.getFirmwareVersion());
             MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         }
@@ -272,6 +295,18 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                                         deviceFragment.setVibrationIntensity(value[4] & 0xff);
                                     }
                                     break;
+                                case KEY_SUBSCRIBE_TOPIC:
+                                    mSubscribeTopic = new String(Arrays.copyOfRange(value, 4, value.length));
+                                    break;
+                                case KEY_PUBLISH_TOPIC:
+                                    mPublishTopic = new String(Arrays.copyOfRange(value, 4, value.length));
+                                    break;
+                                case KEY_CHIP_MAC:
+                                    if (length > 0) {
+                                        byte[] macBytes = Arrays.copyOfRange(value, 4, 4 + length);
+                                        mDeviceMac = MokoUtils.bytesToHexString(macBytes);
+                                    }
+                                    break;
                             }
                         }
                     }
@@ -286,6 +321,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             }
         });
     }
+
     private int firmwareVersion;
 
     private void showAlertDialog(String title, String msg, String confirm) {
@@ -609,5 +645,94 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         if (isWindowLocked()) return;
         Intent intent = new Intent(this, OnOffSettingsActivity.class);
         startActivity(intent);
+    }
+
+
+    public void mainSyncDevices(View view) {
+        if (isWindowLocked()) return;
+        // 登录
+        String account = IoTDMSPUtils.getStringValue(this, IoTDMConstants.SP_LOGIN_ACCOUNT, "");
+        String password = IoTDMSPUtils.getStringValue(this, IoTDMConstants.SP_LOGIN_PASSWORD, "");
+        int env = IoTDMSPUtils.getIntValue(this, IoTDMConstants.SP_LOGIN_ENV, 0);
+        if (TextUtils.isEmpty(account) || TextUtils.isEmpty(password)) {
+            LoginDialog dialog = new LoginDialog();
+            dialog.setOnLoginClicked(this::login);
+            dialog.show(getSupportFragmentManager());
+            return;
+        }
+        login(account, password, env);
+    }
+
+    private void login(String account, String password, int envValue) {
+        LoginEntity entity = new LoginEntity();
+        entity.username = account;
+        entity.password = password;
+        entity.source = 1;
+        if (envValue == 0)
+            Urls.setCloudEnv(getApplicationContext());
+        else
+            Urls.setTestEnv(getApplicationContext());
+        RequestBody body = RequestBody.create(Urls.JSON, new Gson().toJson(entity));
+        OkGo.<String>post(Urls.loginApi(getApplicationContext()))
+                .upRequestBody(body)
+                .execute(new StringCallback() {
+
+                    @Override
+                    public void onStart(Request<String, ? extends Request> request) {
+                        showLoadingProgressDialog();
+                    }
+
+                    @Override
+                    public void onSuccess(Response<String> response) {
+                        Type type = new TypeToken<CommonResp<JsonObject>>() {
+                        }.getType();
+                        CommonResp<JsonObject> commonResp = new Gson().fromJson(response.body(), type);
+                        if (commonResp.code != 200) {
+                            ToastUtils.showToast(DeviceInfoActivity.this, commonResp.msg);
+                            LoginDialog dialog = new LoginDialog();
+                            dialog.setOnLoginClicked((account1, password1, env) -> login(account1, password1, env));
+                            dialog.show(getSupportFragmentManager());
+                            return;
+                        }
+                        // add header
+                        String accessToken = commonResp.data.get("access_token").getAsString();
+                        HttpHeaders headers = new HttpHeaders();
+                        headers.put("Authorization", accessToken);
+                        OkGo.getInstance().addCommonHeaders(headers);
+
+                        IoTDMSPUtils.setStringValue(DeviceInfoActivity.this, IoTDMConstants.SP_LOGIN_ACCOUNT, account);
+                        IoTDMSPUtils.setStringValue(DeviceInfoActivity.this, IoTDMConstants.SP_LOGIN_PASSWORD, password);
+                        IoTDMSPUtils.setIntValue(DeviceInfoActivity.this, IoTDMConstants.SP_LOGIN_ENV, envValue);
+
+
+                        Intent intent = new Intent(DeviceInfoActivity.this, SyncDeviceActivity.class);
+                        ArrayList<SyncDevice> syncDevices = new ArrayList<>();
+                        String macUpper = mDeviceMac.replaceAll(":", "").toUpperCase();
+                        SyncDevice syncDevice = new SyncDevice();
+                        syncDevice.mac = macUpper.toLowerCase();
+                        syncDevice.macName = String.format("PS101-%s", macUpper.substring(8));
+                        syncDevice.publishTopic = mPublishTopic;
+                        syncDevice.subscribeTopic = mSubscribeTopic;
+                        syncDevice.lastWill = "";
+                        syncDevice.model = "210";
+                        syncDevices.add(syncDevice);
+                        intent.putExtra(IoTDMConstants.EXTRA_KEY_SYNC_DEVICES, syncDevices);
+                        intent.putExtra(IoTDMConstants.EXTRA_KEY_DEVICE_MODEL, 210);
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onError(Response<String> response) {
+                        ToastUtils.showToast(DeviceInfoActivity.this, R.string.request_error);
+                        LoginDialog dialog = new LoginDialog();
+                        dialog.setOnLoginClicked((account12, password12, env) -> login(account12, password12, env));
+                        dialog.show(getSupportFragmentManager());
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        dismissLoadingProgressDialog();
+                    }
+                });
     }
 }
