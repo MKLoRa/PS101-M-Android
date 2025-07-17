@@ -2,9 +2,6 @@ package com.moko.support.ps101m.task;
 
 import android.text.TextUtils;
 
-import androidx.annotation.IntRange;
-import androidx.annotation.Nullable;
-
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.support.ps101m.MokoSupport;
@@ -17,6 +14,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.TimeZone;
+
+import androidx.annotation.IntRange;
+import androidx.annotation.Nullable;
 
 public class ParamsTask extends OrderTask {
     public byte[] data;

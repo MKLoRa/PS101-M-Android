@@ -2,9 +2,6 @@ package com.moko.ps101m;
 
 import android.text.TextUtils;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.elvishew.xlog.XLog;
 import com.moko.ps101m.entity.ExcelBean;
 import com.moko.ps101m.entity.NetworkSettings;
@@ -16,6 +13,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;

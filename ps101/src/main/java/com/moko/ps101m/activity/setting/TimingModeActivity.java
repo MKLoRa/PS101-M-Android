@@ -9,10 +9,6 @@ import android.graphics.Canvas;
 import android.os.Bundle;
 import android.view.View;
 
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback;
 import com.chad.library.adapter.base.listener.OnItemSwipeListener;
@@ -21,13 +17,13 @@ import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
+import com.moko.lib.loraui.dialog.BottomDialog;
+import com.moko.lib.loraui.utils.ToastUtils;
 import com.moko.ps101m.R;
 import com.moko.ps101m.activity.BaseActivity;
 import com.moko.ps101m.adapter.TimePointAdapter;
 import com.moko.ps101m.databinding.ActivityTimingModeBinding;
-import com.moko.lib.loraui.dialog.BottomDialog;
 import com.moko.ps101m.entity.TimePoint;
-import com.moko.lib.loraui.utils.ToastUtils;
 import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
 import com.moko.support.ps101m.entity.OrderCHAR;
@@ -41,6 +37,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class TimingModeActivity extends BaseActivity implements BaseQuickAdapter.OnItemChildClickListener {
     private ActivityTimingModeBinding mBind;

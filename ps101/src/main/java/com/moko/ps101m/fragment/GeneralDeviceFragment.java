@@ -7,11 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.moko.lib.loraui.utils.ToastUtils;
+import com.moko.ps101m.databinding.FragmentGeneralDeviceBinding;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-
-import com.moko.ps101m.databinding.FragmentGeneralDeviceBinding;
-import com.moko.lib.loraui.utils.ToastUtils;
 
 public class GeneralDeviceFragment extends Fragment {
     private static final String TAG = GeneralDeviceFragment.class.getSimpleName();

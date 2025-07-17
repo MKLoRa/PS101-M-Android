@@ -1,11 +1,5 @@
 package com.moko.support.ps101m;
 
-import static com.moko.support.ps101m.entity.ParamsKeyEnum.KEY_AXIS_REPORT_INTERVAL;
-import static com.moko.support.ps101m.entity.ParamsKeyEnum.KEY_MQTT_LWT_PAYLOAD;
-
-import androidx.annotation.IntRange;
-import androidx.annotation.Nullable;
-
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.support.ps101m.entity.ParamsKeyEnum;
 import com.moko.support.ps101m.task.GetFirmwareRevisionTask;
@@ -19,6 +13,12 @@ import com.moko.support.ps101m.task.SetPasswordTask;
 
 import java.io.File;
 import java.util.ArrayList;
+
+import androidx.annotation.IntRange;
+import androidx.annotation.Nullable;
+
+import static com.moko.support.ps101m.entity.ParamsKeyEnum.KEY_AXIS_REPORT_INTERVAL;
+import static com.moko.support.ps101m.entity.ParamsKeyEnum.KEY_MQTT_LWT_PAYLOAD;
 
 public class OrderTaskAssembler {
     ///////////////////////////////////////////////////////////////////////////

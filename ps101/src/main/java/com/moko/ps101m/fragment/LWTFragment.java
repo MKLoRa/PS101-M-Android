@@ -8,11 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.moko.lib.loraui.utils.ToastUtils;
+import com.moko.ps101m.databinding.FragmentLwtBinding;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-
-import com.moko.ps101m.databinding.FragmentLwtBinding;
-import com.moko.lib.loraui.utils.ToastUtils;
 
 public class LWTFragment extends Fragment {
     private static final String TAG = LWTFragment.class.getSimpleName();

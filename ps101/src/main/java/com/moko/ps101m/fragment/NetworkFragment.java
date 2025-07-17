@@ -8,11 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import com.moko.ps101m.activity.setting.NetworkSettingsActivity;
 import com.moko.ps101m.databinding.FragmentNetworkBinding;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 public class NetworkFragment extends Fragment {
     private static final String TAG = NetworkFragment.class.getSimpleName();

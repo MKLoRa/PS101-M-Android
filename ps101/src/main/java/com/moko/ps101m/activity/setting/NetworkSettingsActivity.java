@@ -12,13 +12,7 @@ import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.inputmethod.TextAppearanceInfo;
 import android.widget.RadioGroup;
-
-import androidx.annotation.IdRes;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.viewpager2.widget.ViewPager2;
 
 import com.elvishew.xlog.XLog;
 import com.moko.ble.lib.MokoConstants;
@@ -27,20 +21,20 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
+import com.moko.lib.loraui.dialog.AlertMessageDialog;
+import com.moko.lib.loraui.dialog.BottomDialog;
+import com.moko.lib.loraui.utils.ToastUtils;
 import com.moko.ps101m.ExcelHelper;
 import com.moko.ps101m.R;
 import com.moko.ps101m.activity.BaseActivity;
 import com.moko.ps101m.adapter.NetworkFragmentAdapter;
 import com.moko.ps101m.databinding.ActivityNetworkSettingBinding;
-import com.moko.lib.loraui.dialog.AlertMessageDialog;
-import com.moko.lib.loraui.dialog.BottomDialog;
 import com.moko.ps101m.entity.NetworkSettings;
 import com.moko.ps101m.fragment.GeneralDeviceFragment;
 import com.moko.ps101m.fragment.LWTFragment;
 import com.moko.ps101m.fragment.SSLDeviceFragment;
 import com.moko.ps101m.fragment.UserDeviceFragment;
 import com.moko.ps101m.utils.FileUtils;
-import com.moko.lib.loraui.utils.ToastUtils;
 import com.moko.ps101m.utils.Utils;
 import com.moko.support.ps101m.MokoSupport;
 import com.moko.support.ps101m.OrderTaskAssembler;
@@ -58,6 +52,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager2.widget.ViewPager2;
 
 public class NetworkSettingsActivity extends BaseActivity implements RadioGroup.OnCheckedChangeListener {
     private ActivityNetworkSettingBinding mBind;
