@@ -104,14 +104,10 @@ public class BleSettingsActivity extends BaseActivity implements SeekBar.OnSeekB
                                 case KEY_ADV_INTERVAL:
                                 case KEY_ADV_TIMEOUT:
                                 case KEY_ADV_TX_POWER:
-                                    if (result != 1) {
-                                        savedParamsError = true;
-                                    }
+                                    savedParamsError |= result != 1;
                                     break;
                                 case KEY_PASSWORD_VERIFY_ENABLE:
-                                    if (result != 1) {
-                                        savedParamsError = true;
-                                    }
+                                    savedParamsError |= result != 1;
                                     if (savedParamsError) {
                                         ToastUtils.showToast(this, "Opps！Save failed. Please check the input characters and try again.");
                                     } else {

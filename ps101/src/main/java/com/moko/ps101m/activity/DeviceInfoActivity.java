@@ -11,6 +11,11 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.RadioGroup;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.IdRes;
+import androidx.fragment.app.FragmentManager;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -25,17 +30,17 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
-import com.moko.lib.loraiot.IoTDMConstants;
-import com.moko.lib.loraiot.Urls;
-import com.moko.lib.loraiot.activity.SyncDeviceActivity;
-import com.moko.lib.loraiot.dialog.LoginDialog;
-import com.moko.lib.loraiot.entity.CommonResp;
-import com.moko.lib.loraiot.entity.LoginEntity;
-import com.moko.lib.loraiot.entity.SyncDevice;
-import com.moko.lib.loraiot.utils.IoTDMSPUtils;
 import com.moko.lib.loraui.dialog.AlertMessageDialog;
 import com.moko.lib.loraui.dialog.ChangePasswordDialog;
 import com.moko.lib.loraui.utils.ToastUtils;
+import com.moko.lib.scanneriot.IoTDMConstants;
+import com.moko.lib.scanneriot.Urls;
+import com.moko.lib.scanneriot.activity.SyncDeviceActivity;
+import com.moko.lib.scanneriot.dialog.LoginDialog;
+import com.moko.lib.scanneriot.entity.CommonResp;
+import com.moko.lib.scanneriot.entity.LoginEntity;
+import com.moko.lib.scanneriot.entity.SyncDevice;
+import com.moko.lib.scanneriot.utils.IoTDMSPUtils;
 import com.moko.ps101m.AppConstants;
 import com.moko.ps101m.R;
 import com.moko.ps101m.activity.device.ExportDataActivity;
@@ -67,10 +72,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.IdRes;
-import androidx.fragment.app.FragmentManager;
 import okhttp3.RequestBody;
 
 public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnCheckedChangeListener {
@@ -211,10 +212,10 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                                 case KEY_VIBRATION_INTENSITY:
                                 case KEY_LOW_POWER_PAYLOAD_ENABLE:
                                 case KEY_HEARTBEAT_INTERVAL:
-                                    savedParamsError = result != 1;
+                                    savedParamsError |= result != 1;
                                     break;
                                 case KEY_CONTINUITY_TRANSFER_ENABLE:
-                                    savedParamsError = result != 1;
+                                    savedParamsError |= result != 1;
                                     if (savedParamsError) {
                                         ToastUtils.showToast(this, "Opps！Save failed. Please check the input characters and try again.");
                                     } else {
@@ -651,9 +652,9 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     public void mainSyncDevices(View view) {
         if (isWindowLocked()) return;
         // 登录
-        String account = IoTDMSPUtils.getStringValue(this, IoTDMConstants.SP_LOGIN_ACCOUNT, "");
-        String password = IoTDMSPUtils.getStringValue(this, IoTDMConstants.SP_LOGIN_PASSWORD, "");
-        int env = IoTDMSPUtils.getIntValue(this, IoTDMConstants.SP_LOGIN_ENV, 0);
+        String account = IoTDMSPUtils.getStringValue(this, IoTDMConstants.EXTRA_KEY_LOGIN_ACCOUNT, "");
+        String password = IoTDMSPUtils.getStringValue(this, IoTDMConstants.EXTRA_KEY_LOGIN_PASSWORD, "");
+        int env = IoTDMSPUtils.getIntValue(this, IoTDMConstants.EXTRA_KEY_LOGIN_ENV, 0);
         if (TextUtils.isEmpty(account) || TextUtils.isEmpty(password)) {
             LoginDialog dialog = new LoginDialog();
             dialog.setOnLoginClicked(this::login);
@@ -700,9 +701,9 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                         headers.put("Authorization", accessToken);
                         OkGo.getInstance().addCommonHeaders(headers);
 
-                        IoTDMSPUtils.setStringValue(DeviceInfoActivity.this, IoTDMConstants.SP_LOGIN_ACCOUNT, account);
-                        IoTDMSPUtils.setStringValue(DeviceInfoActivity.this, IoTDMConstants.SP_LOGIN_PASSWORD, password);
-                        IoTDMSPUtils.setIntValue(DeviceInfoActivity.this, IoTDMConstants.SP_LOGIN_ENV, envValue);
+                        IoTDMSPUtils.setStringValue(DeviceInfoActivity.this, IoTDMConstants.EXTRA_KEY_LOGIN_ACCOUNT, account);
+                        IoTDMSPUtils.setStringValue(DeviceInfoActivity.this, IoTDMConstants.EXTRA_KEY_LOGIN_PASSWORD, password);
+                        IoTDMSPUtils.setIntValue(DeviceInfoActivity.this, IoTDMConstants.EXTRA_KEY_LOGIN_ENV, envValue);
 
 
                         Intent intent = new Intent(DeviceInfoActivity.this, SyncDeviceActivity.class);
