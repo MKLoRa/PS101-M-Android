@@ -1,396 +1,343 @@
-# PS101 Android SDK Guide（English）
+# PS101-M Android
 
-## Intro
+Android configuration app for the PS101-M cellular positioning device. It configures cellular and device-side MQTT parameters, Wi-Fi / Bluetooth / GPS positioning, operating modes, alarms, BLE scanning filters, and system settings over BLE. After provisioning, the device connects to the cellular network and MQTT broker independently.
 
-Please read the part of this document which you need.
+Cross-platform reference (same protocol): [PS101-M Flutter](https://github.com/MKLoRa/PS101-M-Flutter).
 
-* We will explain the important classes in the SDK.
+---
 
-* will help developers to get started.
-
-* will explain notes in your developing progress.
-
-## Design instructions
-
-We divide the communications between SDK and devices into three stages: Scanning stage, Connection
-stage, Communication stage. For ease of understanding, let's take a look at the related classes and
-the relationships between them.
-
-### 1.Scanning stage
-
-**`com.moko.support.ps101m.MokoBleScanner`**
-
-Scanning processing class, support to open scan, close scan and get the raw data of the scanned
-device.
-
-**`com.moko.support.ps101m.callback.MokoScanDeviceCallback`**
-
-Scanning callback interface,this interface can be used to obtain the scan status and device data.
-
-**`com.moko.support.ps101m.service.DeviceInfoParseable`**
-
-Parsed data interface,this interface can parsed the device broadcast frame, get the specific data.
-the implementation can refer to `BeaconInfoParseableImpl` in the project,the `DeviceInfo` will be
-parsed to `BeaconInfo`.
-
-### 2.Connection stage
-
-**`com.moko.support.ps101m.MokoSupport`**
-
-BLE operation core class, extends from `Mokoblelib`.It can connect the device, disconnect the
-device, send the device connection status, turn on Bluetooth, turn off Bluetooth, judge whether
-Bluetooth is on or not, receive data from the device and send data to the device, notify the page
-data update, turn on and off characteristic notification.
-
-### 3.Communication stage
-
-**`com.moko.support.ps101m.OrderTaskAssembler`**
-
-We assemble read data and write data to `OrderTask`, send the task to the device
-through `MokoSupport `, and receive the resopnse.
-
-**`com.moko.ble.lib.event.ConnectStatusEvent`**
-
-The connection status is notified by `EventBus`, the device connection status and disconnection
-status are obtained from this event.
-
-**`com.moko.ble.lib.event.OrderTaskResponseEvent`**
-
-The response is notified by `EventBus`, we can get result when we send task to device from this
-event,distinguish between function via `OrderTaskResponse`.
-
-## Get Started
-
-### Prepare
-
-**Development environment:**
-
-* Android Studio 3.6.+
-
-* minSdk 28
-
-**Import to Project**
-
-Copy the module mokosupport into the project root directory and add dependencies in build.gradle. As
-shown below:
+## 1. Overview
 
 ```
-dependencies {
-    ...
-    implementation project(path: ':mokosupport')
-}
+┌────────────┐  BLE only   ┌────────────┐  Cellular + MQTT  ┌─────────────┐
+│  PS101-M   │◄───────────►│  PS101-M   │──────────────────►│ MQTT Broker │
+│    APP     │  provision  │   device   │                   └─────────────┘
+└────────────┘             └─────┬──────┘
+                                 │
+                      ┌──────────┼──────────┐
+                      ▼          ▼          ▼
+                    GNSS       Wi-Fi    BLE beacons
+                         positioning sources
 ```
 
-add mokosupport in settings.gradle.As shown below:
+Main flow:
 
-```
-include ':app', ':mokosupport'
-```
+1. **Scan and connect** — Scan for Service Data `0xAA10`; select a connectable PS101-M and verify its password when enabled.
+2. **Configure network** — Write cellular APN / network mode and device-side MQTT settings over BLE.
+3. **Configure positioning** — Set Wi-Fi, Bluetooth, and GPS positioning parameters and BLE scan filters.
+4. **Configure operating modes** — Set standby, timing, periodic, or motion mode and each mode's positioning strategy.
+5. **Configure functions** — Set heartbeat, alarms, ManDown detection, 3-axis behavior, BLE advertising, indicators, power options, and other device parameters.
+6. **Device leaves the BLE session** — PS101-M applies the settings and communicates with the cellular network / MQTT broker on its own.
 
-### Start Developing
+---
 
-**Initialize**
+## 2. Project Structure
 
-First of all, you should initialize the MokoSupport.We recommend putting it in Application.
+| Module | Description |
+|--------|-------------|
+| `ps101` | UI and business flow: BLE scan, connect, network, positioning, modes, alarms, data export, and device settings |
+| `mokosupport` | SDK: BLE scan/connection, command assembly, `ParamsKeyEnum`, entities, tasks, and callbacks |
 
-```
+Package names: `com.moko.ps101m` (app), `com.moko.support.ps101m` (SDK).
+
+The project uses compile/target SDK 35, min SDK 28, Java 8, AndroidX, and View Binding.
+
+Initialize in `Ps101MainActivity`:
+
+```java
 MokoSupport.getInstance().init(getApplicationContext());
 ```
 
-**Scan devices**
+Include the modules:
 
-Before operating the Bluetooth scanning device, we need to apply for permission, which we have added
-in MokoSupport `AndroidManifest.xml`
-
-```
-...
-<uses-permission android:name="android.permission.BLUETOOTH" />
-<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-<uses-feature
-    android:name="android.hardware.bluetooth_le"
-    android:required="true" />
-...
+```gradle
+include ':ps101'
+include ':mokosupport'
 ```
 
-Start scanning task to find devices around you, then you can get their advertisement content,
-connect to device and change parameters.
+```gradle
+implementation project(path: ':mokosupport')
+```
+
+---
+
+## 3. Business Flow
+
+### 3.1 BLE Scan & Connect
+
+Entry: `Ps101MainActivity`
+
+Scan for devices advertising Service Data UUID `0xAA10`. The parser accepts a 16-byte Service Data payload:
+
+- Byte `[7]`: advertising TX power
+- Byte `[8]`: battery percentage
+- Bytes `[9..10]`: battery voltage
+- Byte `[11]`: password verification (`1` = password required)
+- Only **connectable** devices can be selected
+- The last successful password is remembered locally
+
+Custom BLE service `0xAA00`:
+
+| Characteristic | Purpose |
+|----------------|---------|
+| `0xAA00` | Password verification |
+| `0xAA01` | Disconnect reason notification |
+| `0xAA02` | Device parameter read/write |
+| `0xAA04` | Stored data notification |
+| `0xAA05` | Device debug log |
+
+After connection and optional password verification, the app opens `DeviceInfoActivity`, the main configuration hub with four bottom tabs.
+
+### 3.2 Network Configuration
+
+Tab: **Network** (`NetworkFragment`)
+
+The tab displays cellular and MQTT connection status and configures the network reconnect interval. `NetworkSettingsActivity` contains the full cellular and MQTT configuration:
+
+| Area | Purpose |
+|------|---------|
+| Cellular | APN, APN username/password, and network mode (`NB-IoT`, `eMTC`, or priority order) |
+| General MQTT | Host, port, Client ID, publish/subscribe topics, Clean Session, QoS, Keep Alive |
+| User | MQTT username and password |
+| SSL | Connection mode and CA/client certificate/client key files |
+| LWT | Last Will enable, QoS, retain, topic, and payload |
+
+These MQTT settings are written **to the PS101-M firmware**; they are not the Android app's own MQTT client settings. The screen also supports importing/exporting device network settings.
+
+When both cellular and MQTT are connected, the app can synchronize the device identity and topics with the MOKO IoT Device Management service.
+
+### 3.3 Positioning Configuration
+
+Tab: **Positioning Strategy** (`PositionFragment`)
+
+| Screen | Purpose |
+|--------|---------|
+| `PosWifiFixActivity` | Wi-Fi RSSI filter, positioning mechanism, timeout, and required BSSID count |
+| `PosBleFixActivity` | BLE positioning mechanism, timeout, required MAC count, PHY/RSSI, and advertisement filters |
+| `PosGpsFixActivity` | GPS timeout and PDOP limit |
+
+BLE positioning filters:
+
+| Screen | Filter |
+|--------|--------|
+| `FilterMacAddressActivity` | MAC address rules, precise/reverse matching |
+| `FilterAdvNameActivity` | Advertising name rules, precise/reverse matching |
+| `FilterRawDataSwitchActivity` | Raw advertisement type filter hub |
+| `FilterIBeaconActivity` | iBeacon UUID, Major, and Minor |
+| `FilterUIDActivity` / `FilterUrlActivity` / `FilterTLMActivity` | Eddystone UID, URL, and TLM |
+| `FilterBXPIBeaconActivity` | BXP-iBeacon |
+| `FilterBXPButtonActivity` / `FilterBXPTagIdActivity` | BXP Button and BXP Tag |
+| `FilterMkPirActivity` | MK-PIR status and Major/Minor |
+| `FilterOtherActivity` | Other/raw byte rules |
+
+### 3.4 Operating Modes
+
+Entry: `DeviceModeActivity`
+
+| Screen | Purpose |
+|--------|---------|
+| `StandbyModeActivity` | Positioning strategy while the device is in standby |
+| `TimingModeActivity` | Positioning strategy and scheduled report time points |
+| `PeriodicModeActivity` | Periodic positioning strategy and report interval |
+| `MotionModeActivity` | Motion start/trip/end/stationary events, intervals, and positioning strategies |
+
+The selected mode determines when PS101-M performs positioning and reports data.
+
+### 3.5 General / Auxiliary Functions
+
+Tab: **General Settings** (`GeneralFragment`)
+
+- Heartbeat report interval
+- Continuity transfer enable
+
+Additional function screens:
+
+| Screen | Purpose |
+|--------|---------|
+| `AuxiliaryOperationActivity` | Hub for downlink positioning, ManDown, alarms, and 3-axis data reporting |
+| `DownlinkForPosActivity` | Positioning strategy used by a downlink request |
+| `ManDownDetectionActivity` | ManDown enable, timeout, report interval, and positioning strategy |
+| `AlarmFunctionActivity` | Alert and SOS alarm configuration hub |
+| `AlertAlarmSettingActivity` | Alert trigger, positioning strategy, and event notification |
+| `AlarmSosSettingActivity` | SOS trigger, positioning strategy, report interval, and event notification |
+| `ThreeAxisDataReportActivity` | 3-axis data report enable and interval |
+| `AxisSettingActivity` | Accelerometer wake-up and motion detection conditions |
+
+### 3.6 Device / System Configuration
+
+Tab: **Device Settings** (`DeviceFragment`)
+
+| Screen / setting | Purpose |
+|------------------|---------|
+| Data format | Device uplink payload format: JSON or HEX |
+| `NtpSeverSettingActivity` | NTP server and synchronization interval |
+| Time zone | UTC offset |
+| Low-power settings | Threshold and low-power payload enable |
+| Buzzer / vibration | Sound type and vibration intensity |
+| `BleSettingsActivity` | Password verification and BLE advertising parameters |
+| `IndicatorSettingsActivity` | Device indicator state |
+| `OnOffSettingsActivity` | Shutdown payload, button shutdown, and charging auto-power-on |
+| `ExportDataActivity` | Read, pause/resume, export, and clear locally stored device data |
+| `SystemInfoActivity` | Device identifiers, versions, battery, network information, OTA, and debug entry |
+| `LogDataActivity` | Read and export device debug logs |
+
+Factory reset, password change, firmware update, and device information are available from the same configuration hub. OTA uses Nordic DFU and accepts a ZIP firmware package.
+
+---
+
+## 4. BLE Parameter Protocol Summary
+
+Most configuration uses `CHAR_PARAMS` (`0xAA02`) with key-byte addressing defined by `ParamsKeyEnum`.
+During connection setup, the SDK requests MTU 247 and enables the custom-characteristic notifications.
+
+Common frame envelope:
+
+**Single packet** `HEAD=0xED`: `HEAD + FLAG + KEY + LEN + DATA`
+
+**Multi packet** `HEAD=0xEE`: `HEAD + FLAG + KEY + PACKET_COUNT + PACKET_INDEX + CHUNK_LEN + DATA`
+
+| FLAG | Meaning |
+|------|---------|
+| `0x00` | Read |
+| `0x01` | Write |
+| `0x02` | Device notification, such as a disconnect reason |
+
+A parameter write succeeds when the returned result byte is `0x01`.
+
+Key parameter groups:
+
+| Key range | Category | Examples |
+|-----------|----------|----------|
+| `0x10`–`0x2F` | System / power / status / NTP | Reboot, time, battery, mode, heartbeat, indicators, network/MQTT status |
+| `0x30`–`0x35` | BLE | Password verification, password, advertising timeout/TX power/name/interval |
+| `0x3F`–`0x4E` | Operating modes | Standby, timing, periodic, and motion strategies |
+| `0x50`–`0x7B` | BLE scan filters | PHY, RSSI, MAC/name, iBeacon, Eddystone, BXP, MK-PIR, Other |
+| `0x7F`–`0x87` | Positioning | Wi-Fi, BLE, and GPS positioning parameters |
+| `0x88`–`0x94` | Cellular / data | APN credentials, network mode, payload format, reconnect interval, IMEI |
+| `0x95`–`0xA7` | MQTT | Broker, credentials, topics, QoS, LWT, SSL certificates |
+| `0xB0`–`0xBF` | Auxiliary / alarms | Downlink positioning, ManDown, Alert/SOS, 3-axis report |
+| `0xC0`–`0xC2` | Stored data | Read, clear, and pause/resume transfer |
+
+---
+
+## 5. BLE Frame Format Summary
+
+**Password** (`CHAR_PASSWORD`):
 
 ```
+[0xED, 0x01, 0x01, len, passwordBytes..., zeroPadding...]
+```
+
+`SetPasswordTask` allocates a fixed 12-byte frame; password-length validation is handled outside the SDK task.
+
+**Parameter read** (short):
+
+```
+[0xED, 0x00, key, 0x00]
+```
+
+**Parameter read** (long):
+
+```
+[0xEE, 0x00, key, 0x00]
+```
+
+Long reads are used for values such as MQTT credentials, filter rules, and certificate files.
+
+**Parameter write**:
+
+```
+[0xED, 0x01, key, length, payload...]
+```
+
+**Multi-packet write**:
+
+```
+[0xEE, 0x01, key, packetCount, packetIndex, chunkLength, chunkData...]
+```
+
+Multi-packet writes use payload chunks of up to 176 bytes for long strings, filter rules, and TLS certificate files. Command assembly is implemented by `OrderTaskAssembler` and `ParamsTask`.
+
+---
+
+## 6. SDK Quick Start
+
+### 6.1 BLE Scan
+
+```java
 MokoBleScanner mokoBleScanner = new MokoBleScanner(this);
 mokoBleScanner.startScanDevice(new MokoScanDeviceCallback() {
-    @Override
-    public void onStartScan() {
-    }
-
-    @Override
-    public void onScanDevice(DeviceInfo device) {
-    }
-
-    @Override
-    public void onStopScan() {
-    }
+    @Override public void onStartScan() { }
+    @Override public void onScanDevice(DeviceInfo device) { }
+    @Override public void onStopScan() { }
 });
 ```
 
-at the sometime, you can stop the scanning task in this way:
+Scan identification uses service UUID `0xAA10` (`OrderServices.SERVICE_ADV`). Advertisement parsing is implemented by `AdvInfoAnalysisImpl`.
 
-```
-mokoBleScanner.stopScanDevice();
-```
+### 6.2 BLE Connect & Orders
 
-You can use BeaconInfoParseableImpl to parsed advertisement data to the frame data, such as
-deviceType,battery,T&H and etc...
+- Connect: `MokoSupport.getInstance().connDevice(mac)`
+- Connection status: EventBus `ConnectStatusEvent`
+- Send: `MokoSupport.getInstance().sendOrder(OrderTask...)`
+- Response: EventBus `OrderTaskResponseEvent`
 
-```
-int battery = 0;
-int deviceType = 0;
-String tempStr = "";
-String humiStr = "";
-Iterator iterator = map.keySet().iterator();
-if (iterator.hasNext()) {
-    ParcelUuid parcelUuid = (ParcelUuid) iterator.next();
-    if (parcelUuid.toString().startsWith("0000aa00")) {
-        byte[] bytes = map.get(parcelUuid);
-        if (bytes != null) {
-            deviceType = bytes[0] & 0xFF;
-        }
-    } else {
-        return null;
-    }
-}
-battery = manufacturerSpecificDataByte[6] & 0xFF;
-byte[] tempBytes = Arrays.copyOfRange(manufacturerSpecificDataByte, 7, 9);
-byte[] humiBytes = Arrays.copyOfRange(manufacturerSpecificDataByte, 9, 11);
-tempStr = MokoUtils.getDecimalFormat("#.##").format(MokoUtils.toIntSigned(tempBytes) * 0.01);
-humiStr = MokoUtils.getDecimalFormat("#.##").format(MokoUtils.toInt(humiBytes) * 0.01);
+Typical flow: scan → connect → verify password (`SetPasswordTask`) → read/write parameters through `OrderTaskAssembler` → disconnect.
+
+```java
+// Read the device-side MQTT host
+MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getMQTTHost());
+
+// Write the cellular APN
+MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setApn(apn));
 ```
 
-**Connect to devices**
+### 6.3 Logging
 
-Connect to the device in order to do more operations(change parameter, OTA),the only parameter
-required is the MAC address.
+App logging is based on [xLog](https://github.com/elvishew/xLog). `BaseApplication` writes `PS101M/PS101M.txt` and keeps the current log plus its backup according to `ClearLogBackStrategy`.
 
-```
-MokoSupport.getInstance().connDevice(beaconXInfo.mac);
-```
+Device-side debug logs are read from `CHAR_LOG` (`0xAA05`) and can be exported through `LogDataActivity`.
 
-You can get the connection status through `ConnectStatusEvent`,remember to register `EventBus`
-
-```
-@Subscribe(threadMode = ThreadMode.MAIN)
-public void onConnectStatusEvent(ConnectStatusEvent event) {
-    String action = event.getAction();
-    if (MokoConstants.ACTION_DISCONNECTED.equals(action)) {
-    // connect failed
-    ...
-    }
-    if (MokoConstants.ACTION_DISCOVER_SUCCESS.equals(action)) {
-    // connect success
-    ...
-    }
-}
+```java
+XLog.d("log info");
 ```
 
-You will find that when connect to device password may need, so ,we need set password first.
+---
+
+## 7. Main Screen Index
 
 ```
-MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setPassword(password));
-
+GuideActivity                         Splash / permissions
+Ps101MainActivity                     BLE scan, filter, connect
+DeviceInfoActivity                    Configuration hub (4 tabs)
+  Network tab                         Cellular and device-side MQTT status/settings
+    NetworkSettingsActivity             APN, MQTT, SSL, LWT, import/export
+  Positioning Strategy tab            Wi-Fi / BLE / GPS positioning
+    PosWifiFixActivity                  Wi-Fi positioning
+    PosBleFixActivity                   BLE positioning and scan filters
+      filter/*                          Individual BLE advertisement filters
+    PosGpsFixActivity                   GPS timeout / PDOP
+  General Settings tab                Heartbeat / continuity transfer
+  Device Settings tab                 Payload, time, power, buzzer, vibration
+    DeviceModeActivity                  Standby / timing / periodic / motion modes
+    AuxiliaryOperationActivity          Downlink / ManDown / alarms / 3-axis report
+    BleSettingsActivity                 BLE advertising and password verification
+    AxisSettingActivity                 Accelerometer conditions
+    IndicatorSettingsActivity           Indicator state
+    OnOffSettingsActivity               Shutdown and auto-power-on
+    ExportDataActivity                  Stored data export
+    SystemInfoActivity                  Device info / OTA / debug entry
+      LogDataActivity                   Device debug log export
+Ps101AboutActivity                    About / app information
 ```
 
-You can get the response result from device through `OrderTaskResponseEvent`,
+---
 
-```
-@Subscribe(threadMode = ThreadMode.MAIN)
-public void onOrderTaskResponseEvent(OrderTaskResponseEvent event) {
-    final String action = event.getAction();
-    if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
-    // the task timout
-    }
-    if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
-    // finish all task
-    }
-    if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
-    // get the task result
-        OrderTaskResponse response = event.getResponse();
-        OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
-        int responseType = response.responseType;
-        byte[] value = response.responseValue;
-        ...
-    }
-    if (MokoConstants.ACTION_CURRENT_DATA.equals(action)) {
-    // notify data
-    }
-}
-```
+## 8. References
 
-> `ACTION_ORDER_RESULT`
->
-> After the task is sent to the device, the data returned by the device can be obtained by using the `OrderTaskResponse`, and you can determine which task is being returned as a resultis according to the `response.orderCHAR`. The `response.responseValue` is the returned data.
-
-> `ACTION_ORDER_TIMEOUT`
->
-> Every task has a default timeout of 3 seconds to prevent the device from failing to return data due to a fault and the fail will cause other tasks in the queue can not execute normally. You can determine which task is being returned as a resultis according to the `response.orderCHAR` function and then the next task continues.
-
-> `ACTION_ORDER_FINISH`
->
-> When the task in the queue is empty, `onOrderFinish` will be called back.
-
-> `ACTION_CURRENT_DATA`
->
-> The data from device notify.
-
-**Communication with the device**
-
-All the read data and write data is encapsulated into `OrderTask` in `OrderTaskAssembler`, and sent
-to the device in a **QUEUE** way. SDK gets task status from task callback `OrderTaskResponse` after
-sending tasks successfully.
-
-For example, if you want to get the lora region, please refer to the code example below.
-
-```
-// read lora region
-MokoSupport.getInstance().sendOrder(derTaskAssembler.getLoraRegion());
-...
-// get result
-@Subscribe(threadMode = ThreadMode.MAIN)
-public void onOrderTaskResponseEvent(OrderTaskResponseEvent event) {
-    final String action = event.getAction();
-    if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
-        OrderTaskResponse response = event.getResponse();
-        OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
-        int responseType = response.responseType;
-        byte[] value = response.responseValue;
-        switch (orderCHAR) {
-	        case CHAR_PARAMS:
-		        if (value.length >= 4) {
-		            int header = value[0] & 0xFF;// 0xED
-		            int flag = value[1] & 0xFF;// read or write
-		            int cmd = value[2] & 0xFF;
-		            if (header != 0xED)
-		                return;
-		            ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
-		            if (configKeyEnum == null) {
-		                return;
-		            }
-		            int length = value[3] & 0xFF;
-		            if (flag == 0x00) {
-	                    // read
-	                    switch (configKeyEnum) {
-							        case KEY_LORA_REGION:
-						                if (length > 0) {
-						                    final int region = value[4] & 0xFF;
-						                }
-						                break;
-						     }
-					  }
-			    }
-    	 }
-    }
-}
-// read params of device
-ArrayList<OrderTask> orderTasks = new ArrayList<>();
-orderTasks.add(OrderTaskAssembler.getBattery());
-orderTasks.add(OrderTaskAssembler.getMacAddress());
-orderTasks.add(OrderTaskAssembler.getDeviceModel());
-orderTasks.add(OrderTaskAssembler.getSoftwareVersion());
-orderTasks.add(OrderTaskAssembler.getFirmwareVersion());
-orderTasks.add(OrderTaskAssembler.getHardwareVersion());
-orderTasks.add(OrderTaskAssembler.getManufacturer());
-MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-
-```
-
-How to parse the returned results, please refer to the code of the sample project and documentation.
-
-The current data of storage are sent to APP by notification. we have on the notification function of
-characteristic after connected device.
-
-**OTA**
-
-We used the Nordic DFU for the OTA,dependencies have been added to build.gradle.
-
-```
-dependencies {
-    api 'no.nordicsemi.android:dfu:0.6.2'
-}
-```
-
-The OTA requires three important parameters:the path of firmware file,the adv name of device and the
-mac address of device.You can use it like this:
-
-```
-DfuServiceInitiator starter = new DfuServiceInitiator(deviceMac)
-    .setDeviceName(deviceName)
-    .setKeepBond(false)
-    .setDisableNotification(true);
-starter.setZip(null, firmwareFilePath);
-starter.start(this, DfuService.class);
-```
-
-you can get progress of OTA through `DfuProgressListener`,the examples can be referred to demo
-project.
-
-At the end of this part, you can refer all code above to develop. If there is something new, we will
-update this document.
-
-## Notes
-
-1.In Android-6.0 or later, Bluetooth scanning requires dynamic application for location permissions,
-as follows:
-
-```
-if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-!= PackageManager.PERMISSION_GRANTED) {
-ActivityCompat.requestPermissions(this,
-                                  new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_FINE_LOCATION);
-} 
-```
-
-2.`EventBus` is used in the SDK and can be modified in `MokoSupport` if you want to use
-other communication methods.
-
-```
-@Override
-public void orderFinish() {
-    OrderTaskResponseEvent event = new OrderTaskResponseEvent();
-    event.setAction(MokoConstants.ACTION_ORDER_FINISH);
-    EventBus.getDefault().post(event);
-}
-
-@Override
-public void orderTimeout(OrderTaskResponse response) {
-    OrderTaskResponseEvent event = new OrderTaskResponseEvent();
-    event.setAction(MokoConstants.ACTION_ORDER_TIMEOUT);
-    event.setResponse(response);
-    EventBus.getDefault().post(event);
-}
-
-@Override
-public void orderResult(OrderTaskResponse response) {
-    OrderTaskResponseEvent event = new OrderTaskResponseEvent();
-    event.setAction(MokoConstants.ACTION_ORDER_RESULT);
-    event.setResponse(response);
-    EventBus.getDefault().post(event);
-}
-
-@Override
-public boolean orderNotify(BluetoothGattCharacteristic characteristic, byte[] value) {
-    ...
-    OrderTaskResponseEvent event = new OrderTaskResponseEvent();
-    event.setAction(MokoConstants.ACTION_CURRENT_DATA);
-    event.setResponse(response);
-    EventBus.getDefault().post(event);
-    ...
-}
-```
-
-3.In order to record log files, `XLog` is used in the SDK, and the
-permission `WRITE_EXTERNAL_STORAGE` is applied. If you do not want to use it, you can modify it
-in `BaseApplication`, and only keep `XLog.init(config)`.
-
-## Change log
-
-* 2021.03.11 mokosupport version:1.0
-    * First commit
+- Parameter keys: `mokosupport/src/main/java/com/moko/support/ps101m/entity/ParamsKeyEnum.java`
+- Order assembly: `mokosupport/src/main/java/com/moko/support/ps101m/OrderTaskAssembler.java`
+- Parameter frames: `mokosupport/src/main/java/com/moko/support/ps101m/task/ParamsTask.java`
+- BLE connection setup: `mokosupport/src/main/java/com/moko/support/ps101m/MokoBleConfig.java`
+- BLE UUIDs: `mokosupport/src/main/java/com/moko/support/ps101m/entity/OrderServices.java`, `OrderCHAR.java`
+- Advertisement parser: `ps101/src/main/java/com/moko/ps101m/utils/AdvInfoAnalysisImpl.java`

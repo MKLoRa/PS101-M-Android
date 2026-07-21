@@ -31,7 +31,7 @@ public class SSLDeviceFragment extends Fragment {
     private FragmentSslDeviceBinding mBind;
     private BaseActivity activity;
     private int mConnectMode;
-    private final String[] values = {"CA signed server certificate", "CA certificate", "Self signed certificates"};
+    private final String[] values = {"CA certificate", "Self signed certificates"};
     private int selected;
 
     public SSLDeviceFragment() {
@@ -58,23 +58,26 @@ public class SSLDeviceFragment extends Fragment {
             if (!isChecked) {
                 mConnectMode = 0;
             } else {
-                mConnectMode = selected + 1;
+                mConnectMode = selected + 2;
             }
             mBind.clCertificate.setVisibility(isChecked ? View.VISIBLE : View.GONE);
         });
         if (mConnectMode > 0) {
-            selected = mConnectMode - 1;
+            selected = mConnectMode - 2;
+            if (selected < 0)
+                selected = 0;
             mBind.tvCertification.setText(values[selected]);
         }
+//        if (selected == 0) {
+//            mBind.llCa.setVisibility(View.GONE);
+//            mBind.llClientKey.setVisibility(View.GONE);
+//            mBind.llClientCert.setVisibility(View.GONE);
+//        } else
         if (selected == 0) {
-            mBind.llCa.setVisibility(View.GONE);
-            mBind.llClientKey.setVisibility(View.GONE);
-            mBind.llClientCert.setVisibility(View.GONE);
-        } else if (selected == 1) {
             mBind.llCa.setVisibility(View.VISIBLE);
             mBind.llClientKey.setVisibility(View.GONE);
             mBind.llClientCert.setVisibility(View.GONE);
-        } else if (selected == 2) {
+        } else if (selected == 1) {
             mBind.llCa.setVisibility(View.VISIBLE);
             mBind.llClientKey.setVisibility(View.VISIBLE);
             mBind.llClientCert.setVisibility(View.VISIBLE);
@@ -87,19 +90,22 @@ public class SSLDeviceFragment extends Fragment {
         if (mBind == null) return;
         mBind.clCertificate.setVisibility(mConnectMode > 0 ? View.VISIBLE : View.GONE);
         if (mConnectMode > 0) {
-            selected = mConnectMode - 1;
+            selected = mConnectMode - 2;
+            if (selected < 0)
+                selected = 0;
             mBind.tvCertification.setText(values[selected]);
         }
         mBind.cbSsl.setChecked(mConnectMode > 0);
+//        if (selected == 0) {
+//            mBind.llCa.setVisibility(View.GONE);
+//            mBind.llClientKey.setVisibility(View.GONE);
+//            mBind.llClientCert.setVisibility(View.GONE);
+//        } else
         if (selected == 0) {
-            mBind.llCa.setVisibility(View.GONE);
-            mBind.llClientKey.setVisibility(View.GONE);
-            mBind.llClientCert.setVisibility(View.GONE);
-        } else if (selected == 1) {
             mBind.llCa.setVisibility(View.VISIBLE);
             mBind.llClientKey.setVisibility(View.GONE);
             mBind.llClientCert.setVisibility(View.GONE);
-        } else if (selected == 2) {
+        } else if (selected == 1) {
             mBind.llCa.setVisibility(View.VISIBLE);
             mBind.llClientKey.setVisibility(View.VISIBLE);
             mBind.llClientCert.setVisibility(View.VISIBLE);
@@ -113,16 +119,17 @@ public class SSLDeviceFragment extends Fragment {
             selected = value;
             mBind.tvCertification.setText(values[selected]);
             if (selected == 0) {
-                mConnectMode = 1;
-                mBind.llCa.setVisibility(View.GONE);
-                mBind.llClientKey.setVisibility(View.GONE);
-                mBind.llClientCert.setVisibility(View.GONE);
-            } else if (selected == 1) {
+//                mConnectMode = 1;
+//                mBind.llCa.setVisibility(View.GONE);
+//                mBind.llClientKey.setVisibility(View.GONE);
+//                mBind.llClientCert.setVisibility(View.GONE);
+//            } else
+//                if (selected == 1) {
                 mConnectMode = 2;
                 mBind.llCa.setVisibility(View.VISIBLE);
                 mBind.llClientKey.setVisibility(View.GONE);
                 mBind.llClientCert.setVisibility(View.GONE);
-            } else if (selected == 2) {
+            } else if (selected == 1) {
                 mConnectMode = 3;
                 mBind.llCa.setVisibility(View.VISIBLE);
                 mBind.llClientKey.setVisibility(View.VISIBLE);

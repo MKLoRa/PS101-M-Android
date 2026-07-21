@@ -193,9 +193,7 @@ public class NetworkSettingsActivity extends BaseActivity implements RadioGroup.
                         return;
                     }
                     int flag = value[1] & 0xFF;// read or write
-                    if (flag == 1) {
-                        mSavedParamsError = true;
-                    }
+                    mSavedParamsError |= flag == 1;
                 }
             }
             if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
@@ -219,9 +217,7 @@ public class NetworkSettingsActivity extends BaseActivity implements RadioGroup.
                                     case KEY_MQTT_CA:
                                     case KEY_MQTT_CLIENT_CERT:
                                     case KEY_MQTT_CLIENT_KEY:
-                                        if (result != 1) {
-                                            mSavedParamsError = true;
-                                        }
+                                        mSavedParamsError |= result != 1;
                                         break;
                                 }
                             }
@@ -263,14 +259,10 @@ public class NetworkSettingsActivity extends BaseActivity implements RadioGroup.
                                     case KEY_MQTT_LWT_RETAIN:
                                     case KEY_MQTT_LWT_QOS:
                                     case KEY_MQTT_LWT_TOPIC:
-                                        if (result != 1) {
-                                            mSavedParamsError = true;
-                                        }
+                                        mSavedParamsError |= result != 1;
                                         break;
                                     case KEY_MQTT_LWT_PAYLOAD:
-                                        if (result != 1) {
-                                            mSavedParamsError = true;
-                                        }
+                                        mSavedParamsError |= result != 1;
                                         if (mSavedParamsError) {
                                             ToastUtils.showToast(this, "Setup failed！");
                                         } else {
