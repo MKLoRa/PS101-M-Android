@@ -6,13 +6,13 @@ if (!isLibrary.toBoolean()) {
 
 android {
     namespace 'com.moko.ps101m'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         minSdk 28
-        targetSdk 35
-        versionCode 109
-        versionName "1.0.9"
+        targetSdk 36
+        versionCode 110
+        versionName "1.1.0"
         multiDexEnabled true
 
         def formatDate = new Date().format("yyyyMMddHHmm")

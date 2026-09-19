@@ -320,12 +320,8 @@ public class ExportDataActivity extends BaseActivity {
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            back();
-            return false;
-        }
-        return super.onKeyDown(keyCode, event);
+    public void onBackPressed() {
+        back();
     }
 
     public void onStart(View view) {
